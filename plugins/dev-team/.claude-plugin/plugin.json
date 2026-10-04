@@ -1,0 +1,9 @@
+{
+  "name": "dev-team",
+  "version": "0.1.0",
+  "description": "The shared core dev team: architect, owner, mechanic, gate-runner, fix-owner, reviewer, spec-auditor, critic, security-reviewer and scribe. Each app keeps its own memory, specs, gate and specialists.",
+  "author": {
+    "name": "Jase"
+  },
+  "keywords": ["dev-team", "build-loop", "review", "gauntlet"]
+}

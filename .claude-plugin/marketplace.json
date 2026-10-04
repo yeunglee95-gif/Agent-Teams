@@ -1,0 +1,14 @@
+{
+  "name": "agent-teams",
+  "description": "Jase's agent teams, one Claude Code plugin per team.",
+  "owner": {
+    "name": "Jase"
+  },
+  "plugins": [
+    {
+      "name": "dev-team",
+      "source": "./plugins/dev-team",
+      "description": "The shared core dev team: ten roles that build, gate, review and record any app, reading the app's own CLAUDE.md for its specifics."
+    }
+  ]
+}
