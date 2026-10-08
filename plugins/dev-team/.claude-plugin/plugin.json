@@ -1,9 +1,15 @@
 {
   "name": "dev-team",
-  "version": "0.1.0",
-  "description": "The shared core dev team: architect, owner, mechanic, gate-runner, fix-owner, reviewer, spec-auditor, critic, security-reviewer and scribe. Each app keeps its own memory, specs, gate and specialists.",
+  "version": "0.2.0",
+  "description": "The shared core dev team: architect, owner, fixer, gate-runner, reviewer, spec-auditor, critic, security-reviewer, scribe and repo-auditor, with eleven skills they load. Each app keeps its own memory, specs, gate and specialists.",
   "author": {
     "name": "Jase"
   },
-  "keywords": ["dev-team", "build-loop", "review", "gauntlet"]
+  "keywords": [
+    "dev-team",
+    "build-loop",
+    "review",
+    "gauntlet",
+    "repo-audit"
+  ]
 }
