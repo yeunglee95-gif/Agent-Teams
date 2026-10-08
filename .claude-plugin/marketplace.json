@@ -8,7 +8,7 @@
     {
       "name": "dev-team",
       "source": "./plugins/dev-team",
-      "description": "The shared core dev team: ten roles that build, gate, review and record any app, reading the app's own CLAUDE.md for its specifics."
+      "description": "The shared core dev team: ten roles and eleven skills that build, gate, review, audit and record any app, reading the app's own CLAUDE.md for its specifics."
     }
   ]
 }

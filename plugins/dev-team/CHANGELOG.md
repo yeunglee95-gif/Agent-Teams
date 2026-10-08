@@ -1,5 +1,16 @@
 # dev-team changelog
 
+## 0.2.0 (2026-10-08)
+
+Ten roles and eleven skills. The roles stay short and say who does what; the skills say how, and each role preloads only the ones it needs. Skills were adapted from published sources, with each source, commit, license and change recorded (`THIRD_PARTY.md`, `licenses/`).
+
+- Roles: mechanic merged into fix-owner, renamed `fixer`, which keeps both modes (a findings pass, or one bounded fix from a precise brief). New `repo-auditor`, read-only, for code the team did not build. The reviewer now also reviews the architect's plans and the repo-auditor's consolidation plans before anyone builds.
+- Skills: verify-before-done, tests-first, root-cause-debugging, weigh-review-findings, hidden-failure-check, no-quiet-lowering, architecture-critique, repo-audit, decision-record, release-checklist, claude-md-upkeep.
+- The critic preloads only verify-before-done, with the screen as its evidence, and is told to ignore any rule that says to explore the project files first.
+- Not taken, because they break the team's rules: skills that merge, push or deploy on their own; reviewers that fix code; loops that give up on a red after one retry; whole plugins whose startup hooks make every session read the code first.
+- Models: `opus` for fixer and repo-auditor; the rest unchanged. A lead may run the fixer on `sonnet` for a bounded fix.
+- Checked on Claude Code 2.1.294: skills listed by plain name preload in both layouts. The repo-auditor loaded its three from a copied `.claude/` layout, and `dev-team:reviewer` loaded its four from the plugin, per the `--debug` log ("Preloaded skill ..."). A skipped skill is logged there too.
+
 ## 0.1.0 (2026-10-04)
 
 First release. The ten roles come from OS Flow's `.claude/agents/` (os-flow commit 65722fdd, the M3b pilot team), made app-neutral.
