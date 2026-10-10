@@ -34,7 +34,7 @@ On a change that touches auth, money, data loss or security, have a read-only su
 4. **Rank.** High: a spec row with no test at any level, or any gap in access, money, security or data loss. Medium: a partly covered branch, a change no test catches, a missing loading, empty or error state. Low: cosmetic, copy, logging.
 5. **Prove the new tests.** A new test that passed on its first run has not been seen to fail. Break the line it guards in a scratch worktree, see the test red, restore the line, see it green. The broken line never reaches a commit, and nobody who checks this way edits the app's real code.
 
-High gaps block: the stage does not pass while one is open. Each goes to the fixer as a finding with the exact value, the expected result, the level and the target file. Medium and Low are listed and never block on their own.
+High gaps block: the stage does not pass while one is open. Each goes to the fixer as a finding, labeled like any other (Verification miss, or Gap when the behavior itself is missing), with the exact value, the expected result, the level and the target file. Medium and Low are listed and never block on their own.
 
 ## Report each finding
 
@@ -45,7 +45,7 @@ Every finding carries:
 - **Severity:** blocker (silent failure, a fallback that lies, a High gap), major (an untested rule or path a person depends on, a misleading message), minor (missing context, a smell, over-engineering).
 - Path and line, what could be hidden or missed, what the person would experience, and a suggested test title.
 
-A hypothesis or claim you checked and found true is not a finding: list it as "holds", with the `path:line` or command that showed it, so the next round does not argue it again.
+Every item you report as a problem is a finding with all of the above, including test gaps and broken `CLAUDE.md` rules. A hypothesis or claim you checked and found true is not a finding: list it as "holds", with the `path:line` or command that showed it, so the next round does not argue it again.
 
 ## Source
 
