@@ -1,0 +1,399 @@
+<title>OS Flow Team Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Capsule (OS Flow reference copy of Claude OS DESIGN.md). One dark capsule bar, then the
+   room as the page's one picture (rest area, skill shelf, work floor), then plain rows split by hairlines. */
+:root {
+  --paper: #ffffff; --panel: #ffffff; --panel-2: #f4f4f5; --ink: #18181b; --ink-2: #52525b; --ink-3: #6b6b74;
+  --line: #e4e4e7; --line-2: #d4d4d8; --capsule: #18181b; --capsule-ink: #ffffff;
+  --coral: #fc5f2b; --coral-ink: #c2410c; --coral-wash: #fff1ec;
+  --cobalt: #2e62c9; --cobalt-wash: #e8effd; --green: #137045; --green-wash: #e3f5ec;
+  --later: #e4e4e7; --park: #a1a1aa; --on-state: #ffffff; --on-coral: #18181b;
+  --floor: #fafafa; --wood: #e9e4dc; --sofa: #d9dde6;
+  --font: "Inter Tight", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000; --capsule-ink: #ffffff;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113;
+  --floor: #151517; --wood: #2b2824; --sofa: #262a33; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000; --capsule-ink: #ffffff;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113;
+  --floor: #151517; --wood: #2b2824; --sofa: #262a33; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 400 14.5px/1.45 var(--font); letter-spacing: -0.005em; font-feature-settings: "tnum"; }
+.frame { max-width: 1180px; margin: 0 auto; padding-inline: 22px; padding-block: 14px 48px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--coral-ink); outline-offset: 2px; }
+
+/* Capsule bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; container-type: inline-size; background: var(--capsule); color: var(--capsule-ink); border-radius: 15px; padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+.mark { font: 700 15px var(--font); letter-spacing: -0.01em; }
+.mark i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--coral); margin-left: 2px; }
+.bar nav { display: flex; gap: 16px; font-size: 13.5px; }
+.bar nav a { color: rgb(255 255 255 / .62); text-decoration: none; padding-block: 4px; }
+.bar nav a[aria-current] { color: #fff; box-shadow: inset 0 -2px 0 var(--coral); }
+.bar .sp { flex: 1; }
+.btn { border-radius: 9999px; padding: 8px 16px; font: 700 13.5px var(--font); border: 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; transition: transform 160ms var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--coral); color: var(--on-coral); }
+.btn.primary .ar { width: 18px; height: 18px; border-radius: 50%; background: var(--on-coral); color: var(--coral); display: grid; place-items: center; font-size: 11px; }
+.btn.quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink); }
+.bar .btn.quiet { color: #fff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); }
+@container (max-width: 720px) { .bar nav { display: none; } }
+@container (max-width: 520px) { .bar .demo { display: none; } }
+
+/* Head */
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; margin: 26px 0 14px; }
+h1 { font: 400 44px/1 var(--font); letter-spacing: -0.025em; margin: 0; }
+h1 i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral); margin-left: 4px; }
+.meta { color: var(--ink-3); font-size: 13px; margin: 8px 0 0; }
+.counts { display: flex; gap: 14px; flex-wrap: wrap; font: 600 12.5px var(--font); }
+.counts span { display: inline-flex; gap: 6px; align-items: center; }
+.example { font: 600 12.5px var(--font); background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; }
+
+/* State marks (shared core) */
+.sm { width: 14px; height: 14px; border-radius: 2.5px; display: inline-grid; place-items: center; flex: none; position: relative; }
+.sm.ask { background: var(--coral); } .sm.ask::after { content: ""; width: 4px; height: 4px; background: var(--on-coral); }
+.sm.run { background: var(--cobalt); } .sm.run::after { content: ""; width: 6px; height: 2px; background: var(--on-state); border-radius: 1px; }
+.sm.done { background: var(--green); } .sm.done::after { content: ""; width: 6px; height: 3px; border-left: 2px solid var(--on-state); border-bottom: 2px solid var(--on-state); transform: rotate(-45deg) translate(1px, -1px); }
+.sm.later { background: var(--later); } .sm.later::after { content: ""; width: 6px; height: 2px; background: var(--ink-3); }
+.pill { display: inline-flex; gap: 6px; align-items: center; border-radius: 9999px; padding: 2px 9px 2px 6px; font: 600 12.5px var(--font); }
+.pill.ask { background: var(--coral-wash); color: var(--coral-ink); }
+.pill.run { background: var(--cobalt-wash); color: var(--cobalt); }
+.pill.later { background: var(--panel-2); color: var(--ink-2); }
+.chip { background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; font: 400 12px var(--font); white-space: nowrap; }
+.chip b { color: var(--ink); font-weight: 600; }
+
+/* The room */
+.room { border-radius: 15px; box-shadow: inset 0 0 0 1px var(--line), 0 2px 2px rgb(0 0 0 / .05); background: var(--floor); overflow: hidden; }
+.room .scroll { overflow-x: auto; }
+.room svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.room .cap { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; background: var(--panel); }
+.zone { font: 600 12.5px var(--font); fill: var(--ink-3); }
+.wall { fill: var(--panel-2); } .floorc { fill: var(--floor); } .wood { fill: var(--wood); } .sofa { fill: var(--sofa); }
+.ln { stroke: var(--line-2); stroke-width: 1; fill: none; }
+.desk { fill: var(--panel); stroke: var(--line-2); }
+.cup .body { fill: var(--panel); stroke: var(--ink-2); stroke-width: 1.2; }
+.cup .hd { fill: none; stroke: var(--ink-2); stroke-width: 1.2; }
+.cup text { font: 500 7.5px var(--mono); fill: var(--ink-2); text-anchor: middle; }
+.cup.pick .body { stroke: var(--cobalt); stroke-width: 2; }
+.cup.lit .body { stroke: var(--ink); stroke-width: 2; }
+.agent { cursor: pointer; }
+.agent .head { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.agent .torso { fill: var(--ink-2); }
+.agent text.ini { font: 700 9px var(--font); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.agent text.nm { font: 600 10px var(--font); fill: var(--ink-2); text-anchor: middle; }
+.agent .ring { fill: none; stroke-width: 2.5; stroke: transparent; }
+.agent.run .ring { stroke: var(--cobalt); } .agent.ask .ring { stroke: var(--coral); }
+.agent.rest { opacity: .78; }
+.agent.sel .head { stroke-width: 2.5; }
+.agent .tray .tc { fill: var(--panel); stroke: var(--cobalt); stroke-width: 1; }
+.badge rect { rx: 2.5; } .badge.run rect { fill: var(--cobalt); } .badge.ask rect { fill: var(--coral); } .badge.rest rect { fill: var(--later); }
+.badge.run .g { fill: var(--on-state); } .badge.ask .g { fill: var(--on-coral); } .badge.rest .g { fill: var(--ink-3); }
+.flying { pointer-events: none; }
+
+/* Sections and rows */
+.cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; margin-top: 26px; }
+h2 { font: 400 22px/1.2 var(--font); letter-spacing: -0.015em; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+h2 small { font: 400 13px var(--font); color: var(--ink-3); }
+.rows { border-top: 1px solid var(--line); }
+.row { border-bottom: 1px solid var(--line); padding: 10px 8px; display: grid; gap: 4px; border-radius: 0; }
+.row:hover { background: var(--panel-2); border-radius: 12px; }
+.row .l1 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row .t { font: 600 15px var(--font); letter-spacing: -0.01em; }
+.row .now { color: var(--ink-2); }
+.row .sk { display: flex; flex-wrap: wrap; gap: 4px; }
+.row .act { margin-left: auto; }
+.row .act .btn { padding: 4px 12px; font-size: 12.5px; }
+.row.idle .t, .row.idle .now { color: var(--ink-3); }
+.row.sel { background: var(--panel-2); border-radius: 12px; }
+.mono { font: 400 12px var(--mono); color: var(--ink-3); }
+.sh { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; }
+.sh .who { font-size: 12.5px; color: var(--ink-3); }
+.notice { background: var(--panel-2); border-radius: 10px; padding: 10px 14px; color: var(--ink-2); font-size: 13.5px; margin-top: 26px; }
+@media (max-width: 760px) { h1 { font-size: 34px; } .cols { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { h1 { font-size: 30px; } }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; } }
+</style>
+
+<div class="frame">
+  <header class="bar">
+    <span class="mark">OS Flow<i></i></span>
+    <nav aria-label="Main"><a href="#canvas">Canvas</a><a href="#forge">Forge</a><a href="#teamroom" aria-current="page">Team room</a></nav>
+    <span class="sp"></span>
+    <button class="btn quiet demo" id="demo" type="button">Play an example milestone</button>
+    <button class="btn primary" id="askbtn" type="button">Answer the reviewer <span class="ar">→</span></button>
+  </header>
+
+  <div class="head">
+    <div>
+      <h1 id="title">Dev team<i></i></h1>
+      <p class="meta" id="meta"></p>
+    </div>
+    <div class="counts" id="counts"></div>
+  </div>
+
+  <section class="room" aria-label="The team room">
+    <div class="scroll"><svg id="scene" viewBox="0 0 960 470" role="img" aria-labelledby="scene-desc"><desc id="scene-desc">The team room. Resting agents sit on the left, the skill shelf is on the back wall, and the work floor is on the right. The rows below say the same thing in words.</desc></svg></div>
+    <div class="cap"><span class="example">Example states, no real runs yet</span><span>Roles and skills are read from the team repo at <span class="mono" id="commit"></span>.</span><span>Pick an agent or a cup to see who carries what.</span></div>
+  </section>
+
+  <div class="cols">
+    <section aria-labelledby="h-desks">
+      <h2 id="h-desks">On the roster <small id="rcount"></small></h2>
+      <div class="rows" id="desks"></div>
+    </section>
+    <section aria-labelledby="h-shelf">
+      <h2 id="h-shelf">Skill shelf <small id="scount"></small></h2>
+      <div class="rows" id="shelf"></div>
+    </section>
+  </div>
+  <p class="notice">Your own desk is not in this room: anything waiting on you shows in Needs you. Agents never pick up a skill that is not on the shelf; new skills reach the shelf only after you approve them.</p>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const NS = "http://www.w3.org/2000/svg";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const ABBR = { architect: "Ar", owner: "Ow", fixer: "Fx", "gate-runner": "Ga", reviewer: "Rv", "spec-auditor": "Sp", critic: "Cr", "security-reviewer": "Se", scribe: "Sc", "repo-auditor": "Au" };
+const SHORT = { "security-reviewer": "security", "spec-auditor": "spec audit", "repo-auditor": "repo audit", "gate-runner": "gate" };
+const abbr = id => ABBR[id] || id.slice(0, 2);
+const skAbbr = id => id.split("-").map(w => w[0]).join("").slice(0, 3);
+const MODEL = m => ({ opus: "Opus", sonnet: "Sonnet", haiku: "Haiku", fable: "Fable" }[m] || m);
+const roles = D.roles, skills = D.skills;
+const skillIdx = Object.fromEntries(skills.map((s, i) => [s.id, i]));
+const roleById = Object.fromEntries(roles.map(r => [r.id, r]));
+
+// Example state: what a milestone looks like mid-way. Not real runs.
+const NOW = {
+  architect: ["run", "Slicing the cold email plan into lanes"],
+  owner: ["run", "Lane B: Kickstarter finder, red tests first"],
+  reviewer: ["ask", "Waiting on your go for lane A"],
+};
+const state = Object.fromEntries(roles.map(r => [r.id, { s: NOW[r.id]?.[0] || "rest", doing: NOW[r.id]?.[1] || "Resting", busy: false }]));
+let sel = null;
+
+// Geometry
+const seats = [[60, 232], [130, 232], [200, 232], [60, 330], [130, 330], [200, 330], [60, 428], [130, 428], [200, 428], [300, 330]];
+const desks = [[660, 232], [750, 232], [840, 232], [920, 232], [660, 330], [750, 330], [840, 330], [920, 330], [660, 428], [750, 428], [840, 428], [920, 428]];
+const shelfX0 = 430, shelfX1 = 560, shelfY = [70, 110];
+const perRow = Math.ceil(skills.length / 2);
+const cupPos = skills.map((s, i) => { const r = i < perRow ? 0 : 1, c = r ? i - perRow : i; const n = r ? skills.length - perRow : perRow; return [shelfX0 + (shelfX1 - shelfX0) * (n > 1 ? c / (n - 1) : .5), shelfY[r]]; });
+const door = [590, 330], shelfFront = [495, 182];
+const home = {}, deskOf = {};
+roles.forEach((r, i) => { home[r.id] = seats[i % seats.length]; deskOf[r.id] = desks[i % desks.length]; });
+
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+const svg = $("#scene");
+
+function drawRoom() {
+  // back wall and floor
+  el("rect", { x: 0, y: 0, width: 960, height: 140, class: "wall" }, svg);
+  el("line", { x1: 0, y1: 140, x2: 960, y2: 140, class: "ln" }, svg);
+  el("line", { x1: 590, y1: 140, x2: 590, y2: 292, class: "ln" }, svg);
+  el("line", { x1: 590, y1: 368, x2: 590, y2: 470, class: "ln" }, svg);
+  el("path", { d: "M590 292 A38 38 0 0 1 628 330", class: "ln", "stroke-dasharray": "3 3" }, svg);
+  // zone labels
+  [["Resting", 24, 168], ["Skill shelf", 430, 26], ["Work floor", 612, 168]].forEach(([t, x, y]) => { const e = el("text", { x, y, class: "zone" }, svg); e.textContent = t; });
+  // lounge: two sofas, a table, a plant, a tea counter
+  [232, 330, 428].forEach(y => el("rect", { x: 30, y: y - 10, width: 200, height: 26, rx: 10, class: "sofa" }, svg));
+  el("rect", { x: 274, y: 320, width: 52, height: 26, rx: 10, class: "sofa" }, svg);
+  el("circle", { cx: 300, cy: 236, r: 16, class: "wood" }, svg);
+  el("circle", { cx: 300, cy: 430, r: 11, class: "sofa" }, svg);
+  // tea counter on the back wall, left
+  el("rect", { x: 30, y: 96, width: 150, height: 30, rx: 6, class: "wood" }, svg);
+  const tk = el("text", { x: 40, y: 88, class: "zone" }, svg); tk.textContent = "Tea counter";
+  // shelf planks
+  el("rect", { x: shelfX0 - 22, y: shelfY[0] + 13, width: shelfX1 - shelfX0 + 44, height: 4, rx: 2, class: "wood" }, svg);
+  el("rect", { x: shelfX0 - 22, y: shelfY[1] + 13, width: shelfX1 - shelfX0 + 44, height: 4, rx: 2, class: "wood" }, svg);
+  // desks
+  desks.forEach(([x, y]) => el("rect", { x: x - 36, y: y + 4, width: 72, height: 14, rx: 4, class: "desk" }, svg));
+  // cups
+  skills.forEach((s, i) => {
+    const [x, y] = cupPos[i];
+    const g = el("g", { class: "cup", transform: `translate(${x},${y})`, tabindex: 0, "data-skill": s.id, role: "button", "aria-label": `Skill ${s.id}` }, svg);
+    cupShape(g); const t = el("text", { x: 0, y: 26 }, g); t.textContent = skAbbr(s.id);
+    el("title", {}, g).textContent = s.id;
+  });
+}
+function cupShape(g, small) {
+  const k = small ? .55 : 1;
+  el("path", { class: "body", d: `M${-6 * k} ${-8 * k} h${12 * k} l${-1.5 * k} ${14 * k} h${-9 * k} z` }, g);
+  el("path", { class: "hd", d: `M${6 * k} ${-5 * k} q${5 * k} ${1 * k} ${-0.5 * k} ${7 * k}` }, g);
+}
+
+const agents = {};
+function drawAgents() {
+  roles.forEach(r => {
+    const st = state[r.id];
+    const [x, y] = st.s === "rest" ? home[r.id] : [deskOf[r.id][0], deskOf[r.id][1]];
+    const g = el("g", { class: `agent ${st.s}`, tabindex: 0, role: "button", "data-role": r.id, "aria-label": `${r.id}, ${label(st.s)}` }, svg);
+    g.dataset.x = x; g.dataset.y = y; g.setAttribute("transform", `translate(${x},${y})`);
+    const bob = el("g", { class: "bob" }, g);
+    el("rect", { x: -10, y: -4, width: 20, height: 22, rx: 9, class: "torso" }, bob);
+    el("circle", { cx: 0, cy: -16, r: 15, class: "ring" }, bob);
+    el("circle", { cx: 0, cy: -16, r: 11, class: "head" }, bob);
+    el("text", { x: 0, y: -16, class: "ini" }, bob).textContent = abbr(r.id);
+    el("text", { x: 0, y: 32, class: "nm" }, g).textContent = SHORT[r.id] || r.id;
+    const b = el("g", { class: `badge ${st.s}`, transform: "translate(9,-36)" }, bob);
+    el("rect", { width: 11, height: 11, rx: 2.5 }, b);
+    el("rect", { class: "g", x: st.s === "ask" ? 4 : 3, y: st.s === "ask" ? 4 : 4.5, width: st.s === "ask" ? 3 : 5, height: st.s === "ask" ? 3 : 2 }, b);
+    el("g", { class: "tray", transform: "translate(0,-46)" }, bob);
+    el("title", {}, g).textContent = `${r.id}: ${st.doing}`;
+    agents[r.id] = g;
+    if (st.s !== "rest") fillTray(r.id, r.skills.length);
+  });
+}
+function fillTray(id, n) {
+  const tray = agents[id].querySelector(".tray"); tray.innerHTML = "";
+  const w = 9; for (let i = 0; i < n; i++) { const c = el("g", { transform: `translate(${(i - (n - 1) / 2) * w},0)` }, tray); el("path", { class: "tc", d: "M-3.5 -4 h7 l-1 8 h-5 z" }, c); }
+}
+function setBadge(id) {
+  const s = state[id].s, g = agents[id];
+  g.setAttribute("class", `agent ${s}${sel === id ? " sel" : ""}`);
+  const b = g.querySelector(".badge"); b.setAttribute("class", `badge ${s}`);
+  const gl = b.querySelector(".g");
+  gl.setAttribute("x", s === "ask" ? 4 : 3); gl.setAttribute("y", s === "ask" ? 4 : 4.5); gl.setAttribute("width", s === "ask" ? 3 : 5); gl.setAttribute("height", s === "ask" ? 3 : 2);
+  g.setAttribute("aria-label", `${id}, ${label(s)}`); g.querySelector("title").textContent = `${id}: ${state[id].doing}`;
+}
+const label = s => ({ rest: "resting", run: "at work", ask: "needs you" }[s]);
+
+// Motion
+function tween(dur, step) {
+  return new Promise(res => {
+    if (reduce || dur <= 0) { step(1); return res(); }
+    const t0 = performance.now();
+    const f = now => { const k = Math.min(1, (now - t0) / dur); step(k); k < 1 ? requestAnimationFrame(f) : res(); };
+    requestAnimationFrame(f);
+  });
+}
+const ease = k => 1 - Math.pow(1 - k, 3);
+async function walk(id, pts) {
+  const g = agents[id], bob = g.querySelector(".bob");
+  for (const [x, y] of pts) {
+    const x0 = +g.dataset.x, y0 = +g.dataset.y, d = Math.hypot(x - x0, y - y0);
+    await tween(d / 0.24, k => {
+      const e = k; const cx = x0 + (x - x0) * e, cy = y0 + (y - y0) * e;
+      g.setAttribute("transform", `translate(${cx},${cy})`);
+      bob.setAttribute("transform", `translate(0,${reduce ? 0 : -Math.abs(Math.sin(k * d / 9)) * 2.2})`);
+    });
+    g.dataset.x = x; g.dataset.y = y;
+  }
+  bob.removeAttribute("transform");
+}
+async function pickCups(id) {
+  const list = roleById[id].skills.filter(s => s in skillIdx);
+  let n = 0;
+  for (const s of list) {
+    const cupEl = svg.querySelector(`.cup[data-skill="${CSS.escape(s)}"]`); cupEl.classList.add("pick");
+    const [cx, cy] = cupPos[skillIdx[s]];
+    const fly = el("g", { class: "cup flying" }, svg); cupShape(fly, true);
+    const g = agents[id], ax = +g.dataset.x, ay = +g.dataset.y - 46;
+    await tween(240, k => { const e = ease(k); fly.setAttribute("transform", `translate(${cx + (ax - cx) * e},${cy + (ay - cy) * e - Math.sin(k * Math.PI) * 18})`); });
+    fly.remove(); cupEl.classList.remove("pick"); fillTray(id, ++n);
+  }
+}
+async function returnCups(id) {
+  const list = roleById[id].skills.filter(s => s in skillIdx); let n = list.length;
+  for (const s of list) {
+    const [cx, cy] = cupPos[skillIdx[s]]; const g = agents[id], ax = +g.dataset.x, ay = +g.dataset.y - 46;
+    fillTray(id, --n);
+    const fly = el("g", { class: "cup flying" }, svg); cupShape(fly, true);
+    await tween(200, k => { const e = ease(k); fly.setAttribute("transform", `translate(${ax + (cx - ax) * e},${ay + (cy - ay) * e - Math.sin(k * Math.PI) * 14})`); });
+    fly.remove();
+  }
+}
+async function goToWork(id, doing) {
+  const st = state[id]; if (st.busy || st.s !== "rest") return;
+  st.busy = true; st.doing = "Picking up skills"; rows();
+  await walk(id, [shelfFront]);
+  await pickCups(id);
+  st.doing = "Heading to the work floor"; rows();
+  await walk(id, [door, deskOf[id]]);
+  st.s = "run"; st.doing = doing || "Working on the milestone"; st.busy = false; setBadge(id); rows();
+}
+async function goToRest(id) {
+  const st = state[id]; if (st.busy || st.s === "rest") return;
+  st.busy = true; st.s = "run"; st.doing = "Putting skills back"; setBadge(id); rows();
+  await walk(id, [door, shelfFront]);
+  await returnCups(id);
+  await walk(id, [home[id]]);
+  st.s = "rest"; st.doing = "Resting"; st.busy = false; setBadge(id); rows();
+}
+
+// Rows
+function rows() {
+  const order = [...roles].sort((a, b) => rank(a.id) - rank(b.id));
+  const counts = { ask: 0, run: 0, rest: 0 }; roles.forEach(r => counts[state[r.id].s]++);
+  $("#counts").innerHTML = `<span><i class="sm ask"></i>${counts.ask} needs you</span><span><i class="sm run"></i>${counts.run} at work</span><span><i class="sm later"></i>${counts.rest} resting</span>`;
+  $("#rcount").textContent = `${roles.length} roles`;
+  $("#desks").innerHTML = order.map(r => {
+    const st = state[r.id], idle = st.s === "rest" && !st.busy;
+    const pill = st.s === "ask" ? `<span class="pill ask"><i class="sm ask"></i>Needs you</span>` : st.s === "run" || st.busy ? `<span class="pill run"><i class="sm run"></i>At work</span>` : `<span class="pill later"><i class="sm later"></i>Resting</span>`;
+    const act = st.busy ? "" : st.s === "rest" ? `<button class="btn quiet" data-go="${esc(r.id)}">Send to work</button>` : `<button class="btn quiet" data-back="${esc(r.id)}">Call back</button>`;
+    return `<div class="row${idle ? " idle" : ""}${sel === r.id ? " sel" : ""}" data-row="${esc(r.id)}"><div class="l1">${pill}<span class="t">${esc(cap(r.id))}</span><span class="chip"><b>${esc(MODEL(r.model))}</b> ${esc(r.id)}</span><span class="act">${act}</span></div>
+      <div class="now">${esc(st.doing)}</div><div class="sk">${r.skills.map(s => `<span class="chip" data-cup="${esc(s)}">${esc(s)}</span>`).join("")}</div></div>`;
+  }).join("");
+  $("#scount").textContent = `${skills.length} skills, ${D.rejected.length} turned down`;
+  $("#shelf").innerHTML = skills.map(s => {
+    const src = s.sources.length ? s.sources.map(x => x.repo.split("/")[0]).join(", ") : "own";
+    const lic = [...new Set(s.sources.map(x => x.license.split(",")[0].replace("Apache License 2.0", "Apache 2.0")))].join(", ");
+    const commits = [...new Set(s.sources.map(x => x.commit.slice(0, 7)))].join(", ");
+    const carriers = roles.filter(r => r.skills.includes(s.id) && state[r.id].s !== "rest").length;
+    return `<div class="row sh" data-skill-row="${esc(s.id)}"><span class="t" style="font-size:14.5px">${esc(s.id)}</span><span class="who">${carriers ? `${carriers} out` : "on shelf"}</span>
+      <span class="who">from ${esc(src)} · ${esc(lic || "own")}${commits ? ` · <span class="mono">${esc(commits)}</span>` : ""}</span><span class="who">${s.usedBy.length} role${s.usedBy.length === 1 ? "" : "s"}</span></div>`;
+  }).join("");
+}
+const rank = id => ({ ask: 0, run: 1, rest: 2 }[state[id].s]) * 100 + roles.findIndex(r => r.id === id);
+
+function select(id) {
+  sel = sel === id ? null : id;
+  roles.forEach(r => setBadge(r.id));
+  svg.querySelectorAll(".cup").forEach(c => c.classList.toggle("lit", !!sel && roleById[sel].skills.includes(c.dataset.skill)));
+  rows();
+}
+function selectCup(sk) {
+  sel = null; roles.forEach(r => setBadge(r.id));
+  svg.querySelectorAll(".cup").forEach(c => c.classList.toggle("lit", c.dataset.skill === sk));
+  roles.forEach(r => { if (r.skills.includes(sk)) agents[r.id].classList.add("sel"); });
+}
+
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]"), back = e.target.closest("[data-back]");
+  if (go) return goToWork(go.dataset.go);
+  if (back) return goToRest(back.dataset.back);
+  const a = e.target.closest(".agent"); if (a) return select(a.dataset.role);
+  const c = e.target.closest(".cup[data-skill]") || e.target.closest("[data-cup]"); if (c) return selectCup(c.dataset.skill || c.dataset.cup);
+  const r = e.target.closest("[data-row]"); if (r) return select(r.dataset.row);
+});
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches(".agent, .cup")) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); } });
+$("#askbtn").addEventListener("click", async () => {
+  if (state.reviewer?.s !== "ask") return;
+  state.reviewer.s = "run"; state.reviewer.doing = "Go received: re-verifying lane A on the merged head"; setBadge("reviewer"); rows();
+  $("#askbtn").hidden = true;
+});
+$("#demo").addEventListener("click", async () => {
+  const plan = [["spec-auditor", "Test-gap table for lane B"], ["gate-runner", "Full gate on lane B"], ["critic", "Black-box pass as a first-time buyer"]];
+  for (const [id, d] of plan) if (roleById[id]) { await goToWork(id, d); }
+  if (roleById.architect && state.architect.s === "run") await goToRest("architect");
+});
+
+// Header
+$("#title").innerHTML = `${esc(cap(D.team.name.replace("-team", "")))} team<i></i>`;
+$("#meta").textContent = `${roles.length} roles, ${skills.length} skills, version ${D.team.version}. Shared by every business; each business brings its own knowledge.`;
+$("#commit").textContent = `${D.team.ref} ${D.team.commit.slice(0, 8)}`;
+drawRoom(); drawAgents(); rows();
+</script>

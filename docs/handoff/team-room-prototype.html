@@ -1,0 +1,399 @@
+<title>OS Flow Team Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Capsule (OS Flow reference copy of Claude OS DESIGN.md). One dark capsule bar, then the
+   room as the page's one picture (rest area, skill shelf, work floor), then plain rows split by hairlines. */
+:root {
+  --paper: #ffffff; --panel: #ffffff; --panel-2: #f4f4f5; --ink: #18181b; --ink-2: #52525b; --ink-3: #6b6b74;
+  --line: #e4e4e7; --line-2: #d4d4d8; --capsule: #18181b; --capsule-ink: #ffffff;
+  --coral: #fc5f2b; --coral-ink: #c2410c; --coral-wash: #fff1ec;
+  --cobalt: #2e62c9; --cobalt-wash: #e8effd; --green: #137045; --green-wash: #e3f5ec;
+  --later: #e4e4e7; --park: #a1a1aa; --on-state: #ffffff; --on-coral: #18181b;
+  --floor: #fafafa; --wood: #e9e4dc; --sofa: #d9dde6;
+  --font: "Inter Tight", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000; --capsule-ink: #ffffff;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113;
+  --floor: #151517; --wood: #2b2824; --sofa: #262a33; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000; --capsule-ink: #ffffff;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113;
+  --floor: #151517; --wood: #2b2824; --sofa: #262a33; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 400 14.5px/1.45 var(--font); letter-spacing: -0.005em; font-feature-settings: "tnum"; }
+.frame { max-width: 1180px; margin: 0 auto; padding-inline: 22px; padding-block: 14px 48px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--coral-ink); outline-offset: 2px; }
+
+/* Capsule bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; container-type: inline-size; background: var(--capsule); color: var(--capsule-ink); border-radius: 15px; padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+.mark { font: 700 15px var(--font); letter-spacing: -0.01em; }
+.mark i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--coral); margin-left: 2px; }
+.bar nav { display: flex; gap: 16px; font-size: 13.5px; }
+.bar nav a { color: rgb(255 255 255 / .62); text-decoration: none; padding-block: 4px; }
+.bar nav a[aria-current] { color: #fff; box-shadow: inset 0 -2px 0 var(--coral); }
+.bar .sp { flex: 1; }
+.btn { border-radius: 9999px; padding: 8px 16px; font: 700 13.5px var(--font); border: 0; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; transition: transform 160ms var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--coral); color: var(--on-coral); }
+.btn.primary .ar { width: 18px; height: 18px; border-radius: 50%; background: var(--on-coral); color: var(--coral); display: grid; place-items: center; font-size: 11px; }
+.btn.quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink); }
+.bar .btn.quiet { color: #fff; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3); }
+@container (max-width: 720px) { .bar nav { display: none; } }
+@container (max-width: 520px) { .bar .demo { display: none; } }
+
+/* Head */
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; margin: 26px 0 14px; }
+h1 { font: 400 44px/1 var(--font); letter-spacing: -0.025em; margin: 0; }
+h1 i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral); margin-left: 4px; }
+.meta { color: var(--ink-3); font-size: 13px; margin: 8px 0 0; }
+.counts { display: flex; gap: 14px; flex-wrap: wrap; font: 600 12.5px var(--font); }
+.counts span { display: inline-flex; gap: 6px; align-items: center; }
+.example { font: 600 12.5px var(--font); background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; }
+
+/* State marks (shared core) */
+.sm { width: 14px; height: 14px; border-radius: 2.5px; display: inline-grid; place-items: center; flex: none; position: relative; }
+.sm.ask { background: var(--coral); } .sm.ask::after { content: ""; width: 4px; height: 4px; background: var(--on-coral); }
+.sm.run { background: var(--cobalt); } .sm.run::after { content: ""; width: 6px; height: 2px; background: var(--on-state); border-radius: 1px; }
+.sm.done { background: var(--green); } .sm.done::after { content: ""; width: 6px; height: 3px; border-left: 2px solid var(--on-state); border-bottom: 2px solid var(--on-state); transform: rotate(-45deg) translate(1px, -1px); }
+.sm.later { background: var(--later); } .sm.later::after { content: ""; width: 6px; height: 2px; background: var(--ink-3); }
+.pill { display: inline-flex; gap: 6px; align-items: center; border-radius: 9999px; padding: 2px 9px 2px 6px; font: 600 12.5px var(--font); }
+.pill.ask { background: var(--coral-wash); color: var(--coral-ink); }
+.pill.run { background: var(--cobalt-wash); color: var(--cobalt); }
+.pill.later { background: var(--panel-2); color: var(--ink-2); }
+.chip { background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; font: 400 12px var(--font); white-space: nowrap; }
+.chip b { color: var(--ink); font-weight: 600; }
+
+/* The room */
+.room { border-radius: 15px; box-shadow: inset 0 0 0 1px var(--line), 0 2px 2px rgb(0 0 0 / .05); background: var(--floor); overflow: hidden; }
+.room .scroll { overflow-x: auto; }
+.room svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.room .cap { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; background: var(--panel); }
+.zone { font: 600 12.5px var(--font); fill: var(--ink-3); }
+.wall { fill: var(--panel-2); } .floorc { fill: var(--floor); } .wood { fill: var(--wood); } .sofa { fill: var(--sofa); }
+.ln { stroke: var(--line-2); stroke-width: 1; fill: none; }
+.desk { fill: var(--panel); stroke: var(--line-2); }
+.cup .body { fill: var(--panel); stroke: var(--ink-2); stroke-width: 1.2; }
+.cup .hd { fill: none; stroke: var(--ink-2); stroke-width: 1.2; }
+.cup text { font: 500 7.5px var(--mono); fill: var(--ink-2); text-anchor: middle; }
+.cup.pick .body { stroke: var(--cobalt); stroke-width: 2; }
+.cup.lit .body { stroke: var(--ink); stroke-width: 2; }
+.agent { cursor: pointer; }
+.agent .head { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+.agent .torso { fill: var(--ink-2); }
+.agent text.ini { font: 700 9px var(--font); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.agent text.nm { font: 600 10px var(--font); fill: var(--ink-2); text-anchor: middle; }
+.agent .ring { fill: none; stroke-width: 2.5; stroke: transparent; }
+.agent.run .ring { stroke: var(--cobalt); } .agent.ask .ring { stroke: var(--coral); }
+.agent.rest { opacity: .78; }
+.agent.sel .head { stroke-width: 2.5; }
+.agent .tray .tc { fill: var(--panel); stroke: var(--cobalt); stroke-width: 1; }
+.badge rect { rx: 2.5; } .badge.run rect { fill: var(--cobalt); } .badge.ask rect { fill: var(--coral); } .badge.rest rect { fill: var(--later); }
+.badge.run .g { fill: var(--on-state); } .badge.ask .g { fill: var(--on-coral); } .badge.rest .g { fill: var(--ink-3); }
+.flying { pointer-events: none; }
+
+/* Sections and rows */
+.cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; margin-top: 26px; }
+h2 { font: 400 22px/1.2 var(--font); letter-spacing: -0.015em; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: baseline; }
+h2 small { font: 400 13px var(--font); color: var(--ink-3); }
+.rows { border-top: 1px solid var(--line); }
+.row { border-bottom: 1px solid var(--line); padding: 10px 8px; display: grid; gap: 4px; border-radius: 0; }
+.row:hover { background: var(--panel-2); border-radius: 12px; }
+.row .l1 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row .t { font: 600 15px var(--font); letter-spacing: -0.01em; }
+.row .now { color: var(--ink-2); }
+.row .sk { display: flex; flex-wrap: wrap; gap: 4px; }
+.row .act { margin-left: auto; }
+.row .act .btn { padding: 4px 12px; font-size: 12.5px; }
+.row.idle .t, .row.idle .now { color: var(--ink-3); }
+.row.sel { background: var(--panel-2); border-radius: 12px; }
+.mono { font: 400 12px var(--mono); color: var(--ink-3); }
+.sh { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; }
+.sh .who { font-size: 12.5px; color: var(--ink-3); }
+.notice { background: var(--panel-2); border-radius: 10px; padding: 10px 14px; color: var(--ink-2); font-size: 13.5px; margin-top: 26px; }
+@media (max-width: 760px) { h1 { font-size: 34px; } .cols { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { h1 { font-size: 30px; } }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; } }
+</style>
+
+<div class="frame">
+  <header class="bar">
+    <span class="mark">OS Flow<i></i></span>
+    <nav aria-label="Main"><a href="#canvas">Canvas</a><a href="#forge">Forge</a><a href="#teamroom" aria-current="page">Team room</a></nav>
+    <span class="sp"></span>
+    <button class="btn quiet demo" id="demo" type="button">Play an example milestone</button>
+    <button class="btn primary" id="askbtn" type="button">Answer the reviewer <span class="ar">→</span></button>
+  </header>
+
+  <div class="head">
+    <div>
+      <h1 id="title">Dev team<i></i></h1>
+      <p class="meta" id="meta"></p>
+    </div>
+    <div class="counts" id="counts"></div>
+  </div>
+
+  <section class="room" aria-label="The team room">
+    <div class="scroll"><svg id="scene" viewBox="0 0 960 470" role="img" aria-labelledby="scene-desc"><desc id="scene-desc">The team room. Resting agents sit on the left, the skill shelf is on the back wall, and the work floor is on the right. The rows below say the same thing in words.</desc></svg></div>
+    <div class="cap"><span class="example">Example states, no real runs yet</span><span>Roles and skills are read from the team repo at <span class="mono" id="commit"></span>.</span><span>Pick an agent or a cup to see who carries what.</span></div>
+  </section>
+
+  <div class="cols">
+    <section aria-labelledby="h-desks">
+      <h2 id="h-desks">On the roster <small id="rcount"></small></h2>
+      <div class="rows" id="desks"></div>
+    </section>
+    <section aria-labelledby="h-shelf">
+      <h2 id="h-shelf">Skill shelf <small id="scount"></small></h2>
+      <div class="rows" id="shelf"></div>
+    </section>
+  </div>
+  <p class="notice">Your own desk is not in this room: anything waiting on you shows in Needs you. Agents never pick up a skill that is not on the shelf; new skills reach the shelf only after you approve them.</p>
+</div>
+
+<script>
+const D = {"team": {"name": "dev-team", "version": "0.3.0", "description": "The shared core dev team: architect, owner, fixer, gate-runner, reviewer, spec-auditor, critic, security-reviewer, scribe and repo-auditor, with fourteen skills they load and one milestone loop they all follow. Each app keeps its own memory, specs, gate and specialists.", "repo": "yeunglee95-gif/agent-teams", "ref": "origin/main", "commit": "d111723e1d5272976f0ed2ffa72fead008d37b34"}, "roles": [{"id": "architect", "what": "Writes and amends specs, plans a milestone, and owns the app's contract files. Use for anything that changes structure before a lane builds it, for a contracts step, and for the question a lane stops on. Never builds a feature.", "model": "opus", "tools": "", "skills": ["grill-the-plan", "slice-the-plan", "architecture-critique", "decision-record", "verify-before-done"], "path": "plugins/dev-team/agents/architect.md"}, {"id": "critic", "what": "Uses the built app as a first-time user with a named persona and writes a gauntlet report with screenshots. Use for each gauntlet round. Never reads the code first, never fixes.", "model": "opus", "tools": "", "skills": ["verify-before-done"], "path": "plugins/dev-team/agents/critic.md"}, {"id": "fixer", "what": "Fixes findings from a review, a security review or a gauntlet round, each with a test that fails first, and also takes single bounded fixes from a precise brief. Use after a review or critic report, or for one mechanical fix. Owns the cause, not the symptom.", "model": "opus", "tools": "", "skills": ["weigh-review-findings", "root-cause-debugging", "tests-first", "verify-before-done"], "path": "plugins/dev-team/agents/fixer.md"}, {"id": "gate-runner", "what": "Runs the app's full gate and reports numbers, fixing only what it can prove is the harness. Use after a lane or a round reports, before any review. Never merges, never deploys, never settles a red.", "model": "sonnet", "tools": "", "skills": ["verify-before-done", "no-quiet-lowering", "release-checklist"], "path": "plugins/dev-team/agents/gate-runner.md"}, {"id": "owner", "what": "Owns one lane of a milestone with judgement, building against red tests that already exist. Use for anything cross-cutting or needing a decision inside its files. Never touches another lane's files or a frozen contract.", "model": "opus", "tools": "", "skills": ["tests-first", "verify-before-done"], "path": "plugins/dev-team/agents/owner.md"}, {"id": "repo-auditor", "what": "Audits code the team did not build, from one repo to a set of small repos that make one flow, and writes an inventory, a diagram of how the parts connect, a debt score and a plan to merge, retire or keep each part. Use before the team takes over, cleans up or consolidates someone else's code. Read-only; never edits, moves or deletes anything.", "model": "opus", "tools": "Read, Glob, Grep, Bash", "skills": ["repo-audit", "architecture-critique", "verify-before-done"], "path": "plugins/dev-team/agents/repo-auditor.md"}, {"id": "reviewer", "what": "Reviews a milestone's work independently of its builders, forming its own hypotheses before reading any builder's report, for functionality, visual quality and accessibility, and writes the verified-fixed table after the fix pass. Also reviews the architect's plans and the repo-auditor's consolidation plans before anyone builds. Use before a plan is built and before anything is called done. Never fixes.", "model": "opus", "tools": "", "skills": ["verify-before-done", "hidden-failure-check", "no-quiet-lowering", "architecture-critique"], "path": "plugins/dev-team/agents/reviewer.md"}, {"id": "scribe", "what": "Keeps the app's memory file, roadmap, status board and any pilot scorecard current from what the agents actually produced. Owns the team's milestone loop page and runs the retro at each milestone close. Use at every milestone event (a pass starts or ends, a decision is made, a gate reports). Never invents a number, never applies its own retro proposals.", "model": "opus", "tools": "", "skills": ["run-retro", "claude-md-upkeep", "verify-before-done"], "path": "plugins/dev-team/agents/scribe.md"}, {"id": "security-reviewer", "what": "Reviews the branch for secrets, input handling, dependencies and the browser or system paths that touch files, the clipboard or the DOM. Use once per milestone after the feature wave, and on any dependency change. Never fixes.", "model": "opus", "tools": "", "skills": ["verify-before-done", "no-quiet-lowering"], "path": "plugins/dev-team/agents/security-reviewer.md"}, {"id": "spec-auditor", "what": "Runs the conformance sweep, one row per specified behavior, marking each Met, Missing or Partial against the built app, with a test-gap table that maps each row to the test that asserts it. Use once per milestone after the feature wave and before the first critic. Never fixes, never trusts a lane's report.", "model": "opus", "tools": "", "skills": ["verify-before-done", "hidden-failure-check"], "path": "plugins/dev-team/agents/spec-auditor.md"}], "skills": [{"id": "architecture-critique", "title": "Architecture critique", "what": "Use to review a plan before anyone builds it (a milestone or lane plan, a spec change, a consolidation plan from the repo-auditor), or to judge the shape of existing code. Skeptical by default; asks whether each part is needed, what the simplest design is, and what happens when a part fails. The architect may also use its design-it-twice step to compare several interfaces before choosing one.", "lead": "Default stance: skeptical. The plan's author is excited about it; your job is to ask \"do we need this?\" You review the plan, not the person, and you never rewrite the plan yourself.", "sources": [{"repo": "anthropics/claude-plugins-official", "path": "plugins/code-modernization/agents/architecture-critic.md", "commit": "b78ac49cdc6b3d7b61c4439470e311f4291265b1", "license": "Apache License 2.0"}, {"repo": "mattpocock/skills", "path": "skills/engineering/codebase-design (including DEEPENING.md and DESIGN-IT-TWICE.md)", "commit": "f3fc5632f401156837ee3872f14fe33ccf1024ea and 49dd158d1076134a641b33efb035946536778336 (folder unchanged between them)", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["anthropics", "mattpocock"], "changed": "merged into one skill, rewritten in this team's voice, the modernization-specific lines removed, and options plus a recommendation required; the dependency kinds made one check line; design-it-twice made an optional step only the architect runs, with the reviewer limited to critique and a hard-to-reverse choice routed to a decision record.", "sourceText": "Adapted from the `architecture-critic` agent in Anthropic's `code-modernization` plugin (anthropics/claude-plugins-official, Apache License 2.0), commit b78ac49cdc6b3d7b61c4439470e311f4291265b1, and from the deletion test and seam rules in `codebase-design` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit f3fc5632f401156837ee3872f14fe33ccf1024ea, with the dependency kinds from `skills/engineering/codebase-design/DEEPENING.md` and the design-it-twice step from `skills/engineering/codebase-design/DESIGN-IT-TWICE.md` taken at commit 49dd158d1076134a641b33efb035946536778336 (`git diff` shows `skills/engineering/codebase-design` unchanged between the two commits). Changed: merged into one skill, rewritten in this team's voice, the modernization-specific lines removed, and options plus a recommendation required; the dependency kinds made one check line; design-it-twice made an optional step only the architect runs, with the reviewer limited to critique and a hard-to-reverse choice routed to a decision record. License texts: `../../licenses/Apache-2.0.txt`, `../../licenses/mattpocock-skills-MIT.txt`.", "path": "plugins/dev-team/skills/architecture-critique/SKILL.md", "usedBy": ["architect", "repo-auditor", "reviewer"]}, {"id": "claude-md-upkeep", "title": "CLAUDE.md upkeep", "what": "Use at the close of a milestone, and whenever an agent stopped to ask because the app's CLAUDE.md did not say something. Audits each CLAUDE.md against the code, reports a score and proposed changes, and applies only the changes the owner approves.", "lead": "Every role reads the app's `CLAUDE.md` first. A stale one misleads the whole team at once, so it is kept current and short.", "sources": [{"repo": "anthropics/claude-plugins-official", "path": "plugins/claude-md-management/skills/claude-md-improver", "commit": "b78ac49cdc6b3d7b61c4439470e311f4291265b1", "license": "Apache License 2.0"}], "authors": ["anthropics"], "changed": "rewritten in this team's voice, the scoring tied to what this team's roles need from a `CLAUDE.md`, and the sources for additions named.", "sourceText": "Adapted from the `claude-md-improver` skill in Anthropic's `claude-md-management` plugin (anthropics/claude-plugins-official, Apache License 2.0), commit b78ac49cdc6b3d7b61c4439470e311f4291265b1. Changed: rewritten in this team's voice, the scoring tied to what this team's roles need from a `CLAUDE.md`, and the sources for additions named. License text: `../../licenses/Apache-2.0.txt`.", "path": "plugins/dev-team/skills/claude-md-upkeep/SKILL.md", "usedBy": ["scribe"]}, {"id": "decision-record", "title": "Decision record", "what": "Use when a technical choice will be hard to undo (a framework, a data store, an outside service, a repo split or merge, a contract shape). Writes the decision record the owner signs: the options, the trade-offs, the choice, and what it makes harder later.", "lead": "Write one when a choice would cost a day or more to reverse. Small choices go in the memory file as a one-line decision, not a record.", "sources": [{"repo": "anthropics/knowledge-work-plugins", "path": "engineering/skills/architecture", "commit": "8444efcd48f7012f09797778a36a33e73d0861f4", "license": "Apache License 2.0"}], "authors": ["anthropics"], "changed": "rewritten in this team's voice, a recommendation section added, the owner's sign-off and supersede rules added.", "sourceText": "Adapted from the decision record format in the `architecture` skill of Anthropic's `engineering` plugin (anthropics/knowledge-work-plugins, Apache License 2.0), commit 8444efcd48f7012f09797778a36a33e73d0861f4. Changed: rewritten in this team's voice, a recommendation section added, the owner's sign-off and supersede rules added. License text: `../../licenses/Apache-2.0.txt`.", "path": "plugins/dev-team/skills/decision-record/SKILL.md", "usedBy": ["architect"]}, {"id": "grill-the-plan", "title": "Grill the plan", "what": "Use before writing a milestone plan, a spec change or a contract change, whenever the owner's request leaves decisions open. Interviews the owner in short rounds until no decision is left open; looks up every fact itself; writes nothing into a plan until the owner confirms. Keeps the app's glossary current as terms settle.", "lead": "A plan built on a guessed decision is rebuilt later at a higher price. Before you write a plan, find every open decision and put it to the owner, with your recommendation, until none is left.", "sources": [{"repo": "mattpocock/skills", "path": "skills/productivity/grilling and skills/engineering/domain-modeling", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["mattpocock"], "changed": "merged into one skill and rewritten in this team's voice; the user is the owner; at most four questions a round; answers logged in the memory file; the glossary goes to the one file the app's `CLAUDE.md` names instead of a `GLOSSARY.md` the skill creates; domain-modeling's ADR format not taken, only its three-part test, with records written through the `decision-record` skill; nothing written into a plan until the owner confirms.", "sourceText": "Adapted from `skills/productivity/grilling/SKILL.md` and `skills/engineering/domain-modeling/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: merged into one skill and rewritten in this team's voice; the user is the owner; at most four questions a round; answers logged in the memory file; the glossary goes to the one file the app's `CLAUDE.md` names instead of a `GLOSSARY.md` the skill creates; domain-modeling's ADR format not taken, only its three-part test, with records written through the `decision-record` skill; nothing written into a plan until the owner confirms. License text: `../../licenses/mattpocock-skills-MIT.txt`.", "path": "plugins/dev-team/skills/grill-the-plan/SKILL.md", "usedBy": ["architect"]}, {"id": "hidden-failure-check", "title": "Hidden-failure check", "what": "Use when reviewing a change, and in the spec-auditor's sweep. Write your own hypotheses from the spec and the raw diff before reading the builder's report; find errors that fail quietly; build the test-gap table (each spec row to the test that asserts it, edge cases with exact values, ranked High, Medium, Low); label every finding by class and axis; on a re-review, re-check earlier findings by id first.", "lead": "Two questions for every change: does anything fail without telling anyone, and would the tests notice if the feature broke? A builder's report answers neither; it is a lead, never evidence.", "sources": [{"repo": "anthropics/claude-plugins-official", "path": "plugins/pr-review-toolkit/agents/silent-failure-hunter.md and pr-test-analyzer.md", "commit": "b78ac49cdc6b3d7b61c4439470e311f4291265b1", "license": "Apache License 2.0"}, {"repo": "EricTechPro/super-board", "path": "skills/super-review/SKILL.md and skills/super-qa/SKILL.md", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "license": "MIT, Copyright (c) 2026 Eric Tech"}, {"repo": "mattpocock/skills", "path": "skills/engineering/code-review and skills/engineering/tdd", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["EricTechPro", "anthropics", "mattpocock"], "changed": "merged into one skill and rewritten in this team's voice; severities mapped to this team's blocker, major and minor; the mutation check added. From super-board: hypotheses before the builder's report, the five finding classes with over-engineering never blocking alone, re-checking earlier findings by id, and the test-gap table, with acceptance criteria read as spec rows; not taken: the GitHub report comment, the ponytail plugin, routing to lanes by PR thread, filing refactor cards straight to Ready, the \"if the user authorizes, fix\" clause, and writing the High-gap tests (this team's fixer writes them). From code-review: the two axes kept apart and never reranked, and the smell baseline as judgment calls; the parallel sub-agents and tracker lookup not taken.", "sourceText": "Adapted from three sources: - The `silent-failure-hunter` and `pr-test-analyzer` agents in Anthropic's `pr-review-toolkit` plugin (anthropics/claude-plugins-official, Apache License 2.0), commit b78ac49cdc6b3d7b61c4439470e311f4291265b1. License text: `../../licenses/Apache-2.0.txt`. - `skills/super-review/SKILL.md` (review flow steps 2 and 3, \"Review remembers\") and `skills/super-qa/SKILL.md` (\"Test-gap check (after build)\") in EricTechPro/super-board (MIT, Copyright (c) 2026 Eric Tech), commit 35e215615c98fa5da011368e764f38f86959bf95. License text: `../../licenses/erictechpro-super-board-MIT.txt`. - `skills/engineering/code-review/SKILL.md` (the two axes and the smell baseline) and the tautological-test anti-pattern in `skills/engineering/tdd/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. License text: `../../licenses/mattpocock-skills-MIT.txt`. Changed: merged into one skill and rewritten in this team's voice; severities mapped to this team's blocker, major and minor; the mutation check added. From super-board: hypotheses before the builder's report, the five finding classes with over-engineering never blocking alone, re-checking earlier findings by id, and the test-gap table, with acceptance criteria read as spec rows; not taken: the GitHub report comment, the ponytail plugin, routing to lanes by PR thread, filing refactor cards straight to Ready, the \"if the user authorizes, fix\" clause, and writing the High-gap tests (this team's fixer writes them). From code-review: the two axes kept apart and never reranked, and the smell baseline as judgment calls; the parallel sub-agents and tracker lookup not taken.", "path": "plugins/dev-team/skills/hidden-failure-check/SKILL.md", "usedBy": ["reviewer", "spec-auditor"]}, {"id": "no-quiet-lowering", "title": "No quiet lowering", "what": "Use when running the gate or reviewing a diff, to catch a quality bar lowered on the way to green. Checks the diff since the branch point for moved thresholds, easier or skipped tests, silenced checkers, unfinished stubs and new exceptions.", "lead": "An agent that hits a red check takes the cheapest road to green. The cheapest road is usually to lower the bar, not to fix the code. Tightening a bar can be silent; loosening one must be loud.", "sources": [{"repo": "addyosmani/agent-skills", "path": "skills/constraint-driven-development (Step 6)", "commit": "1401c8b8030e023baeebb31781a6653fe8e93026", "license": "MIT, Copyright (c) 2025 Addy Osmani"}], "authors": ["addyosmani"], "changed": "only the diff guard is taken (not the CONSTRAINTS.md interview or tool installs), rewritten in this team's voice, and tied to the memory file for exceptions.", "sourceText": "Adapted from Step 6, \"Guard the bar itself\", of `constraint-driven-development` in addyosmani/agent-skills (MIT, Copyright (c) 2025 Addy Osmani), commit 1401c8b8030e023baeebb31781a6653fe8e93026. Changed: only the diff guard is taken (not the CONSTRAINTS.md interview or tool installs), rewritten in this team's voice, and tied to the memory file for exceptions. License text: `../../licenses/addyosmani-agent-skills-MIT.txt`.", "path": "plugins/dev-team/skills/no-quiet-lowering/SKILL.md", "usedBy": ["gate-runner", "reviewer", "security-reviewer"]}, {"id": "release-checklist", "title": "Release checklist", "what": "Use when a milestone is ready to merge to the main branch, or to go past staging or live. Prepares the release checklist, the merge-danger call, the merge-gate lines and the rollback triggers for the owner to sign. Never merges or releases anything itself.", "lead": "You prepare the checklist. The owner gives the go. Releasing, merging to the main branch, tagging and deploying are Red-tier actions in the app's `CLAUDE.md`, and each one waits for the owner's explicit proceed.", "sources": [{"repo": "anthropics/knowledge-work-plugins", "path": "engineering/skills/deploy-checklist", "commit": "8444efcd48f7012f09797778a36a33e73d0861f4", "license": "Apache License 2.0"}, {"repo": "mattpocock/skills", "path": "skills/engineering/pr (Merge Danger)", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}, {"repo": "EricTechPro/super-board", "path": "skills/super-review/SKILL.md (merge protocol)", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "license": "MIT, Copyright (c) 2026 Eric Tech"}], "authors": ["EricTechPro", "anthropics", "mattpocock"], "changed": "rewritten in this team's voice, tied to the team's gate, reviews and Red-tier rule, on-call and ticket steps removed. From pr: only the one-way or two-way door and blast radius, as two lines for the owner. From super-board: the merge gate's checks (reviewed head is the merged head, base merged in and gate green on it, merge commit confirmed on the base) as lines the owner signs; its automatic merge, merge policy and the merge when CI failed to start are not taken. The analytics-events line is this team's own, from the owner's 2026-10-10 scope.", "sourceText": "Adapted from three sources: - The `deploy-checklist` skill in Anthropic's `engineering` plugin (anthropics/knowledge-work-plugins, Apache License 2.0), commit 8444efcd48f7012f09797778a36a33e73d0861f4. License text: `../../licenses/Apache-2.0.txt`. - The Merge Danger section of `skills/engineering/pr/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. License text: `../../licenses/mattpocock-skills-MIT.txt`. - The merge protocol in `skills/super-review/SKILL.md` (\"Merge protocol: Done means merged\") in EricTechPro/super-board (MIT, Copyright (c) 2026 Eric Tech), commit 35e215615c98fa5da011368e764f38f86959bf95. License text: `../../licenses/erictechpro-super-board-MIT.txt`. Changed: rewritten in this team's voice, tied to the team's gate, reviews and Red-tier rule, on-call and ticket steps removed. From pr: only the one-way or two-way door and blast radius, as two lines for the owner. From super-board: the merge gate's checks (reviewed head is the merged head, base merged in and gate green on it, merge commit confirmed on the base) as lines the owner signs; its automatic merge, merge policy and the merge when CI failed to start are not taken. The analytics-events line is this team's own, from the owner's 2026-10-10 scope.", "path": "plugins/dev-team/skills/release-checklist/SKILL.md", "usedBy": ["gate-runner"]}, {"id": "repo-audit", "title": "Repo audit", "what": "Use to understand code the team did not build, from one repo to a set of small repos that together make one flow. Produces an inventory with every claim cited to a file and line, a diagram of how the parts connect, a debt score, and a safe order to merge, retire or keep each part.", "lead": "Your job is understanding first, judgment second. The code works for somebody today, however messy it looks. Find out what it does before you say what should change.", "sources": [{"repo": "anthropics/claude-plugins-official", "path": "plugins/code-modernization/agents/legacy-analyst.md and commands/modernize-assess.md", "commit": "b78ac49cdc6b3d7b61c4439470e311f4291265b1", "license": "Apache License 2.0"}, {"repo": "anthropics/knowledge-work-plugins", "path": "engineering/skills/tech-debt", "commit": "8444efcd48f7012f09797778a36a33e73d0861f4", "license": "Apache License 2.0"}, {"repo": "addyosmani/agent-skills", "path": "skills/deprecation-and-migration", "commit": "1401c8b8030e023baeebb31781a6653fe8e93026", "license": "MIT, Copyright (c) 2025 Addy Osmani"}], "authors": ["addyosmani", "anthropics"], "changed": "combined into one method for a set of small repos, rewritten in this team's voice, legacy-language and COCOMO material removed.", "sourceText": "Adapted from the `legacy-analyst` agent and the portfolio mode of the `modernize-assess` command in Anthropic's `code-modernization` plugin (anthropics/claude-plugins-official, Apache License 2.0), commit b78ac49cdc6b3d7b61c4439470e311f4291265b1; the tech-debt scoring in Anthropic's `engineering` plugin (anthropics/knowledge-work-plugins, Apache License 2.0), commit 8444efcd48f7012f09797778a36a33e73d0861f4; and the migration steps in `deprecation-and-migration` in addyosmani/agent-skills (MIT, Copyright (c) 2025 Addy Osmani), commit 1401c8b8030e023baeebb31781a6653fe8e93026. Changed: combined into one method for a set of small repos, rewritten in this team's voice, legacy-language and COCOMO material removed. License texts: `../../licenses/Apache-2.0.txt`, `../../licenses/addyosmani-agent-skills-MIT.txt`.", "path": "plugins/dev-team/skills/repo-audit/SKILL.md", "usedBy": ["repo-auditor"]}, {"id": "root-cause-debugging", "title": "Root-cause debugging", "what": "Use for any bug, failing test, red gate or behavior that differs from the spec, before proposing a fix. First build one fast command that shows the bug red; then rank several hypotheses and prove the cause; fix the cause, not the symptom; stop after three failed fixes and question the design.", "lead": "No fix before the cause is found. A fix aimed at a symptom moves the bug somewhere else.", "sources": [{"repo": "obra/superpowers", "path": "skills/systematic-debugging", "commit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d", "license": "MIT, Copyright (c) 2025 Jesse Vincent"}, {"repo": "mattpocock/skills", "path": "skills/engineering/diagnosing-bugs", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["mattpocock", "obra"], "changed": "shortened and rewritten in this team's voice; diagnosing-bugs' feedback-loop phase made step 1 (one red, deterministic, fast command, run before any hypothesis), with its ranked falsifiable hypotheses, tagged debug logs removed by grep, and \"no correct seam is itself a finding\"; its human-in-the-loop script and phase numbering not taken; the escalation pointed at the architect; the team's three-strikes and no-retry rules kept.", "sourceText": "Adapted from two sources: - `systematic-debugging` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. License text: `../../licenses/obra-superpowers-MIT.txt`. - `skills/engineering/diagnosing-bugs/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. License text: `../../licenses/mattpocock-skills-MIT.txt`. Changed: shortened and rewritten in this team's voice; diagnosing-bugs' feedback-loop phase made step 1 (one red, deterministic, fast command, run before any hypothesis), with its ranked falsifiable hypotheses, tagged debug logs removed by grep, and \"no correct seam is itself a finding\"; its human-in-the-loop script and phase numbering not taken; the escalation pointed at the architect; the team's three-strikes and no-retry rules kept.", "path": "plugins/dev-team/skills/root-cause-debugging/SKILL.md", "usedBy": ["fixer"]}, {"id": "run-retro", "title": "Run retro", "what": "Use at the close of every milestone, after the owner's go or stop. Reads what went wrong in the milestone (review findings, fixes, gate failures, critic reports, the owner's rejections) and writes a proposal list for the owner, preferring a deterministic check over more prose. Proposes only; never edits a skill, hook or CLAUDE.md itself.", "lead": "The team gets better between milestones, not during one. A retro turns this milestone's misses into proposals the owner approves or rejects, one by one. Nothing changes until the owner says yes, and then it ships as a new team version or a `CLAUDE.md` edit the owner approved.", "sources": [{"repo": "mattpocock/skills", "path": "skills/engineering/retro", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["mattpocock"], "changed": "rewritten in this team's voice; the input is the milestone's own finding, fixer, gate, critic and owner records instead of session logs; \"review agent\" mapped to this team's reviewer and \"automated checks\" to the gate-runner's gate; a class seen in two milestones must produce a proposal; output is a proposal list the owner approves item by item, never an edit; the `writing-for-agents` step and the tool-economy and no-op sections shortened to one line each.", "sourceText": "Adapted from `skills/engineering/retro/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; the input is the milestone's own finding, fixer, gate, critic and owner records instead of session logs; \"review agent\" mapped to this team's reviewer and \"automated checks\" to the gate-runner's gate; a class seen in two milestones must produce a proposal; output is a proposal list the owner approves item by item, never an edit; the `writing-for-agents` step and the tool-economy and no-op sections shortened to one line each. License text: `../../licenses/mattpocock-skills-MIT.txt`.", "path": "plugins/dev-team/skills/run-retro/SKILL.md", "usedBy": ["scribe"]}, {"id": "slice-the-plan", "title": "Slice the plan", "what": "Use when turning an agreed plan or spec into lanes for a milestone. Cuts the work into thin vertical slices, each a lane with its own files and named red tests, orders lanes by what blocks what, sequences wide refactors as expand then migrate then contract, and has the owner check the breakdown before any lane starts.", "lead": "Run this after the `grill-the-plan` skill has closed every open decision. The output is the lane plan the architect owns.", "sources": [{"repo": "mattpocock/skills", "path": "skills/engineering/to-tickets", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["mattpocock"], "changed": "rewritten in this team's voice; tickets became lanes with disjoint file ownership and named red tests; blocking edges became lane order; the quiz step goes to the owner; the reviewer's plan critique added before lanes start; publishing to a tracker only when the app's `CLAUDE.md` names one, never with a ready-for-agent label; the setup-skill pointer and ticket templates removed.", "sourceText": "Adapted from `skills/engineering/to-tickets/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; tickets became lanes with disjoint file ownership and named red tests; blocking edges became lane order; the quiz step goes to the owner; the reviewer's plan critique added before lanes start; publishing to a tracker only when the app's `CLAUDE.md` names one, never with a ready-for-agent label; the setup-skill pointer and ticket templates removed. License text: `../../licenses/mattpocock-skills-MIT.txt`.", "path": "plugins/dev-team/skills/slice-the-plan/SKILL.md", "usedBy": ["architect"]}, {"id": "tests-first", "title": "Tests first", "what": "Use before writing any feature, fix or behavior change in app code. Write one failing test, watch it fail for the right reason, write the least code that turns it green, then clean up with the suite still green.", "lead": "If you did not watch the test fail, you do not know it tests the right thing.", "sources": [{"repo": "obra/superpowers", "path": "skills/test-driven-development", "commit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d", "license": "MIT, Copyright (c) 2025 Jesse Vincent"}, {"repo": "mattpocock/skills", "path": "skills/engineering/tdd (anti-patterns only)", "commit": "49dd158d1076134a641b33efb035946536778336", "license": "MIT, Copyright (c) 2026 Matt Pocock"}], "authors": ["mattpocock", "obra"], "changed": "shortened, rewritten in this team's voice, and the section on the architect's red tests added so the skill matches the lane plan; from tdd, only the tautological and horizontal-slicing anti-patterns, with its \"confirm seams with the user\" step left out because the architect's lane plan names the red tests.", "sourceText": "Adapted from `test-driven-development` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d, with the two named anti-patterns from `skills/engineering/tdd/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: shortened, rewritten in this team's voice, and the section on the architect's red tests added so the skill matches the lane plan; from tdd, only the tautological and horizontal-slicing anti-patterns, with its \"confirm seams with the user\" step left out because the architect's lane plan names the red tests. License texts: `../../licenses/obra-superpowers-MIT.txt`, `../../licenses/mattpocock-skills-MIT.txt`.", "path": "plugins/dev-team/skills/tests-first/SKILL.md", "usedBy": ["fixer", "owner"]}, {"id": "verify-before-done", "title": "Verify before done", "what": "Use before saying anything is done, fixed, passing, green or clean, before a commit, and before reporting another agent's work as finished. Requires fresh evidence from a check run in this turn; a claim without it is not made.", "lead": "No claim of done, fixed, passing, green or clean without fresh evidence from this turn. A check you ran earlier, a check another agent says it ran, and \"it should pass now\" are not evidence.", "sources": [{"repo": "obra/superpowers", "path": "skills/verification-before-completion", "commit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d", "license": "MIT, Copyright (c) 2025 Jesse Vincent"}], "authors": ["obra"], "changed": "rewritten in this team's voice, the table extended with the spec and critic rows, PR and push wording removed.", "sourceText": "Adapted from `verification-before-completion` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Changed: rewritten in this team's voice, the table extended with the spec and critic rows, PR and push wording removed. License text: `../../licenses/obra-superpowers-MIT.txt`.", "path": "plugins/dev-team/skills/verify-before-done/SKILL.md", "usedBy": ["architect", "critic", "fixer", "gate-runner", "owner", "repo-auditor", "reviewer", "scribe", "security-reviewer", "spec-auditor"]}, {"id": "weigh-review-findings", "title": "Weigh review findings", "what": "Use when taking findings from a review, a security review, a critic report or the owner, before changing any code. Check each finding against the code, ask about unclear ones first, push back with evidence when one is wrong, then fix one at a time.", "lead": "A finding is a claim to check, not an order to obey. Check it against the code before acting.", "sources": [{"repo": "obra/superpowers", "path": "skills/receiving-code-review", "commit": "8ca22dba9a94f28898bbce59f2537ff4d87c747d", "license": "MIT, Copyright (c) 2025 Jesse Vincent"}], "authors": ["obra"], "changed": "shortened, rewritten in this team's voice, pointed at the team's roles and memory file, GitHub reply steps removed.", "sourceText": "Adapted from `receiving-code-review` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Changed: shortened, rewritten in this team's voice, pointed at the team's roles and memory file, GitHub reply steps removed. License text: `../../licenses/obra-superpowers-MIT.txt`.", "path": "plugins/dev-team/skills/weigh-review-findings/SKILL.md", "usedBy": ["fixer"]}], "rejected": [{"candidate": "Automatic merge: `merge_policy.default: \"auto\"`, the reviewer merging through the merge gate, overnight unattended merges", "source path": "super-board `skills/super-board/references/onboard.md`, `skills/super-board/references/run.md` (\"Merge protocol\"), `skills/super-review/SKILL.md`", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "The owner gives every merge and deploy go. The gate's checks were taken as lines the owner signs (`release-checklist`); the merge itself was not.", "date": "2026-10-10"}, {"candidate": "CI-budget bypass: squash-merge when CI failed to start", "source path": "super-board `skills/super-board/references/run.md` (CI-budget block)", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "A gate that did not run is red. Merging on local evidence alone breaks \"verify every claim\" and the owner's go.", "date": "2026-10-10"}, {"candidate": "\"If the user explicitly authorizes Super Review to fix, make the smallest safe patch\"", "source path": "super-board `skills/super-review/SKILL.md` (Review flow, step 4)", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "The reviewer never fixes, even when asked. The fixer fixes; the reviewer re-verifies.", "date": "2026-10-10"}, {"candidate": "Refactor cards with acceptance criteria filed straight into Ready", "source path": "super-board `skills/super-review/SKILL.md` (Review flow, step 4)", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "New work lands in the backlog; only the owner moves it to ready.", "date": "2026-10-10"}, {"candidate": "Worker decision ladder that \"never blocks on the user\"", "source path": "super-board `skills/super-build/references/decision-policy.md`", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "Lanes stop and ask when the app's `CLAUDE.md` is silent; a lane never decides a judgment call alone.", "date": "2026-10-10"}, {"candidate": "Unpinned installs: `npx -y skills@latest add mattpocock/skills`", "source path": "super-board `skills/super-board/references/onboard.md`", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "Outside skills are pinned to a commit and rewritten into the team, never installed at latest.", "date": "2026-10-10"}, {"candidate": "`ui-refine-loop`", "source path": "super-board `skills/ui-refine-loop/SKILL.md`", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "Its checkers read the code first by design, and the critic never reads code first. UI-polish specific; the app's own design spec covers taste.", "date": "2026-10-10"}, {"candidate": "Model routing by card difficulty, and the Codex fallback (`run --codex`)", "source path": "super-board `README.md` (\"Models\"), `workflows/super-board-wave.js`", "commit": "35e215615c98fa5da011368e764f38f86959bf95", "reason": "Tied to super-board's own runtime and named model ids. The team sets one model per role in each agent file.", "date": "2026-10-10"}, {"candidate": "`implement`", "source path": "mattpocock `skills/engineering/implement/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "Builds, reviews and commits in one flow; the team splits building, gating and review across roles, and lanes already own building.", "date": "2026-10-10"}, {"candidate": "`implement-spec`", "source path": "mattpocock `skills/engineering/implement-spec/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "A merger sub-agent merges implementer work into an integration branch on its own; merges wait for the owner.", "date": "2026-10-10"}, {"candidate": "`chief-of-staff`", "source path": "mattpocock `skills/in-progress/chief-of-staff/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "One long session doing its own work and changing its own environment on every task, against the role split and owner approval for any skill or `CLAUDE.md` change.", "date": "2026-10-10"}, {"candidate": "`grill-me`", "source path": "mattpocock `skills/productivity/grill-me/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "A thin wrapper over `grilling`, which `grill-the-plan` already adapts.", "date": "2026-10-10"}, {"candidate": "`handoff`", "source path": "mattpocock `skills/productivity/handoff/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "Hand-off notes go to the OS temp folder; the team's state lives in the app's memory file, one home per fact.", "date": "2026-10-10"}, {"candidate": "`writing-for-agents`, `writing-beats`, `writing-fragments`, `writing-shape`", "source path": "mattpocock `skills/productivity/writing-for-agents/`, `skills/in-progress/writing-*/`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "Writing guides for skill authors and articles, not for building an app. `run-retro` dropped its call to `writing-for-agents`.", "date": "2026-10-10"}, {"candidate": "`migrate-to-shoehorn`", "source path": "mattpocock `skills/misc/migrate-to-shoehorn/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "One library's migration; not general to the team's apps.", "date": "2026-10-10"}, {"candidate": "`scaffold-exercises`", "source path": "mattpocock `skills/misc/scaffold-exercises/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "Course exercise scaffolding; not app work.", "date": "2026-10-10"}, {"candidate": "`setup-ts-deep-modules`", "source path": "mattpocock `skills/in-progress/setup-ts-deep-modules/SKILL.md`", "commit": "49dd158d1076134a641b33efb035946536778336", "reason": "TypeScript-only tooling setup; an app that wants such a check gets it through a `run-retro` proposal for its own gate.", "date": "2026-10-10"}], "loopHeader": ["#", "stage", "who", "gate to move on"], "loop": [{"#": "0", "stage": "Intake", "who": "the owner, or a finding from Watch (stage 13)", "gate to move on": "the owner moves the item from the backlog to ready; nothing else does"}, {"#": "1", "stage": "Grill the plan", "who": "architect, `grill-the-plan`", "gate to move on": "the owner confirms no open decision is left"}, {"#": "2", "stage": "Plan and slice", "who": "architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan", "gate to move on": "the owner approves the breakdown; every reviewer plan finding answered"}, {"#": "3", "stage": "Pre-flight per lane", "who": "each lane owner, with the checklist below", "gate to move on": "each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane"}, {"#": "4", "stage": "Build lanes", "who": "lane owners, `tests-first`; one worktree and branch per lane", "gate to move on": "the lane's named red tests are green in a gate the lane ran"}, {"#": "5", "stage": "Gate", "who": "gate-runner, the app's full gate", "gate to move on": "every part green on a fresh run, with numbers, on every target"}, {"#": "6", "stage": "Spec check", "who": "spec-auditor, conformance table and test-gap table (`hidden-failure-check`)", "gate to move on": "no Missing row and no High test gap open"}, {"#": "7", "stage": "Black-box check", "who": "critic, screens and evidence only, never the code first", "gate to move on": "report filed for each persona; zero blockers and zero majors on every target"}, {"#": "8", "stage": "Review", "who": "reviewer: hypotheses from the spec and raw diff before any builder's report; findings labeled Gap, Bug, Verification miss, Scope drift, Over-engineering; earlier findings re-checked by id", "gate to move on": "no blocking finding open"}, {"#": "9", "stage": "Fix and re-verify", "who": "fixer, then the reviewer's verified-fixed table, signed with the head sha", "gate to move on": "every finding fixed and re-verified; the same root cause twice stops (see caps)"}, {"#": "10", "stage": "Release check", "who": "gate-runner, `release-checklist`: merge danger, merge-gate lines, analytics events named, rollback triggers", "gate to move on": "the owner signs the checklist"}, {"#": "11", "stage": "Owner go", "who": "**the owner**", "gate to move on": "the owner merges or deploys, or says who does, each time"}, {"#": "12", "stage": "Retro", "who": "scribe, `run-retro`", "gate to move on": "proposals on the owner's desk; each approved, rejected or parked by the owner"}, {"#": "13", "stage": "Watch", "who": "whoever the app's `CLAUDE.md` names, reading its analytics tool and error log for the shipped change", "gate to move on": "findings filed to the backlog, never to ready"}], "licenses": ["Apache-2.0.txt", "addyosmani-agent-skills-MIT.txt", "erictechpro-super-board-MIT.txt", "mattpocock-skills-MIT.txt", "obra-superpowers-MIT.txt"], "evals": ["design-it-twice", "grill-the-plan-asks", "release-no-merge", "reviewer-hypotheses-first", "root-cause-red-first", "run-retro-proposes", "slice-the-plan-lanes", "spec-audit-test-gap", "tests-first-tautology"], "issues": []};
+const NS = "http://www.w3.org/2000/svg";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const ABBR = { architect: "Ar", owner: "Ow", fixer: "Fx", "gate-runner": "Ga", reviewer: "Rv", "spec-auditor": "Sp", critic: "Cr", "security-reviewer": "Se", scribe: "Sc", "repo-auditor": "Au" };
+const SHORT = { "security-reviewer": "security", "spec-auditor": "spec audit", "repo-auditor": "repo audit", "gate-runner": "gate" };
+const abbr = id => ABBR[id] || id.slice(0, 2);
+const skAbbr = id => id.split("-").map(w => w[0]).join("").slice(0, 3);
+const MODEL = m => ({ opus: "Opus", sonnet: "Sonnet", haiku: "Haiku", fable: "Fable" }[m] || m);
+const roles = D.roles, skills = D.skills;
+const skillIdx = Object.fromEntries(skills.map((s, i) => [s.id, i]));
+const roleById = Object.fromEntries(roles.map(r => [r.id, r]));
+
+// Example state: what a milestone looks like mid-way. Not real runs.
+const NOW = {
+  architect: ["run", "Slicing the cold email plan into lanes"],
+  owner: ["run", "Lane B: Kickstarter finder, red tests first"],
+  reviewer: ["ask", "Waiting on your go for lane A"],
+};
+const state = Object.fromEntries(roles.map(r => [r.id, { s: NOW[r.id]?.[0] || "rest", doing: NOW[r.id]?.[1] || "Resting", busy: false }]));
+let sel = null;
+
+// Geometry
+const seats = [[60, 232], [130, 232], [200, 232], [60, 330], [130, 330], [200, 330], [60, 428], [130, 428], [200, 428], [300, 330]];
+const desks = [[660, 232], [750, 232], [840, 232], [920, 232], [660, 330], [750, 330], [840, 330], [920, 330], [660, 428], [750, 428], [840, 428], [920, 428]];
+const shelfX0 = 430, shelfX1 = 560, shelfY = [70, 110];
+const perRow = Math.ceil(skills.length / 2);
+const cupPos = skills.map((s, i) => { const r = i < perRow ? 0 : 1, c = r ? i - perRow : i; const n = r ? skills.length - perRow : perRow; return [shelfX0 + (shelfX1 - shelfX0) * (n > 1 ? c / (n - 1) : .5), shelfY[r]]; });
+const door = [590, 330], shelfFront = [495, 182];
+const home = {}, deskOf = {};
+roles.forEach((r, i) => { home[r.id] = seats[i % seats.length]; deskOf[r.id] = desks[i % desks.length]; });
+
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+const svg = $("#scene");
+
+function drawRoom() {
+  // back wall and floor
+  el("rect", { x: 0, y: 0, width: 960, height: 140, class: "wall" }, svg);
+  el("line", { x1: 0, y1: 140, x2: 960, y2: 140, class: "ln" }, svg);
+  el("line", { x1: 590, y1: 140, x2: 590, y2: 292, class: "ln" }, svg);
+  el("line", { x1: 590, y1: 368, x2: 590, y2: 470, class: "ln" }, svg);
+  el("path", { d: "M590 292 A38 38 0 0 1 628 330", class: "ln", "stroke-dasharray": "3 3" }, svg);
+  // zone labels
+  [["Resting", 24, 168], ["Skill shelf", 430, 26], ["Work floor", 612, 168]].forEach(([t, x, y]) => { const e = el("text", { x, y, class: "zone" }, svg); e.textContent = t; });
+  // lounge: two sofas, a table, a plant, a tea counter
+  [232, 330, 428].forEach(y => el("rect", { x: 30, y: y - 10, width: 200, height: 26, rx: 10, class: "sofa" }, svg));
+  el("rect", { x: 274, y: 320, width: 52, height: 26, rx: 10, class: "sofa" }, svg);
+  el("circle", { cx: 300, cy: 236, r: 16, class: "wood" }, svg);
+  el("circle", { cx: 300, cy: 430, r: 11, class: "sofa" }, svg);
+  // tea counter on the back wall, left
+  el("rect", { x: 30, y: 96, width: 150, height: 30, rx: 6, class: "wood" }, svg);
+  const tk = el("text", { x: 40, y: 88, class: "zone" }, svg); tk.textContent = "Tea counter";
+  // shelf planks
+  el("rect", { x: shelfX0 - 22, y: shelfY[0] + 13, width: shelfX1 - shelfX0 + 44, height: 4, rx: 2, class: "wood" }, svg);
+  el("rect", { x: shelfX0 - 22, y: shelfY[1] + 13, width: shelfX1 - shelfX0 + 44, height: 4, rx: 2, class: "wood" }, svg);
+  // desks
+  desks.forEach(([x, y]) => el("rect", { x: x - 36, y: y + 4, width: 72, height: 14, rx: 4, class: "desk" }, svg));
+  // cups
+  skills.forEach((s, i) => {
+    const [x, y] = cupPos[i];
+    const g = el("g", { class: "cup", transform: `translate(${x},${y})`, tabindex: 0, "data-skill": s.id, role: "button", "aria-label": `Skill ${s.id}` }, svg);
+    cupShape(g); const t = el("text", { x: 0, y: 26 }, g); t.textContent = skAbbr(s.id);
+    el("title", {}, g).textContent = s.id;
+  });
+}
+function cupShape(g, small) {
+  const k = small ? .55 : 1;
+  el("path", { class: "body", d: `M${-6 * k} ${-8 * k} h${12 * k} l${-1.5 * k} ${14 * k} h${-9 * k} z` }, g);
+  el("path", { class: "hd", d: `M${6 * k} ${-5 * k} q${5 * k} ${1 * k} ${-0.5 * k} ${7 * k}` }, g);
+}
+
+const agents = {};
+function drawAgents() {
+  roles.forEach(r => {
+    const st = state[r.id];
+    const [x, y] = st.s === "rest" ? home[r.id] : [deskOf[r.id][0], deskOf[r.id][1]];
+    const g = el("g", { class: `agent ${st.s}`, tabindex: 0, role: "button", "data-role": r.id, "aria-label": `${r.id}, ${label(st.s)}` }, svg);
+    g.dataset.x = x; g.dataset.y = y; g.setAttribute("transform", `translate(${x},${y})`);
+    const bob = el("g", { class: "bob" }, g);
+    el("rect", { x: -10, y: -4, width: 20, height: 22, rx: 9, class: "torso" }, bob);
+    el("circle", { cx: 0, cy: -16, r: 15, class: "ring" }, bob);
+    el("circle", { cx: 0, cy: -16, r: 11, class: "head" }, bob);
+    el("text", { x: 0, y: -16, class: "ini" }, bob).textContent = abbr(r.id);
+    el("text", { x: 0, y: 32, class: "nm" }, g).textContent = SHORT[r.id] || r.id;
+    const b = el("g", { class: `badge ${st.s}`, transform: "translate(9,-36)" }, bob);
+    el("rect", { width: 11, height: 11, rx: 2.5 }, b);
+    el("rect", { class: "g", x: st.s === "ask" ? 4 : 3, y: st.s === "ask" ? 4 : 4.5, width: st.s === "ask" ? 3 : 5, height: st.s === "ask" ? 3 : 2 }, b);
+    el("g", { class: "tray", transform: "translate(0,-46)" }, bob);
+    el("title", {}, g).textContent = `${r.id}: ${st.doing}`;
+    agents[r.id] = g;
+    if (st.s !== "rest") fillTray(r.id, r.skills.length);
+  });
+}
+function fillTray(id, n) {
+  const tray = agents[id].querySelector(".tray"); tray.innerHTML = "";
+  const w = 9; for (let i = 0; i < n; i++) { const c = el("g", { transform: `translate(${(i - (n - 1) / 2) * w},0)` }, tray); el("path", { class: "tc", d: "M-3.5 -4 h7 l-1 8 h-5 z" }, c); }
+}
+function setBadge(id) {
+  const s = state[id].s, g = agents[id];
+  g.setAttribute("class", `agent ${s}${sel === id ? " sel" : ""}`);
+  const b = g.querySelector(".badge"); b.setAttribute("class", `badge ${s}`);
+  const gl = b.querySelector(".g");
+  gl.setAttribute("x", s === "ask" ? 4 : 3); gl.setAttribute("y", s === "ask" ? 4 : 4.5); gl.setAttribute("width", s === "ask" ? 3 : 5); gl.setAttribute("height", s === "ask" ? 3 : 2);
+  g.setAttribute("aria-label", `${id}, ${label(s)}`); g.querySelector("title").textContent = `${id}: ${state[id].doing}`;
+}
+const label = s => ({ rest: "resting", run: "at work", ask: "needs you" }[s]);
+
+// Motion
+function tween(dur, step) {
+  return new Promise(res => {
+    if (reduce || dur <= 0) { step(1); return res(); }
+    const t0 = performance.now();
+    const f = now => { const k = Math.min(1, (now - t0) / dur); step(k); k < 1 ? requestAnimationFrame(f) : res(); };
+    requestAnimationFrame(f);
+  });
+}
+const ease = k => 1 - Math.pow(1 - k, 3);
+async function walk(id, pts) {
+  const g = agents[id], bob = g.querySelector(".bob");
+  for (const [x, y] of pts) {
+    const x0 = +g.dataset.x, y0 = +g.dataset.y, d = Math.hypot(x - x0, y - y0);
+    await tween(d / 0.24, k => {
+      const e = k; const cx = x0 + (x - x0) * e, cy = y0 + (y - y0) * e;
+      g.setAttribute("transform", `translate(${cx},${cy})`);
+      bob.setAttribute("transform", `translate(0,${reduce ? 0 : -Math.abs(Math.sin(k * d / 9)) * 2.2})`);
+    });
+    g.dataset.x = x; g.dataset.y = y;
+  }
+  bob.removeAttribute("transform");
+}
+async function pickCups(id) {
+  const list = roleById[id].skills.filter(s => s in skillIdx);
+  let n = 0;
+  for (const s of list) {
+    const cupEl = svg.querySelector(`.cup[data-skill="${CSS.escape(s)}"]`); cupEl.classList.add("pick");
+    const [cx, cy] = cupPos[skillIdx[s]];
+    const fly = el("g", { class: "cup flying" }, svg); cupShape(fly, true);
+    const g = agents[id], ax = +g.dataset.x, ay = +g.dataset.y - 46;
+    await tween(240, k => { const e = ease(k); fly.setAttribute("transform", `translate(${cx + (ax - cx) * e},${cy + (ay - cy) * e - Math.sin(k * Math.PI) * 18})`); });
+    fly.remove(); cupEl.classList.remove("pick"); fillTray(id, ++n);
+  }
+}
+async function returnCups(id) {
+  const list = roleById[id].skills.filter(s => s in skillIdx); let n = list.length;
+  for (const s of list) {
+    const [cx, cy] = cupPos[skillIdx[s]]; const g = agents[id], ax = +g.dataset.x, ay = +g.dataset.y - 46;
+    fillTray(id, --n);
+    const fly = el("g", { class: "cup flying" }, svg); cupShape(fly, true);
+    await tween(200, k => { const e = ease(k); fly.setAttribute("transform", `translate(${ax + (cx - ax) * e},${ay + (cy - ay) * e - Math.sin(k * Math.PI) * 14})`); });
+    fly.remove();
+  }
+}
+async function goToWork(id, doing) {
+  const st = state[id]; if (st.busy || st.s !== "rest") return;
+  st.busy = true; st.doing = "Picking up skills"; rows();
+  await walk(id, [shelfFront]);
+  await pickCups(id);
+  st.doing = "Heading to the work floor"; rows();
+  await walk(id, [door, deskOf[id]]);
+  st.s = "run"; st.doing = doing || "Working on the milestone"; st.busy = false; setBadge(id); rows();
+}
+async function goToRest(id) {
+  const st = state[id]; if (st.busy || st.s === "rest") return;
+  st.busy = true; st.s = "run"; st.doing = "Putting skills back"; setBadge(id); rows();
+  await walk(id, [door, shelfFront]);
+  await returnCups(id);
+  await walk(id, [home[id]]);
+  st.s = "rest"; st.doing = "Resting"; st.busy = false; setBadge(id); rows();
+}
+
+// Rows
+function rows() {
+  const order = [...roles].sort((a, b) => rank(a.id) - rank(b.id));
+  const counts = { ask: 0, run: 0, rest: 0 }; roles.forEach(r => counts[state[r.id].s]++);
+  $("#counts").innerHTML = `<span><i class="sm ask"></i>${counts.ask} needs you</span><span><i class="sm run"></i>${counts.run} at work</span><span><i class="sm later"></i>${counts.rest} resting</span>`;
+  $("#rcount").textContent = `${roles.length} roles`;
+  $("#desks").innerHTML = order.map(r => {
+    const st = state[r.id], idle = st.s === "rest" && !st.busy;
+    const pill = st.s === "ask" ? `<span class="pill ask"><i class="sm ask"></i>Needs you</span>` : st.s === "run" || st.busy ? `<span class="pill run"><i class="sm run"></i>At work</span>` : `<span class="pill later"><i class="sm later"></i>Resting</span>`;
+    const act = st.busy ? "" : st.s === "rest" ? `<button class="btn quiet" data-go="${esc(r.id)}">Send to work</button>` : `<button class="btn quiet" data-back="${esc(r.id)}">Call back</button>`;
+    return `<div class="row${idle ? " idle" : ""}${sel === r.id ? " sel" : ""}" data-row="${esc(r.id)}"><div class="l1">${pill}<span class="t">${esc(cap(r.id))}</span><span class="chip"><b>${esc(MODEL(r.model))}</b> ${esc(r.id)}</span><span class="act">${act}</span></div>
+      <div class="now">${esc(st.doing)}</div><div class="sk">${r.skills.map(s => `<span class="chip" data-cup="${esc(s)}">${esc(s)}</span>`).join("")}</div></div>`;
+  }).join("");
+  $("#scount").textContent = `${skills.length} skills, ${D.rejected.length} turned down`;
+  $("#shelf").innerHTML = skills.map(s => {
+    const src = s.sources.length ? s.sources.map(x => x.repo.split("/")[0]).join(", ") : "own";
+    const lic = [...new Set(s.sources.map(x => x.license.split(",")[0].replace("Apache License 2.0", "Apache 2.0")))].join(", ");
+    const commits = [...new Set(s.sources.map(x => x.commit.slice(0, 7)))].join(", ");
+    const carriers = roles.filter(r => r.skills.includes(s.id) && state[r.id].s !== "rest").length;
+    return `<div class="row sh" data-skill-row="${esc(s.id)}"><span class="t" style="font-size:14.5px">${esc(s.id)}</span><span class="who">${carriers ? `${carriers} out` : "on shelf"}</span>
+      <span class="who">from ${esc(src)} · ${esc(lic || "own")}${commits ? ` · <span class="mono">${esc(commits)}</span>` : ""}</span><span class="who">${s.usedBy.length} role${s.usedBy.length === 1 ? "" : "s"}</span></div>`;
+  }).join("");
+}
+const rank = id => ({ ask: 0, run: 1, rest: 2 }[state[id].s]) * 100 + roles.findIndex(r => r.id === id);
+
+function select(id) {
+  sel = sel === id ? null : id;
+  roles.forEach(r => setBadge(r.id));
+  svg.querySelectorAll(".cup").forEach(c => c.classList.toggle("lit", !!sel && roleById[sel].skills.includes(c.dataset.skill)));
+  rows();
+}
+function selectCup(sk) {
+  sel = null; roles.forEach(r => setBadge(r.id));
+  svg.querySelectorAll(".cup").forEach(c => c.classList.toggle("lit", c.dataset.skill === sk));
+  roles.forEach(r => { if (r.skills.includes(sk)) agents[r.id].classList.add("sel"); });
+}
+
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]"), back = e.target.closest("[data-back]");
+  if (go) return goToWork(go.dataset.go);
+  if (back) return goToRest(back.dataset.back);
+  const a = e.target.closest(".agent"); if (a) return select(a.dataset.role);
+  const c = e.target.closest(".cup[data-skill]") || e.target.closest("[data-cup]"); if (c) return selectCup(c.dataset.skill || c.dataset.cup);
+  const r = e.target.closest("[data-row]"); if (r) return select(r.dataset.row);
+});
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches(".agent, .cup")) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent("click", { bubbles: true })); } });
+$("#askbtn").addEventListener("click", async () => {
+  if (state.reviewer?.s !== "ask") return;
+  state.reviewer.s = "run"; state.reviewer.doing = "Go received: re-verifying lane A on the merged head"; setBadge("reviewer"); rows();
+  $("#askbtn").hidden = true;
+});
+$("#demo").addEventListener("click", async () => {
+  const plan = [["spec-auditor", "Test-gap table for lane B"], ["gate-runner", "Full gate on lane B"], ["critic", "Black-box pass as a first-time buyer"]];
+  for (const [id, d] of plan) if (roleById[id]) { await goToWork(id, d); }
+  if (roleById.architect && state.architect.s === "run") await goToRest("architect");
+});
+
+// Header
+$("#title").innerHTML = `${esc(cap(D.team.name.replace("-team", "")))} team<i></i>`;
+$("#meta").textContent = `${roles.length} roles, ${skills.length} skills, version ${D.team.version}. Shared by every business; each business brings its own knowledge.`;
+$("#commit").textContent = `${D.team.ref} ${D.team.commit.slice(0, 8)}`;
+drawRoom(); drawAgents(); rows();
+</script>

@@ -1,4 +1,4 @@
-# 16 Team setup and skill board
+# 16 Team setup, team room and skill board
 
 _Draft from the Agent Teams session, 2026-10-10. Jase approved the four decisions in §11 the same day. Not yet in the os-flow repo; the OS Flow session owns where it lands and its number. Builds on spec/05 (an agent's "What it may use", `skills?: string[]`), spec/09 (read-back), spec/10 (Forge desk, Needs you), spec/13 (runs, versions, connectors named not configured) and spec/15 §5 (learning reviewed before it ships). References read this session: EricTechPro/super-board at `35e21561` (2026-10-08, MIT), mattpocock/skills at `49dd158d` (2026-10-09, MIT), Agent-Teams `plugins/dev-team` 0.2.0. Nothing here is built._
 
@@ -44,6 +44,23 @@ A map of the team, rebuilt from the repo on every read. Copies super-board's int
 - **Across teams view** (once marketing exists). Skills more than one team loads, which are candidates for a shared skill shelf.
 
 Node click: neighbours stay lit, the rest dims, details open with tabs **What · When · How · Source · Used by**. Source shows license, repo, commit, the path adapted from, and the one-line "what we changed". Deep link `#team=<id>&view=<id>&node=<id>`. Phone: details as a bottom sheet. Export: PNG and the map JSON.
+
+### 3.4 Team room (Jase, 2026-10-10)
+
+Jase: the skill board and the agent teams board live together in OS Flow as one place "where they sit and rest when they are not in use and also shows who is on roster, pick up a skills/cup/something when they go to work, that how it should looks like in animation. But if it is an interface, make it using the capsule design system."
+
+Name: **Team room**, the name Capsule already gives this section of the Forge board (docs/design/CAPSULE-DESIGN.md, Components, Team room). Using it avoids a second name for the same thing. Jase offered hub, living room, break room, staff lounge, tea room and common area; any of them can replace it with a one-word change.
+
+One page per team, two layers:
+
+- **The room (the page's one picture, like the Forge board's wafer map).** Three zones: **Resting** (seats, one per role, plus a tea counter), the **Skill shelf** on the back wall (one cup per skill, labeled), and the **Work floor** through a doorway (a desk per running role). An agent called to work stands, walks to the shelf, picks up a cup for each skill its role preloads (copies; the shelf keeps one of each), goes through the door and sits at a desk with its cups. Called back, it returns its cups and sits down again. An agent waiting on the owner keeps its desk and wears the coral needs-you mark (the One Signal Rule: coral only there). Each agent shows its state mark beside its head (Shape Twin Rule), so the room reads without color. Picking an agent lights its cups on the shelf; picking a cup lights every agent who carries it.
+- **The interface (Capsule).** Under the room: **On the roster**, one row per role (state pill, role, model chip, what it is doing now, its skills as chips; needs you first, then at work, then resting dimmed, never folded away; Jase's own desk is not listed, Needs you is his desk), and **Skill shelf**, one row per skill (source creators, license, pinned commit, how many roles load it, how many cups are out). Rejected candidates and the loop stay as tabs or links from the shelf (§3.2).
+
+**Motion.** Real state changes drive it; nothing walks for decoration. The walk is the one exception to Capsule's under-300ms rule, because it shows a real transition; each cup's flight stays at 200 to 240 ms. Under reduced motion every agent jumps to its new place and the rows carry the change. Motion never carries information on its own: the rows say everything the room shows.
+
+**Data.** Roles, skills and cups come from the team repo at its pinned commit (§4); states come from runs (spec/13) once real runs exist. Until then the room shows example states and says so.
+
+**Prototype.** `docs/handoff/team-room-prototype.html` on this branch, generated from dev-team 0.3.0 at d111723e by `docs/handoff/skill-board/gen.py` with `teamroom-template.html`. It is a design reference built with Capsule tokens, not OS Flow code; OS Flow builds its own in its stack.
 
 ### 3.3 Skill detail
 
@@ -169,7 +186,7 @@ One loop the dev team runs on every project, written once in the team repo (`wor
 | 7 | Black-box check | critic, screens and evidence only | report filed |
 | 8 | Review | reviewer: writes its own 2 to 4 guesses from spec and diff before reading the builder's report; labels findings Gap, Bug, Verification miss, Scope drift, Over-engineering; re-checks its earlier findings | no blocking findings |
 | 9 | Fix and re-verify | fixer, then reviewer's verified-fixed table | same root cause twice stops at the cap and goes to the owner |
-| 10 | Release check | scribe with `release-checklist`: reviewed head is the merged head, base merged in and gate green on it, one-way or two-way door call, analytics events named for any new feature | owner signs |
+| 10 | Release check | gate-runner with `release-checklist` (as built in dev-team 0.3.0): reviewed head is the merged head, base merged in and gate green on it, one-way or two-way door call, analytics events named for any new feature | owner signs |
 | 11 | Owner go | **Jase** | merge or deploy |
 | 12 | Retro | scribe with `run-retro` | proposals on the desk (§6.1) |
 | 13 | Watch | the collect step reads PostHog and errors for the shipped change (§8) | findings filed to Backlog, never to Ready |
