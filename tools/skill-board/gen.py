@@ -69,9 +69,15 @@ commit = git("rev-parse", ref).strip()
 plugin = json.loads(show(".claude-plugin/plugin.json"))
 issues = []
 
-# THIRD_PARTY.md table: skill -> sources
+# THIRD_PARTY.md table: skill -> sources; skills under "## Referenced, not copied" are used by name, not shipped
 third = {}
-for line in (show("THIRD_PARTY.md") or "").splitlines():
+third_text = show("THIRD_PARTY.md") or ""
+referenced = set()
+for line in section(third_text, "Referenced, not copied").splitlines():
+    cells = [c.strip() for c in line.strip().strip("|").split("|")]
+    if line.strip().startswith("|") and cells[0] not in ("Skill", "") and not set(cells[0]) <= set("-: "):
+        referenced.add(cells[0].replace("`", "").split(" ")[0])
+for line in third_text.splitlines():
     cells = [c.strip() for c in line.strip().strip("|").split("|")]
     if len(cells) == 4 and cells[0] not in ("Skill", "") and not set(cells[0]) <= set("-: "):
         name, frm, com, lic = cells
@@ -99,7 +105,7 @@ for name in ls("skills"):
     sources = third.get(name, [])
     if not src_text:
         issues.append(f"Skill {name} has no Source section")
-    if src_text and not sources and "own" not in src_text.lower():
+    if src_text and not sources and "own" not in src_text.lower() and "written by this team" not in src_text.lower():
         issues.append(f"Skill {name} is not listed in THIRD_PARTY.md")
     title = re.search(r"^# (.+)$", body, re.M)
     skills[name] = {
@@ -127,7 +133,7 @@ for f in sorted(ls("agents")):
     for s in sk:
         if s in skills:
             skills[s]["usedBy"].append(rid)
-        else:
+        elif s not in referenced:
             issues.append(f"Role {rid} loads {s}, which does not exist")
     tools = meta.get("tools", "")
     roles.append({
@@ -189,12 +195,13 @@ data = {
     "rejected": rejected,
     "loopHeader": lh or [],
     "loop": loop,
+    "referenced": sorted(referenced),
     "licenses": licenses,
     "evals": evals,
     "issues": issues,
 }
 html = open(template).read().replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False).replace("</", "<\\/"))
 open(out, "w").write(html)
-print(f"{len(roles)} roles, {len(skills)} skills, {len(rejected)} rejected, {len(loop)} loop rows, {len(issues)} issues")
+print(f"{len(roles)} roles, {len(skills)} skills, {len(referenced)} referenced, {len(rejected)} rejected, {len(loop)} loop rows, {len(issues)} issues")
 for i in issues:
     print(" -", i)

@@ -1,6 +1,6 @@
 # Milestone loop
 
-The one loop the dev team runs on every project, from a request to shipped work and back. Owned by the scribe; every role reads it. The roles say who does what and the skills say how; this page says in what order, and what moves work from one stage to the next.
+The one loop the dev team runs on every project, from a request to shipped work and back, with the design team's two stages on milestones that change screens. Owned by the scribe; every role reads it. The roles say who does what and the skills say how; this page says in what order, and what moves work from one stage to the next.
 
 Everything project-specific comes from the app's `CLAUDE.md`: the commands, the gate, the paths, the protected files, the owner, what never ships without approval, the tools it uses (an analytics tool such as PostHog, an error log, an issue tracker). Where the `CLAUDE.md` is silent on something a stage needs, the role stops and asks. Nothing here overrides it.
 
@@ -8,33 +8,37 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 
 ## The stages
 
-| # | Stage | Who | Gate to move on |
-|---|---|---|---|
-| 0 | Intake | the owner, or a finding from Watch (stage 13) | the owner moves the item from the backlog to ready; nothing else does |
-| 1 | Grill the plan | architect, `grill-the-plan` | the owner confirms no open decision is left |
-| 2 | Plan and slice | architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan | the owner approves the breakdown; every reviewer plan finding answered |
-| 3 | Pre-flight per lane | each lane owner, with the checklist below | each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane |
-| 4 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane | the lane's named red tests are green in a gate the lane ran |
-| 5 | Gate | gate-runner, the app's full gate | every part green on a fresh run, with numbers, on every target |
-| 6 | Spec check | spec-auditor, conformance table and test-gap table (`hidden-failure-check`) | no Missing row and no High test gap open |
-| 7 | Black-box check | critic, screens and evidence only, never the code first | report filed for each persona; zero blockers and zero majors on every target |
-| 8 | Review | reviewer: hypotheses from the spec and raw diff before any builder's report; findings labeled Gap, Bug, Verification miss, Scope drift, Over-engineering; earlier findings re-checked by id | no blocking finding open |
-| 9 | Fix and re-verify | fixer, then the reviewer's verified-fixed table, signed with the head sha | every finding fixed and re-verified; the same root cause twice stops (see caps) |
-| 10 | Release check | gate-runner, `release-checklist`: merge danger, merge-gate lines, analytics events named, rollback triggers | the owner signs the checklist |
-| 11 | Owner go | **the owner** | the owner merges or deploys, or says who does, each time |
-| 12 | Retro | scribe, `run-retro` | proposals on the owner's desk; each approved, rejected or parked by the owner |
-| 13 | Watch | whoever the app's `CLAUDE.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready |
+| # | Stage | Who | Gate to move on | Phase |
+|---|---|---|---|---|
+| 0 | Intake | the owner, or a finding from Watch (stage 15) | the owner moves the item from the backlog to ready; nothing else does | Plan |
+| 1 | Grill the plan | architect, `grill-the-plan` | the owner confirms no open decision is left | Plan |
+| 2 | Plan and slice | architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan | the owner approves the breakdown; every reviewer plan finding answered | Plan |
+| 3 | Design | the design team's designer, `design-handoff`: screens, states, tokens used and acceptance notes per screen, extending the app's design system | the owner approves the design hand-off | Plan |
+| 4 | Pre-flight per lane | each lane owner, with the checklist below | each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane | Build |
+| 5 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane; a lane that builds a designed screen builds to the hand-off | the lane's named red tests are green in a gate the lane ran | Build |
+| 6 | Gate | gate-runner, the app's full gate | every part green on a fresh run, with numbers, on every target | Check |
+| 7 | Spec check | spec-auditor, conformance table and test-gap table (`hidden-failure-check`) | no Missing row and no High test gap open | Check |
+| 8 | Black-box check | critic, screens and evidence only, never the code first | report filed for each persona; zero blockers and zero majors on every target | Check |
+| 9 | Design check | the design team's design-auditor: the build against the hand-off and the app's design system (craft, accessibility, motion); read-only | no blocker or major design finding open | Check |
+| 10 | Review | reviewer: hypotheses from the spec and raw diff before any builder's report; findings labeled Gap, Bug, Verification miss, Scope drift, Over-engineering; earlier findings re-checked by id | no blocking finding open | Check |
+| 11 | Fix and re-verify | fixer, then the reviewer's verified-fixed table, signed with the head sha; design findings re-checked by id by the design-auditor | every finding fixed and re-verified; the same root cause twice stops (see caps) | Fix |
+| 12 | Release check | gate-runner, `release-checklist`: merge danger, merge-gate lines, analytics events named, rollback triggers | the owner signs the checklist | Ship |
+| 13 | Owner go | **the owner** | the owner merges or deploys, or says who does, each time | Ship |
+| 14 | Retro | scribe, `run-retro` | proposals on the owner's desk; each approved, rejected or parked by the owner | Learn |
+| 15 | Watch | whoever the app's `CLAUDE.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready | Learn |
 
-A finding at any stage goes back to the stage that owns it (a spec gap to the architect, a red test to the lane or fixer), never around it.
+**Design** (stage 3) and **Design check** (stage 9) run only for a milestone that changes screens; for a milestone with no screen change both are skipped, and the plan says so in one line. They are run by the design team (the `design-team` plugin in this repo); where the app has no design team installed, the owner says who covers them or rules them out for the milestone. The Phase column groups the stages for tools that draw the loop; it changes no gate.
 
-## Pre-flight, before a lane starts (stage 3)
+A finding at any stage goes back to the stage that owns it (a spec gap to the architect, a design gap to the designer, a red test to the lane or fixer), never around it.
+
+## Pre-flight, before a lane starts (stage 4)
 
 The lane owner answers five questions and writes the answers in the lane's first message, before touching a worktree:
 
 1. **Already done?** A merged change, a closed item or code already on the base branch that delivers the same behavior, under any name.
 2. **Already in progress?** Another lane, branch or open pull request doing the same thing.
 3. **Overlapping files?** Another lane or open pull request touching the files this lane owns. Two lanes that overlap go one at a time: the earlier one proceeds, the later one is sequenced with `blocked-by:` the earlier one.
-4. **Unclear?** The spec row or red test is missing, or it contradicts the current code (cite `path:line`). Unclear goes back to the architect; the lane never decides it.
+4. **Unclear?** The spec row or red test is missing, or it contradicts the current code (cite `path:line`). Unclear goes back to the architect; a missing screen, state or token in the design hand-off goes back to the designer. The lane never decides it.
 5. **Too big?** Likely to change more lines than the app's `CLAUDE.md` allows for one lane, or spanning many areas at once. Too big goes back to the architect to split.
 
 Outcomes: **proceed**; **hold** (the item stops with a `blocked-by:` line and one sentence on why); or **sequence** (it waits for the named lane). A lane with no recorded answer is not started.
@@ -56,7 +60,7 @@ Outcomes: **proceed**; **hold** (the item stops with a `blocked-by:` line and on
 - Merge when CI failed to start, or call a gate green that did not run.
 - File follow-up work straight into ready. New work, refactor ideas and Watch findings go to the backlog; the owner moves them on.
 - Let a lane decide a judgment call without asking. A lane stops and asks the architect or the owner.
-- Let the reviewer patch code. The reviewer writes findings; the fixer fixes.
+- Let the reviewer or the design-auditor patch code. They write findings; the fixer fixes.
 - Install an outside skill or tool unpinned. Every outside source is pinned to a commit and recorded in `THIRD_PARTY.md`.
 - Edit a skill, hook, agent file or `CLAUDE.md` without the owner's approval. Retro output is proposals.
 
