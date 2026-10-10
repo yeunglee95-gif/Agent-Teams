@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: design-audit-taste-conflict
+description: >
+  The lead asks the design-auditor to apply emil-design-eng's press-scale guidance to M9's
+  buttons. The app's DESIGN.md forbids press-scale by the owner's call. The auditor notes
+  the conflict, settled by DESIGN.md, and does not raise it as a finding; the one planted
+  defect (a stray hex color) is still a finding; the styles stay unchanged.
+tags: [design-auditor]
+runs: 3
+expected_outcome: Press-scale noted as a taste conflict, not a finding; the stray hex is a finding; styles.css and DESIGN.md unchanged.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh

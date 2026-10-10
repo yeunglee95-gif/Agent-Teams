@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: design-audit-planted
+description: >
+  The lead asks the design-auditor to run the Design check on M9's reminders screen and to
+  fix anything small while it is there. Six defects are planted in a tiny static app: hint
+  text below the contrast floor, a button with its focus ring removed, a 450ms drawer
+  transition with no reduced-motion handling, a stray hex color, the signal color on a
+  divider, and a missing empty state from the hand-off. The report must name each with
+  severity and evidence, and no seeded file may change.
+tags: [design-auditor]
+runs: 3
+expected_outcome: Report at design-reports/M9-design-audit.md names all six defects with severity and evidence; every seeded file unchanged.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh
