@@ -16,7 +16,7 @@ From the repo root, for any branch or commit:
 python3 -I tools/skill-board/gen.py . main plugins/dev-team tools/skill-board/workspace-template.html out/team-room.html
 ```
 
-The arguments are the repo, the git ref, the plugin folder, the template and the output file. The script prints a count and any **map issues** it found. A map issue is a gap in the team repo, not in the page: a skill with no `## Source` section, a skill missing from `THIRD_PARTY.md`, a role that loads a skill that does not exist, or a skill no role loads. Fix it in the repo and run again.
+The arguments are the repo, the git ref, the plugin folder, the template and the output file. The script prints a count and any **map issues** it found. A map issue is a gap in the team repo, not in the page: a skill with no `## Source` section, a skill missing from `THIRD_PARTY.md` (a skill whose Source says "Written by this team" is the team's own), a role that loads a skill that is neither in `skills/` nor in the "Referenced, not copied" table, or a skill no role loads. Fix it in the repo and run again.
 
 Write output under `out/`, which is ignored. Generated pages are not committed, because they would go stale the moment a skill changes.
 
@@ -27,9 +27,9 @@ Only through `git show` and `git ls-tree` at the ref you name, so your working t
 - `.claude-plugin/plugin.json`: name and version
 - `agents/*.md` frontmatter: name, description, model, tools, `skills:`
 - `skills/*/SKILL.md`: frontmatter, title, first paragraph, and the `## Source` section ("Changed:" line)
-- `THIRD_PARTY.md`: the sources table (repo, path, commit, license)
+- `THIRD_PARTY.md`: the sources table (repo, path, commit, license), and the skill names in its "Referenced, not copied" table (skills used from Jase's account by name, not shipped)
 - `skills/REJECTED.md` or `REJECTED.md`: the turned-down table
-- `workflows/milestone-loop.md`: the first table (the stages)
+- `workflows/milestone-loop.md`: the first table (the stages). The Workflow board groups stages into columns by the table's Phase column, in order of first appearance, and finds the fix loop ("Fix and re-verify" back to "Review") and the loop back to intake by stage name. A table without a Phase column keeps the old fixed columns when it has 14 rows, and otherwise shows all stages in one column.
 - `licenses/` and `evals/`: counts only
 
 The repo link comes from the `origin` remote.

@@ -257,7 +257,7 @@ const lic = l => l.replace("Apache License 2.0", "Apache 2.0").split(",")[0];
 
 // Teams: dev is read from the repo; the rest are planned departments with nothing built yet.
 const TEAMS = [
-  { id: "dev", name: "Dev team", live: true },
+  { id: "dev", name: (n => n.charAt(0).toUpperCase() + n.slice(1))(String(D.team.name || "dev team").replace(/-/g, " ")), live: true },
   { id: "marketing", name: "Marketing team", note: "Researched, not built" },
   { id: "finance", name: "Finance team", note: "Planned" },
   { id: "sourcing", name: "Sourcing team", note: "Planned" },
@@ -359,17 +359,29 @@ function shelfRows() {
 }
 
 // Loop as a factory board: phase columns, stage cards, arrows, loops back, and one work item travelling it.
-const PHASES = [["Plan", [0, 1, 2]], ["Build", [3, 4]], ["Check", [5, 6, 7, 8]], ["Fix", [9]], ["Ship", [10, 11]], ["Learn", [12, 13]]];
-const ROUTE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 10, 11, 12, 13, 0];
-const LOOPS = [[9, 8, "re-verify"], [13, 0, "findings go back to intake"]];
+// Columns come from the loop table's Phase column, in order of first appearance. Without one, a 14-row table
+// keeps the old index mapping and any other table goes in one column. Stages are found by name, never by index.
 let flowSel = null, flowPaused = false;
 const F = { hop: 0, t0: 0, phase: "dwell", raf: 0, visible: true };
-function loopKeys() { const h = D.loopHeader; return { nk: h[0], sk: h.find(k => /stage/.test(k)) || h[1], wk: h.find(k => /who/.test(k)), gk: h.find(k => /gate/.test(k)) }; }
+function loopKeys() { const h = D.loopHeader; return { nk: h[0], sk: h.find(k => /stage/.test(k)) || h[1], wk: h.find(k => /who/.test(k)), gk: h.find(k => /gate/.test(k)), pk: h.find(k => /^phase$/.test(k)) }; }
 const isYou = r => { const { sk, wk } = loopKeys(); return /owner go/i.test(r[sk]) || /^\*\*the owner\*\*$/i.test(r[wk] || ""); };
 const plain = t => String(t || "").replace(/\*\*|`/g, "");
 const whoShort = t => plain(t).split(/[,;(:]/)[0].trim();
+const PHASES = (() => {
+  const { pk } = loopKeys();
+  if (pk) { const m = new Map(); D.loop.forEach((r, i) => { const p = plain(r[pk]).trim() || "Other"; if (!m.has(p)) m.set(p, []); m.get(p).push(i); }); return [...m]; }
+  if (D.loop.length === 14) return [["Plan", [0, 1, 2]], ["Build", [3, 4]], ["Check", [5, 6, 7, 8]], ["Fix", [9]], ["Ship", [10, 11]], ["Learn", [12, 13]]];
+  return D.loop.length ? [["Stages", D.loop.map((_, i) => i)]] : [];
+})();
+const stageAt = re => D.loop.findIndex(r => re.test(plain(r[loopKeys().sk]).trim()));
+const LAST = D.loop.length - 1, REVIEW = stageAt(/^review$/i);
+const FIX = (i => i >= 0 ? i : stageAt(/^fix\b/i))(stageAt(/^fix and re-verify$/i));
+const FIXLOOP = FIX >= 0 && REVIEW >= 0 && REVIEW < FIX;
+// Every stage in order; after Fix, back to Review once, then on; from the last stage back to the first.
+const ROUTE = D.loop.length > 1 ? [...D.loop.flatMap((_, i) => FIXLOOP && i === FIX ? [i, REVIEW] : [i]), 0] : [];
+const LOOPS = [...(FIXLOOP ? [[FIX, REVIEW, "re-verify"]] : []), ...(LAST > 0 ? [[LAST, 0, "findings go back to intake"]] : [])];
 function loop() {
-  if (D.loop.length < 14) return "";
+  if (!D.loop.length) return "";
   const { sk } = loopKeys();
   const cols = PHASES.map(([name, ids]) => `<div class="fcol"><div class="fh"><span>${name}</span><small>${ids.length}</small></div>${ids.map(i => {
     const r = D.loop[i]; const you = isYou(r);
@@ -383,7 +395,7 @@ function edgePath(a, b, board) {
   const A = $(`#fn-${a}`).getBoundingClientRect(), B = $(`#fn-${b}`).getBoundingClientRect(), O = board.getBoundingClientRect();
   const ax = A.left - O.left, ay = A.top - O.top, bx = B.left - O.left, by = B.top - O.top;
   const loopBack = LOOPS.find(([x, y]) => x === a && y === b);
-  if (loopBack && a === 13) { // under the board, then up the left margin into Intake's side
+  if (loopBack && a === LAST && b === 0) { // under the board, then up the left margin into Intake's side
     const yb = board.scrollHeight - 16, xl = 8, ty = by + B.height / 2;
     return `M${ax + A.width / 2},${ay + A.height} L${ax + A.width / 2},${yb - 10} Q${ax + A.width / 2},${yb} ${ax + A.width / 2 - 10},${yb} L${xl + 10},${yb} Q${xl},${yb} ${xl},${yb - 10} L${xl},${ty + 10} Q${xl},${ty} ${xl + 10},${ty} L${bx},${ty}`;
   }
@@ -391,7 +403,7 @@ function edgePath(a, b, board) {
     const x1 = ax + A.width / 2, y1 = ay + A.height, x2 = bx + B.width, y2 = by + B.height * .72;
     return `M${x1},${y1} C${x1},${y2} ${x2 + 30},${y2} ${x2},${y2}`;
   }
-  if (a === 8 && b === 9) { const x1 = ax + A.width, y1 = ay + A.height * .3, x2 = bx, y2 = by + B.height / 2; const mx = (x1 + x2) / 2; return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; }
+  if (FIXLOOP && a === REVIEW && b === FIX) { const x1 = ax + A.width, y1 = ay + A.height * .3, x2 = bx, y2 = by + B.height / 2; const mx = (x1 + x2) / 2; return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; }
   if (Math.abs(ax - bx) < 4) return `M${ax + A.width / 2},${ay + A.height} L${bx + B.width / 2},${by}`;
   const x1 = ax + A.width, y1 = ay + A.height / 2, x2 = bx, y2 = by + B.height / 2;
   const mx = (x1 + x2) / 2;
@@ -406,7 +418,7 @@ function drawFlow() {
   for (const k of pairs) {
     const [a, b] = k.split("-").map(Number); const back = LOOPS.find(([x, y]) => x === a && y === b);
     out += `<path id="fe-${k}" class="fedge${back ? " back" : ""}" d="${edgePath(a, b, board)}" marker-end="url(#fa)"/>`;
-    if (back) { const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("d", edgePath(a, b, board)); svg.appendChild(tmp); const L = tmp.getTotalLength(), m = tmp.getPointAtLength(L / 2); tmp.remove(); out += a === 13 ? `<text class="flabel" x="${m.x}" y="${m.y - 6}" text-anchor="middle">${back[2]}</text>` : `<text class="flabel" x="${m.x + 6}" y="${m.y + 4}">${back[2]}</text>`; }
+    if (back) { const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("d", edgePath(a, b, board)); svg.appendChild(tmp); const L = tmp.getTotalLength(), m = tmp.getPointAtLength(L / 2); tmp.remove(); out += a === LAST && b === 0 ? `<text class="flabel" x="${m.x}" y="${m.y - 6}" text-anchor="middle">${back[2]}</text>` : `<text class="flabel" x="${m.x + 6}" y="${m.y + 4}">${back[2]}</text>`; }
   }
   out += `<circle id="fdot" r="6" class="fdot"/>`;
   svg.innerHTML = out;
