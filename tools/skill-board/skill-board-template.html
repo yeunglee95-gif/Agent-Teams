@@ -1,0 +1,289 @@
+<title>Dev Team Skill Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a wiring diagram. Roles are connectors on the left, skills are parts on the right,
+   wires show which role loads which skill; a details strip reads out the selected part. */
+:root {
+  --bg: #f3f4f1; --surface: #ffffff; --ink: #1c2320; --muted: #5d6964; --line: #d3d9d4;
+  --accent: #2a5bd7; --accent-soft: #e3eafb; --wire: #b9c2bd; --warn: #b45309; --warn-soft: #fdf0e1;
+  --c-obra: #7c3aed; --c-anthropics: #b4532a; --c-mattpocock: #0f766e; --c-addyosmani: #a21caf; --c-EricTechPro: #1d4ed8; --c-own: #4b5563;
+  --display: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111513; --surface: #191e1c; --ink: #e4e9e6; --muted: #97a29d; --line: #2b3330;
+  --accent: #86a6ff; --accent-soft: #1d2740; --wire: #3a4440; --warn: #f0a35c; --warn-soft: #2f2416;
+  --c-obra: #b69bff; --c-anthropics: #ec8f62; --c-mattpocock: #4fd1c0; --c-addyosmani: #e48ae9; --c-EricTechPro: #7fa6ff; --c-own: #aab3b0;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111513; --surface: #191e1c; --ink: #e4e9e6; --muted: #97a29d; --line: #2b3330;
+  --accent: #86a6ff; --accent-soft: #1d2740; --wire: #3a4440; --warn: #f0a35c; --warn-soft: #2f2416;
+  --c-obra: #b69bff; --c-anthropics: #ec8f62; --c-mattpocock: #4fd1c0; --c-addyosmani: #e48ae9; --c-EricTechPro: #7fa6ff; --c-own: #aab3b0;
+  color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; }
+header { display: grid; gap: 6px; margin-bottom: 20px; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 700 clamp(30px, 5vw, 44px)/1.05 var(--display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 68ch; margin: 0; }
+.spec { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px var(--mono); color: var(--muted); margin-top: 6px; }
+.spec b { color: var(--ink); font-weight: 500; }
+.spec a { color: var(--accent); }
+nav { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--line); margin: 18px 0 20px; }
+nav button { font: 600 15px var(--display); letter-spacing: .02em; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 8px 12px 9px; cursor: pointer; }
+nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav button:focus-visible, .node:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav .count { font: 12px var(--mono); color: var(--muted); margin-left: 4px; }
+nav .count.warn { color: var(--warn); }
+
+/* Map */
+.map { display: grid; grid-template-columns: minmax(0, 250px) minmax(60px, 1fr) minmax(0, 280px) minmax(0, 340px); gap: 0 0; align-items: start; position: relative; }
+.col { display: grid; gap: 6px; position: relative; z-index: 1; }
+.col h2, .details h2.k { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.node { display: grid; gap: 1px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; cursor: pointer; color: var(--ink); font: inherit; min-width: 0; transition: opacity .15s, border-color .15s; }
+.node .n { font: 600 16px/1.2 var(--display); letter-spacing: .01em; overflow-wrap: anywhere; }
+.node .m { font: 12px var(--mono); color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.role .n::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--muted); margin-right: 7px; vertical-align: 2px; }
+.node.sel { border-color: var(--accent); background: var(--accent-soft); }
+.node.lit { border-color: var(--accent); }
+.dim .node:not(.sel):not(.lit) { opacity: .35; }
+.dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.wires path { fill: none; stroke: var(--wire); stroke-width: 1.2; transition: stroke .15s, opacity .15s; }
+.dim .wires path { opacity: .18; }
+.dim .wires path.on { opacity: 1; stroke: var(--accent); stroke-width: 2; }
+.details { margin-left: 20px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; min-width: 0; display: grid; gap: 12px; max-height: calc(100vh - 24px); overflow: auto; }
+.details h3 { font: 700 24px/1.1 var(--display); margin: 0; overflow-wrap: anywhere; }
+.details p { margin: 0; }
+.details .lead { color: var(--muted); font-style: italic; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; }
+.kv dt { font: 12px var(--mono); color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 13px var(--mono); border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 2px 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.src { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; font-size: 13px; }
+.src .r { font: 500 13px var(--mono); }
+.src code, .mono { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+a { color: var(--accent); }
+.hint { color: var(--muted); font-size: 13px; }
+
+/* Sources */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card h3 { font: 700 22px/1.1 var(--display); margin: 0; display: flex; gap: 8px; align-items: center; }
+.card .lic { font: 12px var(--mono); color: var(--muted); }
+
+/* Loop */
+.loop { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: s; max-width: 900px; }
+.loop li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.loop .no { font: 700 26px/1 var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.loop .st { font: 700 19px/1.2 var(--display); margin: 0 0 4px; }
+.loop .row { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: 14px; }
+.loop .row dt { font: 12px var(--mono); color: var(--muted); padding-top: 2px; }
+td.nw { white-space: nowrap; }
+.loop .row dd { margin: 0; min-width: 0; }
+.loop li.owner .st { color: var(--accent); }
+
+/* Tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+.issues { background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 8px; padding: 12px 16px; color: var(--ink); }
+.issues li { margin: 2px 0; }
+.empty { color: var(--muted); }
+
+@media (max-width: 1000px) {
+  .map { grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr); }
+  .details { grid-column: 1 / -1; margin: 18px 0 0; position: static; max-height: none; }
+}
+@media (max-width: 640px) {
+  .map { grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); }
+  .node { padding: 6px 8px; }
+  .node .n { font-size: 14px; }
+  .node .m { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="h1">Dev team skill board</h1>
+    <p class="sub" id="sub"></p>
+    <div class="spec" id="spec"></div>
+  </header>
+  <nav role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const GH = "https://github.com/";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const md = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+const KNOWN = ["obra", "anthropics", "mattpocock", "addyosmani", "EricTechPro", "own"];
+const color = a => KNOWN.includes(a) ? `var(--c-${a})` : "var(--c-own)";
+const skillById = Object.fromEntries(D.skills.map(s => [s.id, s]));
+const roleById = Object.fromEntries(D.roles.map(r => [r.id, r]));
+const short = c => (c || "").slice(0, 8);
+const repoFile = p => `${GH}${D.team.repo}/blob/${D.team.commit}/${p}`;
+const srcLink = s => /^[\w.-]+\/[\w.-]+$/.test(s.repo) ? `${GH}${s.repo}/tree/${s.commit}/${s.path.split(" ")[0]}` : null;
+
+// Header
+$("#eyebrow").textContent = `Agent Teams · ${D.team.name} ${D.team.version}`;
+const creators = [...new Set(D.skills.flatMap(s => s.authors))];
+$("#sub").textContent = `${D.roles.length} roles and the ${D.skills.length} skills they load, with where each skill came from. Read from the team repo; nothing on this page is typed by hand.`;
+$("#spec").innerHTML = [
+  `repo <b><a href="${GH}${D.team.repo}/tree/${D.team.commit}" target="_blank" rel="noopener">${esc(D.team.repo)}</a></b>`,
+  `ref <b>${esc(D.team.ref)}</b>`, `commit <b>${short(D.team.commit)}</b>`,
+  `sources <b>${creators.filter(c => c !== "own").length}</b>`, `licenses <b>${D.licenses.length}</b>`,
+  D.evals.length ? `evals <b>${D.evals.length}</b>` : ""
+].filter(Boolean).join("");
+
+// Tabs
+const TABS = [
+  ["map", "Map", D.skills.length],
+  ["sources", "Sources", creators.length],
+  ...(D.loop.length ? [["loop", "Loop", D.loop.length]] : []),
+  ["rejected", "Rejected", D.rejected.length],
+  ...(D.issues.length ? [["issues", "Map issues", D.issues.length]] : []),
+];
+let tab = "map", sel = null;
+function renderTabs() {
+  $("#tabs").innerHTML = TABS.map(([id, label, n]) =>
+    `<button role="tab" id="tab-${id}" aria-selected="${tab === id}" data-tab="${id}">${label}<span class="count${id === "issues" ? " warn" : ""}">${n}</span></button>`).join("");
+}
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { tab = b.dataset.tab; sel = null; go(); } });
+
+// Map
+function mapView() {
+  const roles = D.roles.map(r => `<button class="node role" data-k="role" data-id="${esc(r.id)}"><span class="n">${esc(r.id)}</span><span class="m">${esc(r.model)} · ${r.skills.length} skill${r.skills.length === 1 ? "" : "s"}${r.tools ? " · read-only" : ""}</span></button>`).join("");
+  const order = [...D.skills].sort((a, b) => (a.authors[0] + a.id).localeCompare(b.authors[0] + b.id));
+  const skills = order.map(s => `<button class="node skill" data-k="skill" data-id="${esc(s.id)}"><span class="n">${esc(s.id)}</span><span class="m">${s.authors.map(a => `<span class="dot" style="background:${color(a)}"></span>${esc(a)}`).join(" ")}</span></button>`).join("");
+  return `<div class="map" id="map"><svg class="wires" id="wires" aria-hidden="true"></svg>
+    <div class="col" id="roles"><h2>Roles</h2>${roles}</div><div></div>
+    <div class="col" id="skills"><h2>Skills</h2>${skills}</div>
+    <aside class="details" id="details" aria-live="polite"></aside></div>`;
+}
+function drawWires() {
+  const map = $("#map"), svg = $("#wires"); if (!map) return;
+  const box = map.getBoundingClientRect();
+  svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+  let out = "";
+  for (const r of D.roles) for (const s of r.skills) {
+    const a = $(`.role[data-id="${CSS.escape(r.id)}"]`, map), b = $(`.skill[data-id="${CSS.escape(s)}"]`, map);
+    if (!a || !b) continue;
+    const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    const x1 = ra.right - box.left, y1 = ra.top + ra.height / 2 - box.top, x2 = rb.left - box.left, y2 = rb.top + rb.height / 2 - box.top;
+    const dx = (x2 - x1) / 2;
+    out += `<path data-r="${esc(r.id)}" data-s="${esc(s)}" d="M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}"/>`;
+  }
+  svg.innerHTML = out;
+  highlight();
+}
+function highlight() {
+  const map = $("#map"); if (!map) return;
+  map.classList.toggle("dim", !!sel);
+  map.querySelectorAll(".node").forEach(n => n.classList.remove("sel", "lit"));
+  map.querySelectorAll("path").forEach(p => p.classList.remove("on"));
+  if (!sel) return;
+  const me = $(`.node[data-k="${sel.k}"][data-id="${CSS.escape(sel.id)}"]`, map); me && me.classList.add("sel");
+  const linked = sel.k === "role" ? roleById[sel.id].skills : skillById[sel.id].usedBy;
+  const other = sel.k === "role" ? "skill" : "role";
+  linked.forEach(id => { const n = $(`.node[data-k="${other}"][data-id="${CSS.escape(id)}"]`, map); n && n.classList.add("lit"); });
+  map.querySelectorAll(`path[data-${sel.k === "role" ? "r" : "s"}="${CSS.escape(sel.id)}"]`).forEach(p => p.classList.add("on"));
+}
+function details() {
+  const el = $("#details"); if (!el) return;
+  if (!sel) {
+    el.innerHTML = `<h2 class="k">How to read it</h2><p>Each line is a skill a role loads before it starts work. Pick a role to see its skills, or a skill to see who uses it and where it came from.</p>
+      <div class="chips">${creators.map(c => `<span class="chip" style="cursor:default"><span class="dot" style="background:${color(c)}"></span>${esc(c)}</span>`).join("")}</div>
+      <p class="hint">Colors mark the creator a skill was adapted from. "own" means written by this team.</p>`;
+    return;
+  }
+  if (sel.k === "role") {
+    const r = roleById[sel.id];
+    el.innerHTML = `<h2 class="k">Role</h2><h3>${esc(r.id)}</h3><p>${md(r.what)}</p>
+      <dl class="kv"><dt>model</dt><dd>${esc(r.model)}</dd>${r.tools ? `<dt>tools</dt><dd>${esc(r.tools)}</dd>` : ""}<dt>file</dt><dd><a href="${repoFile(r.path)}" target="_blank" rel="noopener" class="mono">${esc(r.path.split("/").slice(-2).join("/"))}</a></dd></dl>
+      <div><h2 class="k">Loads</h2><div class="chips">${r.skills.map(s => `<button class="chip" data-k="skill" data-id="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`;
+  } else {
+    const s = skillById[sel.id];
+    const srcs = s.sources.length ? s.sources.map(x => { const l = srcLink(x); return `<div class="src"><span class="r"><span class="dot" style="background:${color(x.repo.split("/")[0])}"></span> ${l ? `<a href="${l}" target="_blank" rel="noopener">${esc(x.repo)}</a>` : esc(x.repo)}</span><code>${esc(x.path)}</code><dl class="kv"><dt>commit</dt><dd class="mono">${esc(x.commit)}</dd><dt>license</dt><dd>${esc(x.license)}</dd></dl></div>`; }).join("")
+      : `<div class="src"><span class="r">Written by this team</span></div>`;
+    el.innerHTML = `<h2 class="k">Skill</h2><h3>${esc(s.title)}</h3>${s.lead ? `<p class="lead">${md(s.lead)}</p>` : ""}<p>${md(s.what)}</p>
+      <div><h2 class="k">Used by</h2><div class="chips">${s.usedBy.map(r => `<button class="chip" data-k="role" data-id="${esc(r)}">${esc(r)}</button>`).join("") || '<span class="empty">no role</span>'}</div></div>
+      <div><h2 class="k">Source</h2>${srcs}</div>
+      ${s.changed ? `<div><h2 class="k">What we changed</h2><p>${md(s.changed)}</p></div>` : ""}
+      <dl class="kv"><dt>file</dt><dd><a href="${repoFile(s.path)}" target="_blank" rel="noopener" class="mono">skills/${esc(s.id)}/SKILL.md</a></dd></dl>`;
+  }
+}
+
+// Sources
+function sourcesView() {
+  const by = {};
+  for (const s of D.skills) for (const src of (s.sources.length ? s.sources : [{ repo: "own", license: "", commit: "" }])) {
+    const k = src.repo; (by[k] ??= { repo: k, skills: new Set(), commits: new Set(), license: src.license }).skills.add(s.id);
+    if (src.commit) by[k].commits.add(src.commit);
+  }
+  const cards = Object.values(by).sort((a, b) => b.skills.size - a.skills.size).map(g => {
+    const who = g.repo.split("/")[0];
+    return `<section class="card"><h3><span class="dot" style="background:${color(who)};width:12px;height:12px"></span>${g.repo === "own" ? "Written by this team" : `<a href="${GH}${esc(g.repo)}" target="_blank" rel="noopener">${esc(g.repo)}</a>`}</h3>
+      ${g.license ? `<div class="lic">${esc(g.license)}</div>` : ""}
+      <div class="chips">${[...g.skills].map(s => `<button class="chip" data-k="skill" data-id="${esc(s)}" data-jump="1">${esc(s)}</button>`).join("")}</div>
+      ${g.commits.size ? `<div class="mono">pinned at ${[...g.commits].map(short).join(", ")}</div>` : ""}</section>`;
+  }).join("");
+  return `<p class="sub" style="margin-bottom:16px">Every outside skill is copied, rewritten and pinned to one commit, with its license text kept in <code>licenses/</code> (${D.licenses.map(esc).join(", ")}). Nothing here is installed from the source.</p><div class="grid">${cards}</div>`;
+}
+
+// Loop
+function loopView() {
+  const h = D.loopHeader;
+  const numKey = h.find(k => /^#|^no|^step$/.test(k)), stageKey = h.find(k => /stage/.test(k)) || h[1];
+  const rest = h.filter(k => k !== numKey && k !== stageKey);
+  return `<p class="sub" style="margin-bottom:16px">The loop every project runs, read from <code>workflows/milestone-loop.md</code>. Project details come from each project's own CLAUDE.md.</p>
+    <ol class="loop">${D.loop.map((r, i) => `<li class="${/owner go|jase/i.test(r[stageKey] + r[rest[0]]) ? "owner" : ""}"><span class="no">${esc(numKey ? r[numKey] : i)}</span><div><p class="st">${md(r[stageKey])}</p><dl class="row">${rest.map(k => r[k] ? `<dt>${esc(k)}</dt><dd>${md(r[k])}</dd>` : "").join("")}</dl></div></li>`).join("")}</ol>`;
+}
+
+// Rejected and issues
+function tableView(rows, intro) {
+  if (!rows.length) return `<p class="empty">Nothing recorded yet.</p>`;
+  const h = Object.keys(rows[0]);
+  return `<p class="sub" style="margin-bottom:16px">${intro}</p><div class="tbl"><table><thead><tr>${h.map(k => `<th>${esc(k)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${h.map(k => /^[0-9a-f]{40}$/.test(r[k]) ? `<td class="mono" title="${esc(r[k])}">${short(r[k])}</td>` : /^\d{4}-\d\d-\d\d$/.test(r[k]) ? `<td class="nw">${esc(r[k])}</td>` : `<td>${md(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function issuesView() {
+  return `<div class="issues"><p><b>The repo has gaps the board found while reading it.</b> Each is a fix in the team repo, not on this page.</p><ul>${D.issues.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`;
+}
+
+function go(push = true) {
+  renderTabs();
+  const v = $("#view");
+  v.innerHTML = tab === "map" ? mapView() : tab === "sources" ? sourcesView() : tab === "loop" ? loopView()
+    : tab === "rejected" ? tableView(D.rejected, "Skills and practices we looked at and chose not to take, with the reason, so they are not proposed again.") : issuesView();
+  if (tab === "map") { details(); requestAnimationFrame(drawWires); }
+  if (push) { const h = sel ? `${sel.k}-${sel.id}` : tab; try { history.replaceState(null, "", "#" + h); } catch (e) {} }
+}
+document.addEventListener("click", e => {
+  const n = e.target.closest("[data-k][data-id]"); if (!n) return;
+  const next = { k: n.dataset.k, id: n.dataset.id };
+  if (n.dataset.jump) tab = "map";
+  sel = sel && sel.k === next.k && sel.id === next.id && n.classList.contains("node") ? null : next;
+  if (tab !== "map" || n.dataset.jump) go(); else { details(); highlight(); if (sel && innerWidth <= 1000) $("#details").scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); try { history.replaceState(null, "", "#" + (sel ? `${sel.k}-${sel.id}` : "map")); } catch (e) {} }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sel) { sel = null; details(); highlight(); } });
+let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(drawWires, 80); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWires);
+
+// Deep link: #role-architect, #skill-tests-first, #sources
+const h = decodeURIComponent(location.hash.slice(1));
+const m = h.match(/^(role|skill)-(.+)$/);
+if (m && (m[1] === "role" ? roleById[m[2]] : skillById[m[2]])) sel = { k: m[1], id: m[2] };
+else if (TABS.some(t => t[0] === h)) tab = h;
+go(false);
+</script>
