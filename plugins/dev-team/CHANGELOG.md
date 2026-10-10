@@ -1,5 +1,16 @@
 # dev-team changelog
 
+## 0.4.0 (2026-10-10)
+
+The loop gains the design team's two stages. Scope approved by the owner on 2026-10-10; ships with design-team 0.1.0 in the same repo.
+
+- Loop: two new stages for milestones that change screens, **Design** (stage 3, the design team's designer, after Plan and slice and before Build; gate: the owner approves the design hand-off) and **Design check** (stage 9, the design team's design-auditor, after Black-box check and before Review; gate: no blocker or major design finding open). Both are skipped for a milestone with no screen change. Sixteen stages, renumbered; Watch is now stage 15. A new **Phase** column (Plan, Build, Check, Fix, Ship, Learn) groups the stages for tools that draw the loop. A missing screen, state or token goes back to the designer at pre-flight; the design-auditor, like the reviewer, never patches code; design findings are re-checked by id in Fix and re-verify.
+- `owner`: on a lane that builds a designed screen, reads the hand-off, loads `design-system` and `emil-design-eng` with the Skill tool, and builds to the hand-off; a gap goes back to the designer, never invented by the lane.
+- Not taken: preloading the four design skills on every dev role (`skills/REJECTED.md`). The reviewer, critic, architect and the other roles are unchanged; the critic stays screen-only.
+- `THIRD_PARTY.md`: a "Referenced, not copied" table for the two account skills the owner loads.
+- Checked on Claude Code 2.1.296: from a plugin subagent, the Skill tool loads an account skill by plain name (`SkillTool returning 2 newMessages for skill anthropic-skills:design-system` in the `--debug-file` log).
+- Skills and models unchanged.
+
 ## 0.3.0 (2026-10-10)
 
 Fourteen skills, one milestone loop, and the first evals. Scope approved by the owner on 2026-10-10. The team learns between milestones through a retro whose proposals the owner approves; nothing edits a skill, hook or `CLAUDE.md` on its own. New sources: mattpocock/skills at 49dd158d1076134a641b33efb035946536778336 and EricTechPro/super-board at 35e215615c98fa5da011368e764f38f86959bf95, both MIT (`THIRD_PARTY.md`, `licenses/`).

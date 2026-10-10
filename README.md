@@ -1,6 +1,6 @@
 # Agent Teams
 
-Jase's agent teams, in one private repo. Each team is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them. The dev team is the first. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it.
+Jase's agent teams, in one private repo. Each team is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them: the dev team and the design team. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it.
 
 ## Layout
 
@@ -16,11 +16,19 @@ plugins/
     evals/                         one behavior eval per new or changed skill
     licenses/, THIRD_PARTY.md      sources and licenses of adapted skills
     CHANGELOG.md                   what changed in each version
+  design-team/
+    .claude-plugin/plugin.json     name and version
+    agents/                        designer and design-auditor
+    skills/design-handoff/         the team's own skill: what a hand-off holds
+    skills/REJECTED.md             design skills read and not taken, and why
+    evals/                         behavior evals for the design-auditor
+    THIRD_PARTY.md                 the account skills it references, not copies
+    README.md, CHANGELOG.md
 ```
 
 ## The dev team
 
-Ten roles and fourteen skills (0.3.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, pre-flight per lane, build lanes, gate, spec check, black-box check, review, fix and re-verify, release check, the owner's go, retro, watch. The owner gives every merge and deploy go; nothing in the loop merges on its own.
+Ten roles and fourteen skills (0.4.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, spec check, black-box check, design check, review, fix and re-verify, release check, the owner's go, retro, watch. Design and design check are the design team's stages and run only for a milestone that changes screens. The owner gives every merge and deploy go; nothing in the loop merges on its own.
 
 ### Evals
 
@@ -32,9 +40,13 @@ claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edi
 
 `--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list; `--judge-model sonnet` because the default judge was noisy on plan-length files. Cases that grant a shell need the eval sandbox (on Linux, `bubblewrap` and `socat`); without it every run is refused. The LLM-judged cases are not fully stable: expect an occasional failed run on `slice-the-plan-lanes` and `design-it-twice` from judge noise, and read the output before changing a skill. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
 
+## The design team
+
+Two roles (0.1.0): the `designer` extends the app's design system and writes the design hand-off the dev team builds from, and also sets visual direction for marketing pieces when asked; the `design-auditor` checks the build against the hand-off and the design system, read-only, with findings going to the dev team's fixer. They run the Design and Design check stages of the dev team's loop. Four design skills on Jase's claude.ai account (`impeccable`, `ui-ux-pro-max`, `design-system`, `emil-design-eng`) are referenced by name, not copied; `plugins/design-team/THIRD_PARTY.md` records what each file shows and which role uses it for what. The app's own design system always wins over any skill's taste. How the team works and how to run its evals: `plugins/design-team/README.md`.
+
 ## Add a new team
 
-1. Make `plugins/<team>/` with `.claude-plugin/plugin.json` (name and version 0.1.0), `agents/`, `skills/` if the roles need any, and `CHANGELOG.md`. A skill adapted from a published source records its source, commit, license and changes in its own `## Source` section and in `THIRD_PARTY.md`, with the license text in `licenses/`.
+1. Make `plugins/<team>/` with `.claude-plugin/plugin.json` (name and version 0.1.0), `agents/`, `skills/` if the roles need any, and `CHANGELOG.md`. A skill adapted from a published source records its source, commit, license and changes in its own `## Source` section and in `THIRD_PARTY.md`, with the license text in `licenses/`. A skill the team writes says "Written by this team" in its `## Source` section. A skill used from Jase's account without copying it goes in a "Referenced, not copied" table in `THIRD_PARTY.md`.
 2. Add the team to the `plugins` list in `.claude-plugin/marketplace.json`, with `source` set to `./plugins/<team>`. The name there matches the name in `plugin.json`.
 3. Run `claude plugin validate .` and commit.
 
@@ -42,7 +54,7 @@ Do not make a team's folder until the team has roles in it.
 
 ## How an app uses a team
 
-- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams`.
+- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams` (and `/plugin install design-team@agent-teams` for an app with screens).
 - **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/`, `THIRD_PARTY.md` and `workflows/` alongside, into `.claude/agent-teams/`, and name `.claude/agent-teams/workflows/milestone-loop.md` in the app's `CLAUDE.md` as the copy of the loop page.
 
 Each app keeps its own memory, specs, gate commands and specialists (personas, rubrics, domain reviewers) in its own repo. The roles read the app's `CLAUDE.md` for all of these and stop to ask when it does not say.

@@ -20,6 +20,15 @@ Every skill in `skills/` names its source, commit, license and what was changed 
 | slice-the-plan | mattpocock/skills `skills/engineering/to-tickets` | 49dd158d1076134a641b33efb035946536778336 | MIT, Copyright (c) 2026 Matt Pocock |
 | `workflows/milestone-loop.md` (not a skill) | EricTechPro/super-board `skills/super-board/references/run.md` and `run-workflow.md` (pre-flight, `blocked-by:` sweep, root-cause cap, halt) | 35e215615c98fa5da011368e764f38f86959bf95 | MIT, Copyright (c) 2026 Eric Tech |
 
+## Referenced, not copied
+
+Two design skills on Jase's claude.ai account are used by the lane owner and are not copied into this plugin: no license text ships for them, and nothing in `skills/` comes from them. The `owner` loads them with the Skill tool, by plain name, only on a lane that builds a designed screen; no dev role preloads them (`skills/REJECTED.md`). The design team's `THIRD_PARTY.md` lists all four design skills; the columns here say exactly what the synced files show, read on 2026-10-10.
+
+| Skill | Where it lives | Version, license and author as found | Role | What for |
+|---|---|---|---|---|
+| design-system | Jase's account skills (`anthropic-skills:design-system`) | `license: MIT`; `metadata.author: claudekit`; `metadata.version: "1.0.0"` | owner | building to the hand-off's tokens: three layers, day and night, component states |
+| emil-design-eng | Jase's account skills (`anthropic-skills:emil-design-eng`) | no license or version found in the synced files | owner | motion and interaction details while building a designed screen |
+
 All adaptations were rewritten in this team's voice and changed to fit its rules; each skill's `## Source` section says what changed. Candidates read and not taken are listed, with the reason, in `skills/REJECTED.md`.
 
 To check a source for updates, compare the file at its listed commit with the source's current default branch. A change worth taking lands here as a new plugin version with the new commit recorded, never as a silent edit.
