@@ -105,8 +105,6 @@ button.chip:hover { color: var(--ink); }
 .shelfbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 8px; }
 .shelfbar .res { font-size: 13px; color: var(--ink-3); }
 mark { background: var(--panel-2); color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink-3); border-radius: 2px; padding: 0; }
-.shell.norail { grid-template-columns: minmax(0, 1fr); }
-.shell.norail .rail { display: none; }
 /* Shell: teams rail + main */
 .shell > *, .two > * { min-width: 0; }
 .shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 26px; align-items: start; }
@@ -471,7 +469,6 @@ function tabs() {
 function render() {
   rail(); counts(); tabs();
   const t = TEAMS.find(x => x.id === team);
-  $("#shell").classList.toggle("norail", page === "workflow");
   $("#crumb").textContent = `Team room / ${PAGES.find(([k]) => k === page)[1]}`;
   const note = `<section><p class="note">Read from <a href="${GH}${esc(D.team.repo)}/tree/${esc(D.team.commit)}" target="_blank" rel="noopener">${esc(D.team.repo)}</a> at <span class="mono">${esc(D.team.commit.slice(0, 8))}</span>. Work states are examples until real runs exist. Your own desk is Needs you, not this room.</p></section>`;
   if (!t.live) { $("#main").innerHTML = planned(t); return; }

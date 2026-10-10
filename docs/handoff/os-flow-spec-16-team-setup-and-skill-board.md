@@ -55,7 +55,9 @@ The name is **Team room**, which Capsule already uses for this section of the Fo
 - **Three sub-pages (Jase, 2026-10-10),** chosen by tabs under the Team room heading. The active tab has Capsule's coral underline, and each page has its own bare-token link (`#roster`, `#shelf`, `#workflow`).
   1. **Roster:** the teams rail, On the roster and the skill matrix.
   2. **Skill shelf:** the teams rail, then a search bar on top (the `/` key focuses it, Esc clears it). It searches skill names, descriptions, roles, sources, licenses and commits, and highlights each match. Under it sit the All, Adapted and Ours filter, the shelf rows and the Turned down list, which opens on its own when the search matches something in it.
-  3. **Workflow:** the factory board, full width with no rail.
+  3. **Workflow:** the teams rail and the factory board.
+
+  The teams rail is shared by all three pages (Jase, 2026-10-10): picking a team changes all three to that team.
 
   A skill chip on the Roster page opens that skill on the Skill shelf page; a role chip on the shelf opens that role on the Roster page.
 - **Teams rail.** One row per department team: Dev team (live), Marketing team ("Researched, not built"), Finance, Sourcing and Ops ("Planned"). Each row shows a state mark and a one-line count. On a phone it becomes a sideways strip.
