@@ -32,6 +32,7 @@ body { background: var(--paper); color: var(--ink); font: 400 14.5px/1.45 var(--
 .frame { max-width: 1240px; margin: 0 auto; padding-inline: 22px; padding-block: 14px 56px; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
 :focus-visible { outline: 2px solid var(--coral-ink); outline-offset: 2px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .mono { font: 400 12px var(--mono); color: var(--ink-3); }
 a { color: inherit; text-underline-offset: 2px; }
 
@@ -85,6 +86,27 @@ h1 i { width: 10px; height: 10px; margin-left: 4px; }
 button.chip:hover { color: var(--ink); }
 .example { font: 600 12.5px var(--font); background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; }
 
+/* Sub-page tabs */
+.tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); margin: 0 0 22px; overflow-x: auto; }
+.tabs button { font: 600 14px var(--font); color: var(--ink-3); padding: 8px 0 10px; white-space: nowrap; display: inline-flex; gap: 6px; align-items: baseline; }
+.tabs button small { font: 400 12.5px var(--font); }
+.tabs button[aria-selected="true"] { color: var(--ink); box-shadow: inset 0 -2px 0 var(--coral); }
+/* Search */
+.search { display: flex; align-items: center; gap: 10px; background: var(--panel); border-radius: 9999px; box-shadow: inset 0 0 0 1px var(--line-2); padding: 0 6px 0 14px; margin-bottom: 14px; }
+.search:focus-within { box-shadow: inset 0 0 0 2px var(--ink); }
+.search svg { flex: none; color: var(--ink-3); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font: 400 15px var(--font); padding: 11px 0; }
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.search:focus-within kbd { display: none; }
+.search input::placeholder { color: var(--ink-3); }
+.search kbd { font: 400 12px var(--mono); color: var(--ink-3); border: 1px solid var(--line-2); border-radius: 6px; padding: 1px 6px; }
+.search .clear { font: 600 12.5px var(--font); color: var(--ink-2); padding: 6px 10px; border-radius: 9999px; }
+.search .clear:hover { background: var(--panel-2); }
+.shelfbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin-bottom: 8px; }
+.shelfbar .res { font-size: 13px; color: var(--ink-3); }
+mark { background: var(--panel-2); color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink-3); border-radius: 2px; padding: 0; }
+.shell.norail { grid-template-columns: minmax(0, 1fr); }
+.shell.norail .rail { display: none; }
 /* Shell: teams rail + main */
 .shell > *, .two > * { min-width: 0; }
 .shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 26px; align-items: start; }
@@ -101,6 +123,7 @@ button.chip:hover { color: var(--ink); }
 h2 { font: 400 22px/1.2 var(--font); letter-spacing: -0.015em; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 h2 small { font: 400 13px var(--font); color: var(--ink-3); }
 section + section { margin-top: 26px; }
+.two > section + section { margin-top: 0; }
 .two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; align-items: start; }
 
 /* Rows */
@@ -213,8 +236,9 @@ details.fold summary .tg { font-size: 13px; color: var(--ink-3); }
     </div>
     <div class="counts" id="counts"></div>
   </div>
+  <nav class="tabs" role="tablist" aria-label="Team room pages" id="tabs"></nav>
 
-  <div class="shell">
+  <div class="shell" id="shell">
     <aside class="rail" aria-label="Teams"><h2>Teams <small id="tcount"></small></h2><div id="teams" style="display:contents"></div></aside>
     <main id="main"></main>
   </div>
@@ -269,7 +293,6 @@ function rail() {
   $("#teams").innerHTML = TEAMS.map(t => `<button class="team${t.live ? "" : " off"}" data-team="${t.id}" aria-current="${team === t.id}">
     <i class="sm ${t.live ? (roles.some(r => st(r.id) === "ask") ? "ask" : "run") : "queued"}"></i><span class="n">${esc(t.name)}</span>
     <span class="d">${t.live ? `${roles.length} roles, ${skills.length} skills, v${esc(D.team.version)}` : esc(t.note)}</span></button>`).join("");
-  $("#crumb").textContent = `Team room / ${TEAMS.find(t => t.id === team).name}`;
 }
 
 // Roster
@@ -304,24 +327,37 @@ function matrix() {
 }
 
 // Shelf
+let query = "";
+const hl = (html, q) => { if (!q) return html; const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig"); return html.split(/(<[^>]+>)/).map(part => part.startsWith("<") ? part : part.replace(re, "<mark>$1</mark>")).join(""); };
+const hay = s => [s.id, s.what, s.lead, s.changed, ...s.usedBy, ...s.sources.flatMap(x => [x.repo, x.path, x.license, x.commit])].join(" ").toLowerCase();
 function shelf() {
-  const list = skills.filter(s => shelfFilter === "all" || (shelfFilter === "own" ? ownSkill(s) : !ownSkill(s)))
-    .sort((a, b) => b.usedBy.length - a.usedBy.length || a.id.localeCompare(b.id));
   const nOwn = skills.filter(ownSkill).length;
-  return `<section aria-labelledby="h-shelf"><h2 id="h-shelf">Skill shelf <span class="filter" role="group" aria-label="Filter skills">${[["all", `All ${skills.length}`], ["adapted", `Adapted ${skills.length - nOwn}`], ["own", `Ours ${nOwn}`]].map(([k, l]) => `<button data-filter="${k}" aria-pressed="${shelfFilter === k}">${l}</button>`).join("")}</span></h2>
-  <div class="rows">${list.length ? list.map(s => {
-    const open = openSkill === s.id;
+  return `<section aria-labelledby="h-shelf"><h2 id="h-shelf" class="sr">Skill shelf</h2>
+    <label class="search"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search skills, roles, sources or licenses" value="${esc(query)}" autocomplete="off" aria-label="Search the skill shelf"><kbd id="qk">/</kbd><button class="clear" id="qclear" type="button" ${query ? "" : "hidden"}>Clear</button></label>
+    <div class="shelfbar"><span class="filter" role="group" aria-label="Filter skills">${[["all", `All ${skills.length}`], ["adapted", `Adapted ${skills.length - nOwn}`], ["own", `Ours ${nOwn}`]].map(([k, l]) => `<button data-filter="${k}" aria-pressed="${shelfFilter === k}">${l}</button>`).join("")}</span><span class="res" id="qres"></span></div>
+    <div id="shelfrows"></div></section>`;
+}
+function shelfRows() {
+  const q = query.trim().toLowerCase();
+  const list = skills.filter(s => (shelfFilter === "all" || (shelfFilter === "own" ? ownSkill(s) : !ownSkill(s))) && (!q || hay(s).includes(q)))
+    .sort((a, b) => b.usedBy.length - a.usedBy.length || a.id.localeCompare(b.id));
+  const rej = D.rejected.filter(r => !q || Object.values(r).join(" ").toLowerCase().includes(q));
+  $("#qres").textContent = q ? `${plural(list.length, "skill")} and ${rej.length} turned down match` : `${plural(list.length, "skill")}, sorted by how many roles carry them`;
+  $("#qclear").hidden = !query;
+  $("#shelfrows").innerHTML = `<div class="rows">${list.length ? list.map(s => {
+    const open = openSkill === s.id || (q && list.length === 1);
     const from = s.sources.length ? [...new Set(s.sources.map(x => x.repo.split("/")[0]))].join(", ") : "this team";
     const lics = [...new Set(s.sources.map(x => lic(x.license)))].join(", ");
     return `<div class="row${hiSkill === s.id ? " sel" : ""}" id="skill-${esc(s.id)}"><button class="hit" data-skill="${esc(s.id)}" data-open="1" aria-expanded="${open}">
-      <span class="l1"><span class="t">${esc(s.id)}</span><span class="chip">${esc(from)}</span>${lics ? `<span class="chip">${esc(lics)}</span>` : ""}<span class="r">${plural(s.usedBy.length, "role")}</span></span>
-      <span class="sub">${md(open ? s.what : firstSentence(s.what))}</span></button>
-      ${open ? `<div class="open">${s.lead ? `<p><b>${md(s.lead)}</b></p>` : ""}
-        <dl class="kv"><dt>Used by</dt><dd><span class="chips">${s.usedBy.map(r => `<button class="chip" data-role="${esc(r)}" data-open="1">${esc(r)}</button>`).join("")}</span></dd>
-        ${s.sources.map(x => `<dt>Source</dt><dd>${/^[\w.-]+\/[\w.-]+$/.test(x.repo) ? `<a href="${GH}${esc(x.repo)}/tree/${esc(x.commit)}/${esc(x.path.split(" ")[0])}" target="_blank" rel="noopener">${esc(x.repo)}</a>` : esc(x.repo)} <span class="mono">${esc(x.path)}</span><br><span class="mono">${esc(x.commit.slice(0, 12))}</span> · ${esc(x.license)}</dd>`).join("")}
-        ${s.changed ? `<dt>We changed</dt><dd>${md(s.changed)}</dd>` : ""}
+      <span class="l1"><span class="t">${hl(esc(s.id), q)}</span><span class="chip">${hl(esc(from), q)}</span>${lics ? `<span class="chip">${hl(esc(lics), q)}</span>` : ""}<span class="r">${plural(s.usedBy.length, "role")}</span></span>
+      <span class="sub">${hl(md(open ? s.what : firstSentence(s.what)), q)}</span></button>
+      ${open ? `<div class="open">${s.lead ? `<p><b>${hl(md(s.lead), q)}</b></p>` : ""}
+        <dl class="kv"><dt>Used by</dt><dd><span class="chips">${s.usedBy.map(r => `<button class="chip" data-role="${esc(r)}" data-open="1">${hl(esc(r), q)}</button>`).join("")}</span></dd>
+        ${s.sources.map(x => `<dt>Source</dt><dd>${/^[\w.-]+\/[\w.-]+$/.test(x.repo) ? `<a href="${GH}${esc(x.repo)}/tree/${esc(x.commit)}/${esc(x.path.split(" ")[0])}" target="_blank" rel="noopener">${hl(esc(x.repo), q)}</a>` : esc(x.repo)} <span class="mono">${hl(esc(x.path), q)}</span><br><span class="mono">${esc(x.commit.slice(0, 12))}</span> · ${hl(esc(x.license), q)}</dd>`).join("")}
+        ${s.changed ? `<dt>We changed</dt><dd>${hl(md(s.changed), q)}</dd>` : ""}
         <dt>File</dt><dd><a href="${repoFile(s.path)}" target="_blank" rel="noopener" class="mono">skills/${esc(s.id)}/SKILL.md</a></dd></dl></div>` : ""}</div>`;
-  }).join("") : `<div class="empty">No skills written by this team yet; every skill is adapted from a pinned outside source.</div>`}</div></section>`;
+  }).join("") : `<div class="empty">${q ? `No skill matches "${esc(query)}". Try a role name, a creator such as mattpocock, or a license.` : "No skills written by this team yet; every skill is adapted from a pinned outside source."}</div>`}</div>${rejected(rej, q)}`;
 }
 
 // Loop as a factory board: phase columns, stage cards, arrows, loops back, and one work item travelling it.
@@ -414,10 +450,10 @@ function startFlow() {
 }
 
 // Turned down
-function rejected() {
+function rejected(list = D.rejected, q = "") {
   if (!D.rejected.length) return "";
   const h = Object.keys(D.rejected[0]), nk = h[0], rk = h.find(k => /reason/.test(k)) || h[h.length - 2], sk = h.find(k => /source/.test(k));
-  return `<section><details class="fold"><summary><h2>Turned down</h2><span class="tg">${D.rejected.length} read and not taken, so they are not proposed again</span></summary><div class="rows">${D.rejected.map(r => `<div class="row"><div class="hit" style="cursor:default"><span class="t" style="font-size:14px">${md(r[nk])}</span><span class="sub">${md(r[rk])}</span>${sk ? `<span class="mono">${md(r[sk])}</span>` : ""}</div></div>`).join("")}</div></details></section>`;
+  return `<details class="fold" style="margin-top:26px"${q && list.length ? " open" : ""}><summary><h2>Turned down</h2><span class="tg">${q ? `${list.length} of ${D.rejected.length} match` : `${D.rejected.length} read and not taken, so they are not proposed again`}</span></summary><div class="rows">${list.map(r => `<div class="row"><div class="hit" style="cursor:default"><span class="t" style="font-size:14px">${hl(md(r[nk]), q)}</span><span class="sub">${hl(md(r[rk]), q)}</span>${sk ? `<span class="mono">${hl(md(r[sk]), q)}</span>` : ""}</div></div>`).join("") || '<div class="empty">None match.</div>'}</div></details>`;
 }
 
 function planned(t) {
@@ -425,28 +461,49 @@ function planned(t) {
     <span class="sub" style="padding-left:22px">This team appears here when its repo exists. It will share the same shelf rules: outside skills copied, pinned and licensed, new skills added only after your approval.</span></div></div></div></section>`;
 }
 
-function render() {
-  rail(); counts();
+const PAGES = [["roster", "Roster"], ["shelf", "Skill shelf"], ["workflow", "Workflow"]];
+let page = PAGES.some(([k]) => k === location.hash.slice(1)) ? location.hash.slice(1) : "roster";
+function tabs() {
   const t = TEAMS.find(x => x.id === team);
-  $("#main").innerHTML = t.live
-    ? `<div class="two">${roster()}${matrix()}</div>${loop()}${shelf()}${rejected()}
-       <section><p class="note">Read from <a href="${GH}${esc(D.team.repo)}/tree/${esc(D.team.commit)}" target="_blank" rel="noopener">${esc(D.team.repo)}</a> at <span class="mono">${esc(D.team.commit.slice(0, 8))}</span>. Work states are examples until real runs exist. Your own desk is Needs you, not this room.</p></section>`
-    : planned(t);
-  if (t.live) startFlow();
+  const n = { roster: t.live ? roles.length : 0, shelf: t.live ? skills.length : 0, workflow: t.live ? D.loop.length : 0 };
+  $("#tabs").innerHTML = PAGES.map(([k, l]) => `<button role="tab" id="tab-${k}" aria-selected="${page === k}" data-page="${k}">${l}<small>${n[k] || ""}</small></button>`).join("");
 }
+function render() {
+  rail(); counts(); tabs();
+  const t = TEAMS.find(x => x.id === team);
+  $("#shell").classList.toggle("norail", page === "workflow");
+  $("#crumb").textContent = `Team room / ${PAGES.find(([k]) => k === page)[1]}`;
+  const note = `<section><p class="note">Read from <a href="${GH}${esc(D.team.repo)}/tree/${esc(D.team.commit)}" target="_blank" rel="noopener">${esc(D.team.repo)}</a> at <span class="mono">${esc(D.team.commit.slice(0, 8))}</span>. Work states are examples until real runs exist. Your own desk is Needs you, not this room.</p></section>`;
+  if (!t.live) { $("#main").innerHTML = planned(t); return; }
+  $("#main").innerHTML = page === "roster" ? `<div class="two">${roster()}${matrix()}</div>${note}`
+    : page === "shelf" ? shelf()
+    : `${loop()}${note}`;
+  if (page === "shelf") shelfRows();
+  if (page === "workflow") startFlow();
+}
+function go(p, after) { page = p; try { history.replaceState(null, "", "#" + p); } catch (e) {} render(); after && after(); window.scrollTo({ top: 0 }); }
 
 document.addEventListener("click", e => {
+  const pg = e.target.closest("[data-page]"); if (pg) { go(pg.dataset.page); return; }
+  if (e.target.closest("#qclear")) { query = ""; $("#q").value = ""; shelfRows(); $("#q").focus(); return; }
   if (e.target.closest("#fplay")) { flowPaused = !flowPaused; e.target.closest("#fplay").textContent = flowPaused ? "Play" : "Pause"; return; }
   const fs = e.target.closest("[data-stage]"); if (fs) { const i = +fs.dataset.stage; flowSel = flowSel === i ? null : i; document.querySelectorAll(".fnode").forEach(n => n.classList.toggle("sel", +n.dataset.stage === flowSel)); $("#fnow").dataset.i = ""; showNow(flowSel ?? ROUTE[F.hop], flowSel == null); return; }
   const tb = e.target.closest("[data-team]"); if (tb) { team = tb.dataset.team; openRole = openSkill = hiRole = hiSkill = null; render(); return; }
-  const f = e.target.closest("[data-filter]"); if (f) { shelfFilter = f.dataset.filter; render(); return; }
+  const f = e.target.closest("[data-filter]"); if (f) { shelfFilter = f.dataset.filter; document.querySelectorAll("[data-filter]").forEach(b => b.setAttribute("aria-pressed", b.dataset.filter === shelfFilter)); shelfRows(); return; }
   const rb = e.target.closest("[data-role]"), sb = e.target.closest("[data-skill]");
   if (rb && rb.dataset.hi) { hiRole = hiRole === rb.dataset.role ? null : rb.dataset.role; render(); return; }
   if (sb && sb.dataset.hi) { hiSkill = hiSkill === sb.dataset.skill ? null : sb.dataset.skill; render(); return; }
   if (rb) { const id = rb.dataset.role; const toggle = rb.classList.contains("hit"); openRole = toggle && openRole === id ? null : id; hiRole = openRole; render(); if (!toggle) document.querySelector(`[data-role="${CSS.escape(id)}"].hit`)?.scrollIntoView({ block: "center" }); return; }
-  if (sb) { const id = sb.dataset.skill; const toggle = sb.classList.contains("hit"); openSkill = toggle && openSkill === id ? null : id; hiSkill = openSkill; if (shelfFilter !== "all" && openSkill) shelfFilter = "all"; render(); if (!toggle) $(`#skill-${CSS.escape(id)}`)?.scrollIntoView({ block: "center" }); return; }
+  if (sb && page !== "shelf") { const id = sb.dataset.skill; openSkill = hiSkill = id; query = ""; shelfFilter = "all"; go("shelf", () => $(`#skill-${CSS.escape(id)}`)?.scrollIntoView({ block: "center" })); return; }
+  if (rb && page !== "roster") { const id = rb.dataset.role; openRole = hiRole = id; go("roster"); return; }
+  if (sb) { const id = sb.dataset.skill; const toggle = sb.classList.contains("hit"); openSkill = toggle && openSkill === id ? null : id; hiSkill = openSkill; shelfRows(); if (!toggle) $(`#skill-${CSS.escape(id)}`)?.scrollIntoView({ block: "center" }); return; }
 });
 $("#ask").addEventListener("click", () => { const r = roles.find(x => st(x.id) === "ask"); if (r) { openRole = hiRole = r.id; render(); } });
+document.addEventListener("input", e => { if (e.target.id === "q") { query = e.target.value; openSkill = null; shelfRows(); } });
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && page === "shelf" && document.activeElement?.id !== "q") { e.preventDefault(); $("#q").focus(); }
+  if (e.key === "Escape" && document.activeElement?.id === "q" && query) { query = ""; $("#q").value = ""; shelfRows(); }
+});
 let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawFlow, 80); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawFlow);
 render();
