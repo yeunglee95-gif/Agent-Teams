@@ -1,0 +1,352 @@
+<title>OS Flow Team Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Capsule, Workspace mode. Dark capsule bar; teams rail on the left; for the chosen team the
+   roster beside the skill matrix (the page's one picture), then the skill shelf, the loop on a rail,
+   and the turned-down list folded. Rows and hairlines; cards only for the matrix. */
+:root {
+  --paper: #ffffff; --panel: #ffffff; --panel-2: #f4f4f5; --ink: #18181b; --ink-2: #52525b; --ink-3: #6b6b74;
+  --line: #e4e4e7; --line-2: #d4d4d8; --capsule: #18181b;
+  --coral: #fc5f2b; --coral-ink: #c2410c; --coral-wash: #fff1ec;
+  --cobalt: #2e62c9; --cobalt-wash: #e8effd; --green: #137045; --green-wash: #e3f5ec;
+  --later: #e4e4e7; --park: #a1a1aa; --on-state: #ffffff; --on-coral: #18181b;
+  --font: "Inter Tight", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #111113; --panel: #1a1a1d; --panel-2: #232327; --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+  --line: #2a2a2f; --line-2: #3a3a40; --capsule: #000000;
+  --coral: #ff7a4d; --coral-ink: #ff9d7a; --coral-wash: #2e1a12;
+  --cobalt: #6f9bf0; --cobalt-wash: #182238; --green: #47c08a; --green-wash: #13261d;
+  --later: #2e2e33; --park: #5f5f68; --on-state: #111113; --on-coral: #111113; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 400 14.5px/1.45 var(--font); letter-spacing: -0.005em; font-feature-settings: "tnum"; }
+.frame { max-width: 1240px; margin: 0 auto; padding-inline: 22px; padding-block: 14px 56px; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+:focus-visible { outline: 2px solid var(--coral-ink); outline-offset: 2px; border-radius: 4px; }
+.mono { font: 400 12px var(--mono); color: var(--ink-3); }
+a { color: inherit; text-underline-offset: 2px; }
+
+/* Capsule bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; container-type: inline-size; background: var(--capsule); color: #fff; border-radius: 15px; padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+.wm { font: 700 15px var(--font); letter-spacing: -0.01em; }
+.wm i, h1 i { display: inline-block; border-radius: 50%; background: var(--coral); }
+.wm i { width: 6px; height: 6px; margin-left: 2px; }
+.bar nav { display: flex; gap: 16px; font-size: 13.5px; }
+.bar nav a { color: rgb(255 255 255 / .62); text-decoration: none; padding-block: 4px; }
+.bar nav a[aria-current] { color: #fff; box-shadow: inset 0 -2px 0 var(--coral); }
+.crumb { font-size: 13.5px; color: rgb(255 255 255 / .62); }
+.sp { flex: 1; }
+.seg { display: inline-flex; background: rgb(255 255 255 / .1); border-radius: 9999px; padding: 3px; }
+.seg button { color: rgb(255 255 255 / .62); border-radius: 9999px; padding: 4px 12px; font: 600 12.5px var(--font); }
+.seg button[aria-pressed="true"] { background: #fff; color: #18181b; }
+.seg button[disabled] { cursor: not-allowed; }
+.seg small { font-weight: 400; opacity: .8; margin-left: 4px; }
+.btn { border-radius: 9999px; padding: 8px 16px; font: 700 13.5px var(--font); display: inline-flex; gap: 8px; align-items: center; transition: transform 160ms var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--coral); color: var(--on-coral); }
+.btn.primary .ar { width: 18px; height: 18px; border-radius: 50%; background: var(--on-coral); color: var(--coral); display: grid; place-items: center; font-size: 11px; transition: transform 160ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .btn.primary:hover .ar { transform: translateX(2px); } }
+.btn.quiet { box-shadow: inset 0 0 0 1px var(--line-2); padding: 5px 12px; font-size: 12.5px; }
+@container (max-width: 900px) { .crumb { display: none; } }
+@container (max-width: 720px) { .bar nav { display: none; } }
+@container (max-width: 560px) { .seg { display: none; } }
+
+/* Head */
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; margin: 26px 0 22px; }
+h1 { font: 400 44px/1 var(--font); letter-spacing: -0.025em; margin: 0; }
+h1 i { width: 10px; height: 10px; margin-left: 4px; }
+.meta { color: var(--ink-3); font-size: 13px; margin: 8px 0 0; max-width: 75ch; }
+.counts { display: flex; gap: 14px; flex-wrap: wrap; font: 600 12.5px var(--font); }
+.counts span { display: inline-flex; gap: 6px; align-items: center; }
+
+/* State marks and pills (shared core) */
+.sm { width: 14px; height: 14px; border-radius: 2.5px; display: inline-grid; place-items: center; flex: none; }
+.sm.ask { background: var(--coral); } .sm.ask::after { content: ""; width: 4px; height: 4px; background: var(--on-coral); }
+.sm.run { background: var(--cobalt); } .sm.run::after { content: ""; width: 6px; height: 2px; background: var(--on-state); border-radius: 1px; }
+.sm.done { background: var(--green); } .sm.done::after { content: ""; width: 6px; height: 3px; border-left: 2px solid var(--on-state); border-bottom: 2px solid var(--on-state); transform: rotate(-45deg) translate(1px, -1px); }
+.sm.later { background: var(--later); } .sm.later::after { content: ""; width: 6px; height: 2px; background: var(--ink-3); }
+.sm.queued { box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.pill { display: inline-flex; gap: 6px; align-items: center; border-radius: 9999px; padding: 2px 9px 2px 6px; font: 600 12.5px var(--font); white-space: nowrap; }
+.pill.ask { background: var(--coral-wash); color: var(--coral-ink); }
+.pill.run { background: var(--cobalt-wash); color: var(--cobalt); }
+.pill.done { background: var(--green-wash); color: var(--green); }
+.pill.later { background: var(--panel-2); color: var(--ink-2); }
+.chip { background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; font: 400 12px var(--font); white-space: nowrap; display: inline-flex; gap: 4px; align-items: center; }
+.chip b { color: var(--ink); font-weight: 600; }
+button.chip:hover { color: var(--ink); }
+.example { font: 600 12.5px var(--font); background: var(--panel-2); color: var(--ink-2); border-radius: 9999px; padding: 2px 9px; }
+
+/* Shell: teams rail + main */
+.shell > *, .two > * { min-width: 0; }
+.shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 26px; align-items: start; }
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 70px); display: grid; gap: 2px; }
+.rail h2 { margin-bottom: 6px; }
+.team { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: start; padding: 9px 10px; border-radius: 12px; width: 100%; }
+.team .sm { margin-top: 3px; }
+.team .n { font: 600 15px var(--font); letter-spacing: -0.01em; }
+.team .d { grid-column: 2; font-size: 12.5px; color: var(--ink-3); }
+.team:hover { background: var(--panel-2); }
+.team[aria-current="true"] { background: var(--panel-2); box-shadow: inset 2px 0 0 var(--ink); }
+.team.off .n { color: var(--ink-3); }
+
+h2 { font: 400 22px/1.2 var(--font); letter-spacing: -0.015em; margin: 0 0 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+h2 small { font: 400 13px var(--font); color: var(--ink-3); }
+section + section { margin-top: 26px; }
+.two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+
+/* Rows */
+.rows { border-top: 1px solid var(--line); }
+.row { border-bottom: 1px solid var(--line); }
+.row > .hit { display: grid; gap: 3px; width: 100%; padding: 10px 8px; border-radius: 12px; }
+.row > .hit:hover { background: var(--panel-2); }
+.l1 { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.t { font: 600 15px var(--font); letter-spacing: -0.01em; }
+.sub { color: var(--ink-2); }
+.dim .t, .dim .sub { color: var(--ink-3); }
+.r { margin-left: auto; font-size: 12.5px; color: var(--ink-3); }
+.open { padding: 4px 8px 14px 30px; display: grid; gap: 10px; }
+.open p { margin: 0; max-width: 75ch; color: var(--ink-2); }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; font-size: 13px; }
+.kv dt { color: var(--ink-3); font: 600 12.5px var(--font); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.row.sel > .hit { background: var(--panel-2); }
+
+/* Skill matrix (the picture) */
+.matrix { background: var(--panel); border-radius: 15px; box-shadow: inset 0 0 0 1px var(--line), 0 2px 2px rgb(0 0 0 / .05); padding: 14px 14px 12px; }
+.mscroll { overflow-x: auto; }
+.mx { border-collapse: separate; border-spacing: 0; margin: 0 auto; }
+.mx th { font: 600 12.5px var(--font); color: var(--ink-2); padding: 0; }
+.mx thead th { height: 118px; vertical-align: bottom; width: 24px; }
+.mx thead th button { writing-mode: vertical-rl; transform: rotate(180deg); font: 400 12px var(--font); color: var(--ink-3); padding: 4px 0; white-space: nowrap; }
+.mx thead th.on button { color: var(--ink); font-weight: 600; }
+.mx tbody th { text-align: right; padding-right: 10px; white-space: nowrap; font-weight: 400; }
+.mx tbody th button { color: var(--ink-2); font-size: 13px; }
+.mx tbody th.on button { color: var(--ink); font-weight: 600; }
+.mx td { width: 24px; height: 24px; text-align: center; padding: 0; }
+.mx td i { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--line-2); vertical-align: middle; }
+.mx td b { display: inline-block; width: 14px; height: 14px; border-radius: 2.5px; background: var(--ink); vertical-align: middle; transition: transform 200ms var(--ease); }
+.mx td.own b { background: var(--panel); box-shadow: inset 0 0 0 2px var(--ink); }
+.mx td.x { background: var(--panel-2); }
+.mx td.x.y { background: var(--line); }
+.mx tfoot td, .mx td.tot { font: 400 11.5px var(--font); color: var(--ink-3); }
+.mx td.tot { width: auto; padding-left: 8px; text-align: left; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 12.5px; color: var(--ink-3); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.legend b { width: 12px; height: 12px; border-radius: 2.5px; background: var(--ink); display: inline-block; }
+.legend b.own { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+.facts div { display: grid; }
+.facts b { font: 400 22px/1.1 var(--font); letter-spacing: -0.015em; }
+.facts span { font-size: 12.5px; color: var(--ink-3); }
+
+/* Shelf filter */
+.filter { display: inline-flex; background: var(--panel-2); border-radius: 9999px; padding: 3px; }
+.filter button { border-radius: 9999px; padding: 3px 11px; font: 600 12.5px var(--font); color: var(--ink-2); }
+.filter button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line-2); }
+
+/* Loop rail (milestone rail) */
+.loop { list-style: none; margin: 0; padding: 0; position: relative; display: grid; }
+.loop::before { content: ""; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 2px; background: var(--line-2); }
+.loop li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding: 6px 0; position: relative; }
+.loop .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line-2); display: grid; place-items: center; font: 600 12px var(--font); color: var(--ink-2); z-index: 1; }
+.loop li.you .dot { background: var(--ink); color: var(--paper); box-shadow: none; }
+.loop .st { font: 600 15px var(--font); letter-spacing: -0.01em; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.loop .w { color: var(--ink-2); font-size: 13.5px; }
+.loop .g { color: var(--ink-3); font-size: 13px; }
+.loop .youtag { font: 600 12px var(--font); background: var(--ink); color: var(--paper); border-radius: 9999px; padding: 1px 8px; }
+
+details.fold { border-top: 1px solid var(--line); }
+details.fold summary { cursor: pointer; list-style: none; padding: 12px 8px; display: flex; justify-content: space-between; gap: 12px; }
+details.fold summary::-webkit-details-marker { display: none; }
+details.fold summary h2 { margin: 0; }
+details.fold summary .tg { font-size: 13px; color: var(--ink-3); }
+.empty { padding: 22px 8px; color: var(--ink-3); }
+.note { background: var(--panel-2); border-radius: 10px; padding: 10px 14px; color: var(--ink-2); font-size: 13.5px; }
+
+@media (max-width: 980px) { .shell { grid-template-columns: minmax(0, 1fr); } .rail { position: static; grid-auto-flow: column; grid-auto-columns: minmax(180px, 1fr); overflow-x: auto; } .rail h2 { display: none; } }
+@media (max-width: 760px) { h1 { font-size: 34px; } .two { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) { h1 { font-size: 30px; } .open { padding-left: 8px; } }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; } }
+</style>
+
+<div class="frame">
+  <header class="bar">
+    <span class="wm">OS Flow<i></i></span>
+    <nav aria-label="Main"><a href="#canvas">Canvas</a><a href="#forge">Forge</a><a href="#team-room" aria-current="page">Team room</a></nav>
+    <span class="crumb" id="crumb"></span>
+    <span class="sp"></span>
+    <span class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">Workspace</button><button type="button" disabled title="The animated tea room comes before launch">Tea room<small>later</small></button></span>
+    <button class="btn primary" type="button" id="ask" hidden>Answer <span class="ar">→</span></button>
+  </header>
+
+  <div class="head">
+    <div>
+      <h1>Team room<i></i></h1>
+      <p class="meta">Every department's agent team, the skills each role carries and where each skill came from. Teams are shared by all your businesses; each business brings its own knowledge.</p>
+    </div>
+    <div class="counts" id="counts"></div>
+  </div>
+
+  <div class="shell">
+    <aside class="rail" aria-label="Teams"><h2>Teams <small id="tcount"></small></h2><div id="teams" style="display:contents"></div></aside>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const md = s => esc(s).replace(/`([^`]+)`/g, '<span class="mono">$1</span>').replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const MODEL = m => ({ opus: "Opus", sonnet: "Sonnet", haiku: "Haiku", fable: "Fable" }[m] || m);
+const GH = "https://github.com/";
+const repoFile = p => `${GH}${D.team.repo}/blob/${D.team.commit}/${p}`;
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+const firstSentence = t => { const m = String(t).match(/^.*?[.;](\s|$)/); return m ? m[0].trim().replace(/;$/, ".") : t; };
+const lic = l => l.replace("Apache License 2.0", "Apache 2.0").split(",")[0];
+
+// Teams: dev is read from the repo; the rest are planned departments with nothing built yet.
+const TEAMS = [
+  { id: "dev", name: "Dev team", live: true },
+  { id: "marketing", name: "Marketing team", note: "Researched, not built" },
+  { id: "finance", name: "Finance team", note: "Planned" },
+  { id: "sourcing", name: "Sourcing team", note: "Planned" },
+  { id: "ops", name: "Ops team", note: "Planned" },
+];
+// Example work states until real runs exist (spec/13). Shown as examples on the page.
+const NOW = {
+  reviewer: ["ask", "Lane A review done; waiting on your go to merge"],
+  architect: ["run", "Slicing the cold email plan into lanes"],
+  owner: ["run", "Lane B: Kickstarter finder, red tests first"],
+  "gate-runner": ["run", "Full gate on lane B"],
+  scribe: ["done", "Milestone notes updated"],
+};
+const roles = D.roles, skills = D.skills;
+const skillById = Object.fromEntries(skills.map(s => [s.id, s]));
+const st = id => NOW[id]?.[0] || "later";
+const doing = id => NOW[id]?.[1] || "Idle, on the roster";
+const STATE = { ask: "Needs you", run: "Running", done: "Done", later: "Idle" };
+const RANK = { ask: 0, run: 1, done: 2, later: 3 };
+const ownSkill = s => !s.sources.length;
+let team = "dev", openRole = null, openSkill = null, hiRole = null, hiSkill = null, shelfFilter = "all";
+
+function counts() {
+  const c = { ask: 0, run: 0, later: 0 }; roles.forEach(r => { const s = st(r.id); c[s === "done" ? "later" : s]++; });
+  $("#counts").innerHTML = `<span><i class="sm ask"></i>${c.ask} needs you</span><span><i class="sm run"></i>${c.run} running</span><span><i class="sm later"></i>${c.later} idle</span><span class="example">Example states</span>`;
+  const ask = roles.find(r => st(r.id) === "ask");
+  if (ask) { $("#ask").hidden = false; $("#ask").firstChild.textContent = `Answer the ${ask.id} `; }
+}
+function rail() {
+  $("#tcount").textContent = TEAMS.length;
+  $("#teams").innerHTML = TEAMS.map(t => `<button class="team${t.live ? "" : " off"}" data-team="${t.id}" aria-current="${team === t.id}">
+    <i class="sm ${t.live ? (roles.some(r => st(r.id) === "ask") ? "ask" : "run") : "queued"}"></i><span class="n">${esc(t.name)}</span>
+    <span class="d">${t.live ? `${roles.length} roles, ${skills.length} skills, v${esc(D.team.version)}` : esc(t.note)}</span></button>`).join("");
+  $("#crumb").textContent = `Team room / ${TEAMS.find(t => t.id === team).name}`;
+}
+
+// Roster
+function roster() {
+  const order = [...roles].sort((a, b) => RANK[st(a.id)] - RANK[st(b.id)]);
+  return `<section aria-labelledby="h-roster"><h2 id="h-roster">On the roster <small>${roles.length} roles</small></h2><div class="rows">${order.map(r => {
+    const s = st(r.id), open = openRole === r.id;
+    return `<div class="row${s === "later" ? " dim" : ""}${hiRole === r.id ? " sel" : ""}"><button class="hit" data-role="${esc(r.id)}" aria-expanded="${open}">
+      <span class="l1"><i class="sm ${s}" title="${STATE[s]}"></i><span class="t">${esc(cap(r.id))}</span><span class="chip"><b>${esc(MODEL(r.model))}</b> ${esc(r.id)}</span><span class="r">${plural(r.skills.length, "skill")}</span></span>
+      <span class="sub" style="padding-left:22px">${esc(doing(r.id))}</span></button>
+      ${open ? `<div class="open"><p>${md(r.what)}</p><dl class="kv"><dt>Model</dt><dd>${esc(MODEL(r.model))}</dd>${r.tools ? `<dt>Tools</dt><dd>${esc(r.tools)}</dd>` : ""}<dt>Brief</dt><dd><a href="${repoFile(r.path)}" target="_blank" rel="noopener" class="mono">agents/${esc(r.id)}.md</a></dd></dl>
+      <div class="chips">${r.skills.map(k => `<button class="chip" data-skill="${esc(k)}">${esc(k)}</button>`).join("")}</div></div>` : ""}</div>`;
+  }).join("")}</div></section>`;
+}
+
+// Matrix
+function matrix() {
+  const cols = [...skills].sort((a, b) => b.usedBy.length - a.usedBy.length || a.id.localeCompare(b.id));
+  const head = cols.map(s => `<th scope="col" class="${hiSkill === s.id ? "on" : ""}"><button data-skill="${esc(s.id)}" data-hi="1">${esc(s.id)}</button></th>`).join("");
+  const body = roles.map(r => `<tr><th scope="row" class="${hiRole === r.id ? "on" : ""}"><button data-role="${esc(r.id)}" data-hi="1">${esc(r.id)}</button></th>${cols.map(s => {
+    const has = r.skills.includes(s.id), x = hiRole === r.id || hiSkill === s.id, y = hiRole === r.id && hiSkill === s.id;
+    return `<td class="${x ? "x" : ""}${y ? " y" : ""}${has && ownSkill(s) ? " own" : ""}" title="${esc(r.id)} ${has ? "loads" : "does not load"} ${esc(s.id)}">${has ? "<b></b>" : "<i></i>"}</td>`;
+  }).join("")}<td class="tot">${r.skills.length}</td></tr>`).join("");
+  const foot = `<tr><td></td>${cols.map(s => `<td>${s.usedBy.length}</td>`).join("")}<td></td></tr>`;
+  const creators = new Set(skills.flatMap(s => s.sources.map(x => x.repo)));
+  const shared = skills.filter(s => s.usedBy.length > 1).length;
+  return `<section aria-labelledby="h-matrix"><h2 id="h-matrix">Skill matrix <small>who carries what</small></h2><div class="matrix">
+    <div class="mscroll"><table class="mx" aria-label="Roles by skills"><thead><tr><th></th>${head}<th></th></tr></thead><tbody>${body}</tbody><tfoot>${foot}</tfoot></table></div>
+    <div class="legend"><span><b></b>Loaded before work starts</span>${skills.some(ownSkill) ? '<span><b class="own"></b>Written by this team</span>' : ""}<span>Pick a role or a skill to trace it</span></div>
+    <div class="facts"><div><b>${skills.length}</b><span>skills on the shelf</span></div><div><b>${shared}</b><span>shared by 2+ roles</span></div><div><b>${creators.size}</b><span>outside sources, pinned</span></div></div>
+  </div></section>`;
+}
+
+// Shelf
+function shelf() {
+  const list = skills.filter(s => shelfFilter === "all" || (shelfFilter === "own" ? ownSkill(s) : !ownSkill(s)))
+    .sort((a, b) => b.usedBy.length - a.usedBy.length || a.id.localeCompare(b.id));
+  const nOwn = skills.filter(ownSkill).length;
+  return `<section aria-labelledby="h-shelf"><h2 id="h-shelf">Skill shelf <span class="filter" role="group" aria-label="Filter skills">${[["all", `All ${skills.length}`], ["adapted", `Adapted ${skills.length - nOwn}`], ["own", `Ours ${nOwn}`]].map(([k, l]) => `<button data-filter="${k}" aria-pressed="${shelfFilter === k}">${l}</button>`).join("")}</span></h2>
+  <div class="rows">${list.length ? list.map(s => {
+    const open = openSkill === s.id;
+    const from = s.sources.length ? [...new Set(s.sources.map(x => x.repo.split("/")[0]))].join(", ") : "this team";
+    const lics = [...new Set(s.sources.map(x => lic(x.license)))].join(", ");
+    return `<div class="row${hiSkill === s.id ? " sel" : ""}" id="skill-${esc(s.id)}"><button class="hit" data-skill="${esc(s.id)}" data-open="1" aria-expanded="${open}">
+      <span class="l1"><span class="t">${esc(s.id)}</span><span class="chip">${esc(from)}</span>${lics ? `<span class="chip">${esc(lics)}</span>` : ""}<span class="r">${plural(s.usedBy.length, "role")}</span></span>
+      <span class="sub">${md(open ? s.what : firstSentence(s.what))}</span></button>
+      ${open ? `<div class="open">${s.lead ? `<p><b>${md(s.lead)}</b></p>` : ""}
+        <dl class="kv"><dt>Used by</dt><dd><span class="chips">${s.usedBy.map(r => `<button class="chip" data-role="${esc(r)}" data-open="1">${esc(r)}</button>`).join("")}</span></dd>
+        ${s.sources.map(x => `<dt>Source</dt><dd>${/^[\w.-]+\/[\w.-]+$/.test(x.repo) ? `<a href="${GH}${esc(x.repo)}/tree/${esc(x.commit)}/${esc(x.path.split(" ")[0])}" target="_blank" rel="noopener">${esc(x.repo)}</a>` : esc(x.repo)} <span class="mono">${esc(x.path)}</span><br><span class="mono">${esc(x.commit.slice(0, 12))}</span> · ${esc(x.license)}</dd>`).join("")}
+        ${s.changed ? `<dt>We changed</dt><dd>${md(s.changed)}</dd>` : ""}
+        <dt>File</dt><dd><a href="${repoFile(s.path)}" target="_blank" rel="noopener" class="mono">skills/${esc(s.id)}/SKILL.md</a></dd></dl></div>` : ""}</div>`;
+  }).join("") : `<div class="empty">No skills written by this team yet; every skill is adapted from a pinned outside source.</div>`}</div></section>`;
+}
+
+// Loop
+function loop() {
+  if (!D.loop.length) return "";
+  const h = D.loopHeader, nk = h[0], sk = h.find(k => /stage/.test(k)) || h[1], wk = h.find(k => /who/.test(k)), gk = h.find(k => /gate/.test(k));
+  return `<section aria-labelledby="h-loop"><h2 id="h-loop">How the team works <small>${D.loop.length} stages, every project</small></h2><ol class="loop">${D.loop.map(r => {
+    const you = /owner go/i.test(r[sk]) || /^\*\*the owner\*\*$/i.test(r[wk] || "");
+    return `<li class="${you ? "you" : ""}"><span class="dot">${esc(r[nk])}</span><div><div class="st">${md(r[sk])}${you ? '<span class="youtag">You</span>' : ""}</div>${wk ? `<div class="w">${md(r[wk])}</div>` : ""}${gk ? `<div class="g">Moves on when: ${md(r[gk])}</div>` : ""}</div></li>`;
+  }).join("")}</ol></section>`;
+}
+
+// Turned down
+function rejected() {
+  if (!D.rejected.length) return "";
+  const h = Object.keys(D.rejected[0]), nk = h[0], rk = h.find(k => /reason/.test(k)) || h[h.length - 2], sk = h.find(k => /source/.test(k));
+  return `<section><details class="fold"><summary><h2>Turned down</h2><span class="tg">${D.rejected.length} read and not taken, so they are not proposed again</span></summary><div class="rows">${D.rejected.map(r => `<div class="row"><div class="hit" style="cursor:default"><span class="t" style="font-size:14px">${md(r[nk])}</span><span class="sub">${md(r[rk])}</span>${sk ? `<span class="mono">${md(r[sk])}</span>` : ""}</div></div>`).join("")}</div></details></section>`;
+}
+
+function planned(t) {
+  return `<section><h2>${esc(t.name)} <small>${esc(t.note)}</small></h2><div class="rows"><div class="row"><div class="hit" style="cursor:default"><span class="l1"><i class="sm queued"></i><span class="t">Nothing on the roster yet</span></span>
+    <span class="sub" style="padding-left:22px">This team appears here when its repo exists. It will share the same shelf rules: outside skills copied, pinned and licensed, new skills added only after your approval.</span></div></div></div></section>`;
+}
+
+function render() {
+  rail(); counts();
+  const t = TEAMS.find(x => x.id === team);
+  $("#main").innerHTML = t.live
+    ? `<div class="two">${roster()}${matrix()}</div>${shelf()}${loop()}${rejected()}
+       <section><p class="note">Read from <a href="${GH}${esc(D.team.repo)}/tree/${esc(D.team.commit)}" target="_blank" rel="noopener">${esc(D.team.repo)}</a> at <span class="mono">${esc(D.team.commit.slice(0, 8))}</span>. Work states are examples until real runs exist. Your own desk is Needs you, not this room.</p></section>`
+    : planned(t);
+}
+
+document.addEventListener("click", e => {
+  const tb = e.target.closest("[data-team]"); if (tb) { team = tb.dataset.team; openRole = openSkill = hiRole = hiSkill = null; render(); return; }
+  const f = e.target.closest("[data-filter]"); if (f) { shelfFilter = f.dataset.filter; render(); return; }
+  const rb = e.target.closest("[data-role]"), sb = e.target.closest("[data-skill]");
+  if (rb && rb.dataset.hi) { hiRole = hiRole === rb.dataset.role ? null : rb.dataset.role; render(); return; }
+  if (sb && sb.dataset.hi) { hiSkill = hiSkill === sb.dataset.skill ? null : sb.dataset.skill; render(); return; }
+  if (rb) { const id = rb.dataset.role; const toggle = rb.classList.contains("hit"); openRole = toggle && openRole === id ? null : id; hiRole = openRole; render(); if (!toggle) document.querySelector(`[data-role="${CSS.escape(id)}"].hit`)?.scrollIntoView({ block: "center" }); return; }
+  if (sb) { const id = sb.dataset.skill; const toggle = sb.classList.contains("hit"); openSkill = toggle && openSkill === id ? null : id; hiSkill = openSkill; if (shelfFilter !== "all" && openSkill) shelfFilter = "all"; render(); if (!toggle) $(`#skill-${CSS.escape(id)}`)?.scrollIntoView({ block: "center" }); return; }
+});
+$("#ask").addEventListener("click", () => { const r = roles.find(x => st(x.id) === "ask"); if (r) { openRole = hiRole = r.id; render(); } });
+render();
+</script>
