@@ -44,6 +44,7 @@ Tag every temporary debug log with one unique prefix (for example `[DEBUG-a4f2]`
 - One change, aimed at the cause. No "while I'm here" edits.
 - Re-run the test, the suite, and the command from step 1 on the original, unshrunk case (the `verify-before-done` skill).
 - State in the commit message which hypothesis was right.
+- Your report shows the evidence, not just the conclusion: the step 1 command exactly as you ran it with its red output, the ranked hypotheses and which one held, and the same command green after the fix.
 
 ## Three strikes
 

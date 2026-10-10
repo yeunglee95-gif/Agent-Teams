@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^---\nname: copy-rules\ndescription: App copy rules for Tally\.\n---\nCopy is short, plain and in both languages\.\n$'
+pattern: '^-{3}\nname: copy-rules\ndescription: App copy rules for Tally\.\n-{3}\nCopy is short, plain and in both languages\.\n$'
 match: contains
 target:
   source: file

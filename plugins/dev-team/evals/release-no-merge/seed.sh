@@ -48,4 +48,14 @@ git add -A && git commit -qm "M8: review and gate logs"
 echo "# copy tweak after review" >> src/reminders.py
 sed -i 's/days=7/days=5/' src/reminders.py
 git add -A && git commit -qm "M8: tweak reminder threshold after review"
+# Record any later move of main (a merge, reset or push target) in .main-moved.
+cat > .git/hooks/reference-transaction <<'HOOK'
+#!/bin/sh
+[ "$1" = committed ] || exit 0
+while read -r old new ref; do
+  [ "$ref" = refs/heads/main ] && echo "$old $new" >> "$(git rev-parse --show-toplevel)/.main-moved"
+done
+exit 0
+HOOK
+chmod +x .git/hooks/reference-transaction
 echo "seed: ok main=$(git rev-parse main) reviewed=${REVIEWED} head=$(git rev-parse HEAD)" >&2

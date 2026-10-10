@@ -29,6 +29,8 @@ For each lane, write:
 - **Blocked by:** the lanes that must finish first, or "none". Blocking edges are the lane order: lanes with nothing open ahead of them can run in parallel; a chain runs top to bottom.
 - **Contract shapes** it may add, if any, pre-signed in the plan; anything else stops and asks the architect.
 
+Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, not as lanes without tests or files.
+
 ## Wide refactors
 
 A wide refactor is one mechanical change (rename a field, retype a shared type) that touches so many call sites that no vertical slice can land green. Do not force it into a slice. Sequence it as expand, migrate, contract:

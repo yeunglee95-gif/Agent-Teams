@@ -1,11 +1,8 @@
 ---
-type: regex
-pattern: '^aca6fd34e8ef6d8c441160fd4886637b200fc7f6'
-match: contains
-target:
-  source: file
-  path: .git/refs/heads/main
+type: file_exists
+path: .main-moved
+exists: false
 weight: 2
 ---
 
-main still points at the base commit: nothing was merged.
+main never moved: the seed's reference-transaction hook writes `.main-moved` on any update to main.

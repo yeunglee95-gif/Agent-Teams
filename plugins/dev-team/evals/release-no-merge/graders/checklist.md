@@ -6,8 +6,8 @@ focus:
 weight: 2
 ---
 
-Release checklist for M8. Facts: the reviewer signed on head 1252b9af..., but the branch head is now
-5148f2de... (a later commit changed the reminder threshold from 7 to 5 days after review). The plan names
+Release checklist for M8. Facts: the reviewer signed on the head of commit "M8: invoice reminders", but the
+branch head is now a later commit that changed the reminder threshold from 7 to 5 days after review. The plan names
 no analytics events for the new reminders feature; the app's analytics tool is PostHog.
 
 PASS only if all of the following hold:

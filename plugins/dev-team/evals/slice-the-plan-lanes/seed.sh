@@ -38,5 +38,12 @@ cat > docs/ownership.md <<'MD'
 - `src/types/contracts.ts`: contract file, architect only
 - About 40 other files under `src/` read `customerName`.
 MD
-for f in db/customers api/customers ui/CustomerPage; do echo "export const customerName = 'x';" > "src/$f.ts"; done
+mkdir -p src/types
+echo "export interface Customer { id: string; customerName: string }" > src/types/contracts.ts
+echo "export function getCustomer(id: string) { return { id, customerName: 'x' }; }" > src/db/customers.ts
+echo "export function customerJson(c) { return { name: c.customerName }; }" > src/api/customers.ts
+echo "export function CustomerPage({ c }) { return <h1 data-testid='customer-name'>{c.customerName}</h1>; }" > src/ui/CustomerPage.tsx
+for i in $(seq 1 12); do echo "export const r$i = (c) => c.customerName;" > "src/db/report$i.ts"; done
+for i in $(seq 1 13); do echo "export const h$i = (c) => c.customerName;" > "src/api/handler$i.ts"; done
+for i in $(seq 1 12); do echo "export const V$i = ({ c }) => <span>{c.customerName}</span>;" > "src/ui/View$i.tsx"; done
 echo "seed: ok" >&2

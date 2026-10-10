@@ -27,10 +27,10 @@ Ten roles and fourteen skills (0.3.0). Each role preloads only the skills it nee
 Each new or changed skill has a behavior eval in `plugins/dev-team/evals/<case>/` (`case.yaml`, `prompt.md`, `seed.sh`, `graders/`). Each case seeds a small throwaway app, runs one role with the plugin loaded, and grades what it did. Run them from the repo root:
 
 ```
-claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edit Agent --ablation none --no-publish
+claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edit Agent --ablation none --judge-model sonnet --no-publish
 ```
 
-`--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
+`--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list; `--judge-model sonnet` because the default judge was noisy on plan-length files. Cases that grant a shell need the eval sandbox (on Linux, `bubblewrap` and `socat`); without it every run is refused. The LLM-judged cases are not fully stable: expect an occasional failed run on `slice-the-plan-lanes` and `design-it-twice` from judge noise, and read the output before changing a skill. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
 
 ## Add a new team
 
