@@ -27,8 +27,13 @@ When the architect's lane plan already names the red tests a lane starts from, t
 - A test that checks a mock instead of the behavior.
 - "I tested it by hand", "I'll add tests after", "this one is too simple to test".
 
+## Two named anti-patterns
+
+- **Tautological test.** The assertion works out the expected value the same way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot built the same way, a constant compared with itself). It passes by construction and can never disagree with the code. Expected values come from somewhere independent: a known good literal, a worked example, the spec.
+- **Horizontal slicing.** Writing all the tests first and then all the code. Tests written in bulk check imagined behavior and the shape of things, not what a person sees, and they fix the test structure before you understand the code. Work in vertical slices: one test, the code for it, then the next test, each one shaped by what the last cycle taught you. This holds even when the architect's plan names several red tests up front.
+
 A throwaway spike or generated code may skip this only when the brief says so.
 
 ## Source
 
-Adapted from `test-driven-development` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Changed: shortened, rewritten in this team's voice, and the section on the architect's red tests added so the skill matches the lane plan. License text: `../../licenses/obra-superpowers-MIT.txt`.
+Adapted from `test-driven-development` in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d, with the two named anti-patterns from `skills/engineering/tdd/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: shortened, rewritten in this team's voice, and the section on the architect's red tests added so the skill matches the lane plan; from tdd, only the tautological and horizontal-slicing anti-patterns, with its "confirm seams with the user" step left out because the architect's lane plan names the red tests. License texts: `../../licenses/obra-superpowers-MIT.txt`, `../../licenses/mattpocock-skills-MIT.txt`.

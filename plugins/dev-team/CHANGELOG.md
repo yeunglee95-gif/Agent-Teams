@@ -1,5 +1,17 @@
 # dev-team changelog
 
+## 0.3.0 (2026-10-10)
+
+Fourteen skills, one milestone loop, and the first evals. Scope approved by the owner on 2026-10-10. The team learns between milestones through a retro whose proposals the owner approves; nothing edits a skill, hook or `CLAUDE.md` on its own. New sources: mattpocock/skills at 49dd158d1076134a641b33efb035946536778336 and EricTechPro/super-board at 35e215615c98fa5da011368e764f38f86959bf95, both MIT (`THIRD_PARTY.md`, `licenses/`).
+
+- New skills: `run-retro` (scribe; turns a milestone's findings into proposals, a finding class seen twice must get one, a deterministic check preferred), `grill-the-plan` (architect; facts looked up, decisions to the owner, at most four questions a round, nothing written until the owner confirms), `slice-the-plan` (architect; vertical slices as lanes with disjoint files and named red tests, blocked-by order, expand then migrate then contract for wide refactors, owner checks the breakdown).
+- Changed skills: `root-cause-debugging` (a red, deterministic, fast command first; three to five ranked hypotheses; tagged debug logs removed; no correct seam is a finding), `architecture-critique` (dependency kinds; an optional design-it-twice step only the architect runs), `hidden-failure-check` (hypotheses before the builder's report; finding classes Gap, Bug, Verification miss, Scope drift, Over-engineering, with over-engineering never blocking alone; earlier findings re-checked by id; spec and standards axes kept apart; the test-gap table; a code-smell baseline in `smells.md`), `tests-first` (tautological tests and horizontal slicing named), `release-checklist` (merge danger, merge-gate lines the owner signs, analytics events named for every new feature).
+- Roles: architect preloads `grill-the-plan`, `slice-the-plan` and `architecture-critique`; scribe preloads `run-retro` and owns the loop page; spec-auditor preloads `hidden-failure-check` and adds the test-gap table to its sweep; reviewer writes hypotheses before any builder's report, labels findings by class and axis, and records the head sha it verified on. Every role in the loop points to the loop page; lane owners answer the pre-flight questions first.
+- New: `workflows/milestone-loop.md`, the fourteen-stage loop from intake to watch, with pre-flight per lane, `blocked-by:` lines and a sweep at each stage start, a same-root-cause-twice cap that goes to the owner, a halt after two rounds with no progress, and the list of what the loop never does.
+- New: `skills/REJECTED.md`, the candidates read and not taken, with source, commit and reason (auto-merge, the CI-budget bypass, the reviewer's authorize-to-fix clause, cards straight to ready, the never-ask decision ladder, unpinned installs, and others).
+- New: `evals/`, one case per new or changed skill, run with `claude plugin eval`. How to run them is in the README.
+- Models unchanged.
+
 ## 0.2.0 (2026-10-08)
 
 Ten roles and eleven skills. The roles stay short and say who does what; the skills say how, and each role preloads only the ones it needs. Skills were adapted from published sources, with each source, commit, license and change recorded (`THIRD_PARTY.md`, `licenses/`).

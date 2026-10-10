@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: run-retro-proposes
+description: >
+  Milestone M3 closed. Its records and M2's show two finding classes seen in both
+  milestones: a hard-coded English string in the UI (mechanical) and a refused action
+  with no message. The scribe runs run-retro. It must write a proposal list where the
+  app's CLAUDE.md says, propose a deterministic check for the mechanical class, cover
+  every class seen twice, and leave CLAUDE.md, the lint config and the skills untouched.
+tags: [run-retro, scribe]
+runs: 3
+expected_outcome: retros/M3-retro.md lists proposals for the owner; nothing else edited.
+execution:
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh

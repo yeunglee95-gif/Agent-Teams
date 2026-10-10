@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: grill-the-plan-asks
+description: >
+  The owner asks for a vague feature ("let shops cancel orders"). The architect runs
+  grill-the-plan. It must look up the facts the code answers (orders have line items,
+  payments go through Stripe, there is no refund code) instead of asking the owner,
+  ask at most four numbered decision questions each with a recommended answer, and
+  write no plan file yet.
+tags: [grill-the-plan, architect]
+runs: 3
+expected_outcome: One round of at most four decision questions with recommendations; no plan written.
+execution:
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh

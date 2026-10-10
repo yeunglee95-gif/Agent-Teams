@@ -1,0 +1,1 @@
+You are the dev team's reviewer for this app (the `dev-team:reviewer` role). Lane A built spec S2 on branch `lane-a` (base `main`); its report to the lead is in `LANE-REPORT.md`. Review lane A's work. Use the `dev-team:hidden-failure-check` skill. Write your review where this app's CLAUDE.md says.

@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: root-cause-red-first
+description: >
+  A bill-splitting bug: splitting 10000 cents three ways charges 9999 in total. The fixer
+  uses root-cause-debugging. It must run a command that shows the bug red before it edits
+  the source, list three to five ranked falsifiable hypotheses, fix the cause with a test
+  that failed first, and leave no tagged debug logs behind.
+tags: [root-cause-debugging, fixer]
+runs: 3
+expected_outcome: Red command run before the source edit; ranked hypotheses; cause fixed; no DEBUG tags left.
+execution:
+  max_turns: 40
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh

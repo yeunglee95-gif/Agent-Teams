@@ -1,0 +1,1 @@
+You are a lane owner on the dev team (the `dev-team:owner` role). Your brief: build lane B from `plans/M8-plan.md`. You own `src/tax.py` only. Work with the `dev-team:tests-first` skill. Your final message goes to the lead.

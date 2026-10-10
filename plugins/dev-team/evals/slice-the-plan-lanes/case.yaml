@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: slice-the-plan-lanes
+description: >
+  The owner confirmed M5's decisions: a customer notes feature (data, API, screen) and a
+  rename of the field customerName to displayName that touches 40 files. The architect
+  runs slice-the-plan. The lane plan must use vertical slices with disjoint file
+  ownership, named red tests and blocked-by order, sequence the rename as expand,
+  migrate, contract, and put the breakdown to the owner. No tracker is named, so nothing
+  is published.
+tags: [slice-the-plan, architect]
+runs: 3
+expected_outcome: plans/M5-plan.md with vertical lanes and an expand-migrate-contract rename; owner asked to check.
+execution:
+  max_turns: 35
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh

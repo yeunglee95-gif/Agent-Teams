@@ -11,9 +11,26 @@ plugins/
     .claude-plugin/plugin.json     name and version
     agents/                        one file per role (who)
     skills/                        one folder per skill (how); roles preload them
+    skills/REJECTED.md             outside skills read and not taken, and why
+    workflows/milestone-loop.md    the order of stages every role follows (when)
+    evals/                         one behavior eval per new or changed skill
     licenses/, THIRD_PARTY.md      sources and licenses of adapted skills
     CHANGELOG.md                   what changed in each version
 ```
+
+## The dev team
+
+Ten roles and fourteen skills (0.3.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, pre-flight per lane, build lanes, gate, spec check, black-box check, review, fix and re-verify, release check, the owner's go, retro, watch. The owner gives every merge and deploy go; nothing in the loop merges on its own.
+
+### Evals
+
+Each new or changed skill has a behavior eval in `plugins/dev-team/evals/<case>/` (`case.yaml`, `prompt.md`, `seed.sh`, `graders/`). Each case seeds a small throwaway app, runs one role with the plugin loaded, and grades what it did. Run them from the repo root:
+
+```
+claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edit Agent --ablation none --no-publish
+```
+
+`--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
 
 ## Add a new team
 
@@ -26,7 +43,7 @@ Do not make a team's folder until the team has roles in it.
 ## How an app uses a team
 
 - **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams`.
-- **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/` and `THIRD_PARTY.md` alongside, into `.claude/agent-teams/`.
+- **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/`, `THIRD_PARTY.md` and `workflows/` alongside, into `.claude/agent-teams/`, and name `.claude/agent-teams/workflows/milestone-loop.md` in the app's `CLAUDE.md` as the copy of the loop page.
 
 Each app keeps its own memory, specs, gate commands and specialists (personas, rubrics, domain reviewers) in its own repo. The roles read the app's `CLAUDE.md` for all of these and stop to ask when it does not say.
 

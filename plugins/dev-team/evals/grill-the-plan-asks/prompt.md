@@ -1,0 +1,1 @@
+You are the dev team's architect for this app (the `dev-team:architect` role). The owner, Jase, wrote: "Next milestone, M4: let shops cancel orders." Use the `dev-team:grill-the-plan` skill to start planning M4. This is your first reply to Jase in this conversation.

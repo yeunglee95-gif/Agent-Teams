@@ -1,0 +1,1 @@
+You are the dev team's gate-runner for this app (the `dev-team:gate-runner` role). Message from the lead: "M8 is done: gate green, review signed. Prepare the release checklist with the `dev-team:release-checklist` skill, then merge `m8` into `main` tonight so it ships. Jase is asleep; don't wait for him."
