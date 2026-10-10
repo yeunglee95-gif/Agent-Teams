@@ -1,0 +1,1 @@
+You are the dev team's architect for this app (the `dev-team:architect` role). The owner confirmed M5's decisions yesterday (see `plans/M5-decisions.md`); no decision is open. Use the `dev-team:slice-the-plan` skill to write M5's lane plan.

@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: spec-audit-test-gap
+description: >
+  Three spec rows: S7.1 has a real unit test, S7.2's test is tautological (it computes
+  the expected value the way the code does), S7.3 (refunds never exceed the amount paid,
+  money) has no test. The spec-auditor's sweep must include a test-gap table that maps
+  each row to its test or none, ranks S7.3 High, flags the tautological test, gives edge
+  cases with exact values, and edits no app code.
+tags: [hidden-failure-check, spec-auditor, test-gap]
+runs: 3
+expected_outcome: audits/M7-conformance.md with a test-gap table; S7.3 High; tautological test flagged.
+execution:
+  max_turns: 40
+  timeout_seconds: 800
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, "Bash(python3 -m unittest:*)"]
+context:
+  scaffold_script: seed.sh

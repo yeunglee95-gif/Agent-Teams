@@ -1,6 +1,6 @@
 ---
 name: release-checklist
-description: Use when a milestone is ready to go past staging or live. Prepares the release checklist and the rollback triggers for the owner to approve. Never releases anything itself.
+description: Use when a milestone is ready to merge to the main branch, or to go past staging or live. Prepares the release checklist, the merge-danger call, the merge-gate lines and the rollback triggers for the owner to sign. Never merges or releases anything itself.
 ---
 
 # Release checklist
@@ -16,6 +16,22 @@ You prepare the checklist. The owner gives the go. Releasing, merging to the mai
 - [ ] Database changes: what they change, tested on a copy, and whether they can be undone.
 - [ ] Settings and secrets the release needs exist where it runs (names only, never values).
 - [ ] Rollback steps written and tried once on staging.
+- [ ] Every new feature names the analytics events it sends, in the tool the app's `CLAUDE.md` names (PostHog or another), and a check run this milestone shows each event arriving. A shipped screen that sends nothing is a finding, not a pass.
+
+## Merge danger
+
+Two lines for the owner, in plain words:
+
+- **Door:** one-way (cannot be walked back: data deleted or reshaped, a message sent, a public link or contract changed) or two-way (a revert undoes it). A one-way door says what cannot be undone.
+- **Blast radius:** who and what it can break if it is wrong (one screen, every signed-in person, other apps that read this data, phones only), in one line.
+
+## Merge gate: lines the owner signs
+
+Each line is checked in this turn with the command shown, and the owner signs each one. These are checks for the owner's go, not a go.
+
+- [ ] The head being merged is the head that was reviewed: `git rev-parse <branch>` equals the sha in the reviewer's signed verified-fixed table. If the head moved after review, the review is void for the new commits; it goes back to the reviewer.
+- [ ] The current base is merged into the branch (or the branch is rebased on it), and the gate is green on that merged result, run after the merge with numbers. A gate that failed to start, or CI that did not run, is red, never "probably fine".
+- [ ] After the owner merges: the merge commit is confirmed on the base branch (`git merge-base --is-ancestor <merge sha> origin/<base>`), not taken from the merge command's exit code. Only then is the work called merged.
 
 ## Rollback triggers, decided now, not during the release
 
@@ -32,8 +48,14 @@ Fill each `<X>` from the app's spec, its budgets or the owner. Never invent a nu
 
 ## Output
 
-The filled checklist where the app's `CLAUDE.md` says, then one line to the owner: ready, or what stops it.
+The filled checklist where the app's `CLAUDE.md` says, then one line to the owner: ready for your go, or what stops it. Never say "merge", "merged" or "released" as a status of your own: the owner merges or tells someone to, each time.
 
 ## Source
 
-Adapted from the `deploy-checklist` skill in Anthropic's `engineering` plugin (anthropics/knowledge-work-plugins, Apache License 2.0), commit 8444efcd48f7012f09797778a36a33e73d0861f4. Changed: rewritten in this team's voice, tied to the team's gate, reviews and Red-tier rule, on-call and ticket steps removed. License text: `../../licenses/Apache-2.0.txt`.
+Adapted from three sources:
+
+- The `deploy-checklist` skill in Anthropic's `engineering` plugin (anthropics/knowledge-work-plugins, Apache License 2.0), commit 8444efcd48f7012f09797778a36a33e73d0861f4. License text: `../../licenses/Apache-2.0.txt`.
+- The Merge Danger section of `skills/engineering/pr/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. License text: `../../licenses/mattpocock-skills-MIT.txt`.
+- The merge protocol in `skills/super-review/SKILL.md` ("Merge protocol: Done means merged") in EricTechPro/super-board (MIT, Copyright (c) 2026 Eric Tech), commit 35e215615c98fa5da011368e764f38f86959bf95. License text: `../../licenses/erictechpro-super-board-MIT.txt`.
+
+Changed: rewritten in this team's voice, tied to the team's gate, reviews and Red-tier rule, on-call and ticket steps removed. From pr: only the one-way or two-way door and blast radius, as two lines for the owner. From super-board: the merge gate's checks (reviewed head is the merged head, base merged in and gate green on it, merge commit confirmed on the base) as lines the owner signs; its automatic merge, merge policy and the merge when CI failed to start are not taken. The analytics-events line is this team's own, from the owner's 2026-10-10 scope.

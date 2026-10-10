@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: design-it-twice
+description: >
+  The interface of a new notifications part is in question (email through an outside
+  provider now, SMS later, in-app notices in the app's own database). The architect uses
+  architecture-critique's design-it-twice step: three or more sub-agents with different
+  constraints, compared by depth, locality and seam placement, with each dependency's
+  kind named and one recommendation.
+tags: [architecture-critique, architect]
+runs: 3
+expected_outcome: plans/M6-design.md compares three or more designs and recommends one.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Agent]
+context:
+  scaffold_script: seed.sh
