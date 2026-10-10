@@ -154,16 +154,33 @@ section + section { margin-top: 26px; }
 .filter button { border-radius: 9999px; padding: 3px 11px; font: 600 12.5px var(--font); color: var(--ink-2); }
 .filter button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--line-2); }
 
-/* Loop rail (milestone rail) */
-.loop { list-style: none; margin: 0; padding: 0; position: relative; display: grid; }
-.loop::before { content: ""; position: absolute; left: 13px; top: 14px; bottom: 14px; width: 2px; background: var(--line-2); }
-.loop li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding: 6px 0; position: relative; }
-.loop .dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line-2); display: grid; place-items: center; font: 600 12px var(--font); color: var(--ink-2); z-index: 1; }
-.loop li.you .dot { background: var(--ink); color: var(--paper); box-shadow: none; }
-.loop .st { font: 600 15px var(--font); letter-spacing: -0.01em; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.loop .w { color: var(--ink-2); font-size: 13.5px; }
-.loop .g { color: var(--ink-3); font-size: 13px; }
-.loop .youtag { font: 600 12px var(--font); background: var(--ink); color: var(--paper); border-radius: 9999px; padding: 1px 8px; }
+/* Loop as a factory board */
+.fctl { display: inline-flex; gap: 12px; align-items: center; }
+.flow { border-top: 1px solid var(--line); }
+.fscroll { overflow-x: auto; }
+.fboard { position: relative; display: grid; grid-template-columns: repeat(6, minmax(118px, 1fr)); gap: 0 26px; min-width: 860px; padding: 14px 4px 46px 24px; }
+.fedges { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.fedge { fill: none; stroke: var(--line-2); stroke-width: 1.5; }
+.fedge.back { stroke-dasharray: 4 4; stroke: var(--ink-3); }
+.fhead { fill: var(--line-2); }
+.flabel { font: 400 11.5px var(--font); fill: var(--ink-3); }
+.fdot { fill: var(--cobalt); stroke: var(--paper); stroke-width: 2.5; }
+.fcol { display: flex; flex-direction: column; gap: 22px; position: relative; z-index: 1; }
+.fh { display: flex; justify-content: space-between; align-items: baseline; font: 600 12.5px var(--font); color: var(--ink-2); border-bottom: 1px solid var(--line); padding: 0 2px 6px; margin-bottom: -8px; }
+.fh small { font: 400 12px var(--font); color: var(--ink-3); }
+.fnode { display: grid; gap: 2px; background: var(--panel); border-radius: 12px; padding: 9px 11px 10px; box-shadow: inset 0 0 0 1px var(--line), 0 2px 2px rgb(0 0 0 / .05); position: relative; transition: box-shadow 200ms var(--ease); }
+.fnode .fnum { font: 600 11.5px var(--font); color: var(--ink-3); }
+.fnode .fname { font: 600 14px/1.25 var(--font); letter-spacing: -0.01em; color: var(--ink); }
+.fnode .fwho { font-size: 12px; color: var(--ink-3); }
+.fnode.on { box-shadow: inset 0 2px 0 var(--cobalt), inset 0 0 0 1px var(--line-2), 0 2px 2px rgb(0 0 0 / .05); }
+.fnode.sel { box-shadow: inset 0 0 0 2px var(--ink), 0 6px 16px rgb(0 0 0 / .08); }
+.fnode.you { background: var(--panel-2); }
+.youtag { font: 600 11px var(--font); background: var(--ink); color: var(--paper); border-radius: 9999px; padding: 1px 7px; vertical-align: 1px; }
+.fnow { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; padding: 12px 8px; border-top: 1px solid var(--line); min-height: 76px; }
+.fnow b { font: 600 15px var(--font); }
+.fnow .w, .fnow .g { grid-column: 2; font-size: 13.5px; color: var(--ink-2); }
+.fnow .g { color: var(--ink-3); font-size: 13px; }
+@media (max-width: 640px) { .fnow { grid-template-columns: 1fr; } .fnow .w, .fnow .g { grid-column: 1; } }
 
 details.fold { border-top: 1px solid var(--line); }
 details.fold summary { cursor: pointer; list-style: none; padding: 12px 8px; display: flex; justify-content: space-between; gap: 12px; }
@@ -307,14 +324,93 @@ function shelf() {
   }).join("") : `<div class="empty">No skills written by this team yet; every skill is adapted from a pinned outside source.</div>`}</div></section>`;
 }
 
-// Loop
+// Loop as a factory board: phase columns, stage cards, arrows, loops back, and one work item travelling it.
+const PHASES = [["Plan", [0, 1, 2]], ["Build", [3, 4]], ["Check", [5, 6, 7, 8]], ["Fix", [9]], ["Ship", [10, 11]], ["Learn", [12, 13]]];
+const ROUTE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 10, 11, 12, 13, 0];
+const LOOPS = [[9, 8, "re-verify"], [13, 0, "findings go back to intake"]];
+let flowSel = null, flowPaused = false;
+const F = { hop: 0, t0: 0, phase: "dwell", raf: 0, visible: true };
+function loopKeys() { const h = D.loopHeader; return { nk: h[0], sk: h.find(k => /stage/.test(k)) || h[1], wk: h.find(k => /who/.test(k)), gk: h.find(k => /gate/.test(k)) }; }
+const isYou = r => { const { sk, wk } = loopKeys(); return /owner go/i.test(r[sk]) || /^\*\*the owner\*\*$/i.test(r[wk] || ""); };
+const plain = t => String(t || "").replace(/\*\*|`/g, "");
+const whoShort = t => plain(t).split(/[,;(:]/)[0].trim();
 function loop() {
-  if (!D.loop.length) return "";
-  const h = D.loopHeader, nk = h[0], sk = h.find(k => /stage/.test(k)) || h[1], wk = h.find(k => /who/.test(k)), gk = h.find(k => /gate/.test(k));
-  return `<section aria-labelledby="h-loop"><h2 id="h-loop">How the team works <small>${D.loop.length} stages, every project</small></h2><ol class="loop">${D.loop.map(r => {
-    const you = /owner go/i.test(r[sk]) || /^\*\*the owner\*\*$/i.test(r[wk] || "");
-    return `<li class="${you ? "you" : ""}"><span class="dot">${esc(r[nk])}</span><div><div class="st">${md(r[sk])}${you ? '<span class="youtag">You</span>' : ""}</div>${wk ? `<div class="w">${md(r[wk])}</div>` : ""}${gk ? `<div class="g">Moves on when: ${md(r[gk])}</div>` : ""}</div></li>`;
-  }).join("")}</ol></section>`;
+  if (D.loop.length < 14) return "";
+  const { sk } = loopKeys();
+  const cols = PHASES.map(([name, ids]) => `<div class="fcol"><div class="fh"><span>${name}</span><small>${ids.length}</small></div>${ids.map(i => {
+    const r = D.loop[i]; const you = isYou(r);
+    return `<button class="fnode${you ? " you" : ""}${flowSel === i ? " sel" : ""}" data-stage="${i}" id="fn-${i}"><span class="fnum">${i}</span><span class="fname">${md(r[sk])}${you ? ' <span class="youtag">You</span>' : ""}</span><span class="fwho">${esc(whoShort(r[loopKeys().wk]))}</span></button>`;
+  }).join("")}</div>`).join("");
+  return `<section aria-labelledby="h-loop"><h2 id="h-loop">How the team works <span class="fctl"><small>${D.loop.length} stages, every project</small><button class="btn quiet" id="fplay" type="button">${flowPaused ? "Play" : "Pause"}</button></span></h2>
+    <div class="flow"><div class="fscroll"><div class="fboard" id="fboard"><svg class="fedges" id="fedges" aria-hidden="true"></svg>${cols}</div></div>
+    <div class="fnow" id="fnow" aria-live="off"></div></div></section>`;
+}
+function edgePath(a, b, board) {
+  const A = $(`#fn-${a}`).getBoundingClientRect(), B = $(`#fn-${b}`).getBoundingClientRect(), O = board.getBoundingClientRect();
+  const ax = A.left - O.left, ay = A.top - O.top, bx = B.left - O.left, by = B.top - O.top;
+  const loopBack = LOOPS.find(([x, y]) => x === a && y === b);
+  if (loopBack && a === 13) { // under the board, then up the left margin into Intake's side
+    const yb = board.scrollHeight - 16, xl = 8, ty = by + B.height / 2;
+    return `M${ax + A.width / 2},${ay + A.height} L${ax + A.width / 2},${yb - 10} Q${ax + A.width / 2},${yb} ${ax + A.width / 2 - 10},${yb} L${xl + 10},${yb} Q${xl},${yb} ${xl},${yb - 10} L${xl},${ty + 10} Q${xl},${ty} ${xl + 10},${ty} L${bx},${ty}`;
+  }
+  if (loopBack) { // fix back to review: from Fix's bottom down into Review's right side, low
+    const x1 = ax + A.width / 2, y1 = ay + A.height, x2 = bx + B.width, y2 = by + B.height * .72;
+    return `M${x1},${y1} C${x1},${y2} ${x2 + 30},${y2} ${x2},${y2}`;
+  }
+  if (a === 8 && b === 9) { const x1 = ax + A.width, y1 = ay + A.height * .3, x2 = bx, y2 = by + B.height / 2; const mx = (x1 + x2) / 2; return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`; }
+  if (Math.abs(ax - bx) < 4) return `M${ax + A.width / 2},${ay + A.height} L${bx + B.width / 2},${by}`;
+  const x1 = ax + A.width, y1 = ay + A.height / 2, x2 = bx, y2 = by + B.height / 2;
+  const mx = (x1 + x2) / 2;
+  return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+}
+function drawFlow() {
+  const board = $("#fboard"), svg = $("#fedges"); if (!board) return;
+  svg.setAttribute("viewBox", `0 0 ${board.scrollWidth} ${board.scrollHeight}`);
+  svg.setAttribute("width", board.scrollWidth); svg.setAttribute("height", board.scrollHeight);
+  const pairs = []; for (let i = 0; i < ROUTE.length - 1; i++) { const k = `${ROUTE[i]}-${ROUTE[i + 1]}`; if (!pairs.includes(k)) pairs.push(k); }
+  let out = `<defs><marker id="fa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" class="fhead"/></marker></defs>`;
+  for (const k of pairs) {
+    const [a, b] = k.split("-").map(Number); const back = LOOPS.find(([x, y]) => x === a && y === b);
+    out += `<path id="fe-${k}" class="fedge${back ? " back" : ""}" d="${edgePath(a, b, board)}" marker-end="url(#fa)"/>`;
+    if (back) { const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("d", edgePath(a, b, board)); svg.appendChild(tmp); const L = tmp.getTotalLength(), m = tmp.getPointAtLength(L / 2); tmp.remove(); out += a === 13 ? `<text class="flabel" x="${m.x}" y="${m.y - 6}" text-anchor="middle">${back[2]}</text>` : `<text class="flabel" x="${m.x + 6}" y="${m.y + 4}">${back[2]}</text>`; }
+  }
+  out += `<circle id="fdot" r="6" class="fdot"/>`;
+  svg.innerHTML = out;
+  placeDot();
+}
+function hopEdge(h) { return $(`#fe-${ROUTE[h]}-${ROUTE[h + 1]}`); }
+function placeDot(k = F.phase === "move" ? F.k || 0 : 0) {
+  const dot = $("#fdot"); if (!dot) return;
+  const e = hopEdge(F.hop % (ROUTE.length - 1)); if (!e) return;
+  const L = e.getTotalLength(); const p = e.getPointAtLength(F.phase === "move" ? L * k : 0);
+  dot.setAttribute("cx", p.x); dot.setAttribute("cy", p.y);
+  const at = F.phase === "move" && k > .5 ? ROUTE[F.hop + 1] : ROUTE[F.hop];
+  document.querySelectorAll(".fnode").forEach(n => n.classList.toggle("on", +n.dataset.stage === at));
+  showNow(flowSel ?? at, flowSel == null);
+}
+function showNow(i, live) {
+  const el = $("#fnow"); if (!el || el.dataset.i === `${i}${live}`) return; el.dataset.i = `${i}${live}`;
+  const { sk, wk, gk } = loopKeys(); const r = D.loop[i];
+  el.innerHTML = `<span class="pill ${live ? "run" : "later"}"><i class="sm ${live ? "run" : "later"}"></i>${live ? "Example item here" : "Picked"}</span><b>${i}. ${md(r[sk])}</b><span class="w">${md(r[wk])}</span><span class="g">Moves on when: ${md(r[gk])}</span>`;
+}
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+function tick(now) {
+  F.raf = requestAnimationFrame(tick);
+  if (flowPaused || !F.visible || !$("#fdot")) { F.t0 = now; return; }
+  if (!F.t0) F.t0 = now;
+  const dt = now - F.t0;
+  const at = ROUTE[F.hop]; const dwell = isYou(D.loop[at]) ? 1800 : 900;
+  if (F.phase === "dwell") { if (dt > dwell) { F.phase = "move"; F.t0 = now; } placeDot(); return; }
+  const e = hopEdge(F.hop); const dur = Math.min(900, Math.max(280, e.getTotalLength() * 2.2));
+  F.k = easeIO(Math.min(1, dt / dur)); placeDot(F.k);
+  if (dt >= dur) { F.hop = (F.hop + 1) % (ROUTE.length - 1); F.phase = "dwell"; F.t0 = now; F.k = 0; placeDot(); }
+}
+function startFlow() {
+  drawFlow();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { flowPaused = true; const b = $("#fplay"); if (b) b.textContent = "Play"; }
+  if (!F.raf) F.raf = requestAnimationFrame(tick);
+  const board = $("#fboard");
+  if (board && "IntersectionObserver" in window) new IntersectionObserver(es => { F.visible = es[0].isIntersecting; }).observe(board);
 }
 
 // Turned down
@@ -333,12 +429,15 @@ function render() {
   rail(); counts();
   const t = TEAMS.find(x => x.id === team);
   $("#main").innerHTML = t.live
-    ? `<div class="two">${roster()}${matrix()}</div>${shelf()}${loop()}${rejected()}
+    ? `<div class="two">${roster()}${matrix()}</div>${loop()}${shelf()}${rejected()}
        <section><p class="note">Read from <a href="${GH}${esc(D.team.repo)}/tree/${esc(D.team.commit)}" target="_blank" rel="noopener">${esc(D.team.repo)}</a> at <span class="mono">${esc(D.team.commit.slice(0, 8))}</span>. Work states are examples until real runs exist. Your own desk is Needs you, not this room.</p></section>`
     : planned(t);
+  if (t.live) startFlow();
 }
 
 document.addEventListener("click", e => {
+  if (e.target.closest("#fplay")) { flowPaused = !flowPaused; e.target.closest("#fplay").textContent = flowPaused ? "Play" : "Pause"; return; }
+  const fs = e.target.closest("[data-stage]"); if (fs) { const i = +fs.dataset.stage; flowSel = flowSel === i ? null : i; document.querySelectorAll(".fnode").forEach(n => n.classList.toggle("sel", +n.dataset.stage === flowSel)); $("#fnow").dataset.i = ""; showNow(flowSel ?? ROUTE[F.hop], flowSel == null); return; }
   const tb = e.target.closest("[data-team]"); if (tb) { team = tb.dataset.team; openRole = openSkill = hiRole = hiSkill = null; render(); return; }
   const f = e.target.closest("[data-filter]"); if (f) { shelfFilter = f.dataset.filter; render(); return; }
   const rb = e.target.closest("[data-role]"), sb = e.target.closest("[data-skill]");
@@ -348,5 +447,7 @@ document.addEventListener("click", e => {
   if (sb) { const id = sb.dataset.skill; const toggle = sb.classList.contains("hit"); openSkill = toggle && openSkill === id ? null : id; hiSkill = openSkill; if (shelfFilter !== "all" && openSkill) shelfFilter = "all"; render(); if (!toggle) $(`#skill-${CSS.escape(id)}`)?.scrollIntoView({ block: "center" }); return; }
 });
 $("#ask").addEventListener("click", () => { const r = roles.find(x => st(x.id) === "ask"); if (r) { openRole = hiRole = r.id; render(); } });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawFlow, 80); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawFlow);
 render();
 </script>
