@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: claim-before-lane
+description: >
+  Two milestones run in parallel sessions. The roadmap's claim board shows M6 owning
+  src/billing/**, and the M7 lane the owner is briefed on would edit src/billing/invoice.py.
+  The owner runs as the dev-team:owner subagent. Before any lane work it must write M7's
+  claim row on the board, hold the overlapping lane with a blocked-by line that names M6
+  instead of editing the file, and edit nothing under src/billing/. All checks are regex
+  over the files and the trace, and tool use; no judge question.
+tags: [owner, sessions]
+runs: 3
+expected_outcome: M7's claim row written in ROADMAP.md; the lane held with blocked-by naming M6; nothing under src/billing/ edited.
+execution:
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh

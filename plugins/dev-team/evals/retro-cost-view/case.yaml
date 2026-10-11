@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: retro-cost-view
+description: >
+  Milestone M5 closed. Its records hold a stage cost table in which Review costs far more
+  than any other stage, and a routing miss log in which the reviewer already failed on
+  sonnet. The scribe runs run-retro. The retro must name the most expensive stage, propose
+  no model change without eval evidence, not propose the logged failure again, and leave
+  CLAUDE.md, the app's skill and its agent file untouched. The stage, the retro file and the
+  untouched files are checked by regex; one short judge question checks the proposals.
+tags: [run-retro, scribe, cost]
+runs: 3
+expected_outcome: retros/M5-retro.md names Review as the most expensive stage, proposes no model switch without eval evidence and does not repeat the logged reviewer-on-sonnet failure; nothing else edited.
+execution:
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh
