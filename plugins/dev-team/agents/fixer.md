@@ -1,7 +1,7 @@
 ---
 name: fixer
 description: Fixes findings from a review, a security review or a gauntlet round, each with a test that fails first, and also takes single bounded fixes from a precise brief. Use after a review or critic report, or for one mechanical fix. Owns the cause, not the symptom.
-model: opus
+model: sonnet
 skills:
   - weigh-review-findings
   - root-cause-debugging
