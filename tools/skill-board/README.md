@@ -29,7 +29,7 @@ Only through `git show` and `git ls-tree` at the ref you name, so your working t
 - `skills/*/SKILL.md`: frontmatter, title, first paragraph, and the `## Source` section ("Changed:" line)
 - `THIRD_PARTY.md`: the sources table (repo, path, commit, license), and the skill names in its "Referenced, not copied" table (skills used from Jase's account by name, not shipped)
 - `skills/REJECTED.md` or `REJECTED.md`: the turned-down table
-- `workflows/milestone-loop.md`: the first table (the stages). The Workflow board groups stages into columns by the table's Phase column, in order of first appearance, and finds the fix loop ("Fix and re-verify" back to "Review") and the loop back to intake by stage name. A table without a Phase column keeps the old fixed columns when it has 14 rows, and otherwise shows all stages in one column.
+- `workflows/milestone-loop.md`: the first table (the stages). The Workflow board groups stages into columns by the table's Phase column, in order of first appearance, and finds the fix loop ("Fix and re-verify" back to "Review", then once more through every stage between them, for the second and last fix round) and the loop back to intake by stage name. A stage whose Who column says "in parallel" is drawn as a stack of cards. A table without a Phase column keeps the old fixed columns when it has 14 rows, and otherwise shows all stages in one column.
 - `licenses/` and `evals/`: counts only
 
 The repo link comes from the `origin` remote.
