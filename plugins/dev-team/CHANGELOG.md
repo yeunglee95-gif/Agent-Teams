@@ -1,5 +1,14 @@
 # dev-team changelog
 
+## 0.4.2 (2026-10-11)
+
+The last dev-team eval with one long LLM judge, `spec-audit-test-gap`, moves to mechanical checks, and the skill it exercises asks for one fixed-shape table. Approved by the owner on 2026-10-11.
+
+- `hidden-failure-check`: Part 2 writes the test-gap table with fixed columns (`Spec row | Test (file > name, or none) | Level (unit, component, e2e) | Edge cases (exact values) | Rank (High, Medium, Low) | Note`), one row per spec row, because the owner, the fixer and the checks read it. Rank is the row's worst open gap, Low when none is open; a tautological test stays in Test and its row says `tautological` in Note. Other tables can follow but do not replace it. Why: in a 6-run reproduction on 0.4.1 the judge passed all 6, but every table had a different shape from the one the checks need (`Row | Unit | Component | End-to-end`, no rank column, the rank only in a findings list), and 4 of the 6 did not mark the tautological test in its row. The 0.4.1 suite's judge FAIL (three votes) was on an audit like these: correct, with the rank and the tautological flag outside the table.
+- Evals: `spec-audit-test-gap` replaces its long judge with six regex graders over the table rows: the header, S7.1 names its test, S7.2 says `tautological`, S7.3 has `none` and High, S7.3's edge cases give at least two exact numbers, and every row has a rank. No judge question is left. `no-code-edit` now ignores scratch copies outside the app, and a matching `no-code-write` checks the Write tool. Before any new run, the graders passed the 6 reproduction audits rewritten into the new table and failed each of 9 hand-made negatives on its own grader (no table, no S7.3 row, S7.3 Medium, S7.3 with a test, S7.1 `none`, no tautological flag, no exact values, a single value, a row with no rank).
+- Results on Claude Code 2.1.296, judge `sonnet`: `spec-audit-test-gap` 6 of 6 twice (12 of 12). Full suite, 3 runs each: 26 of 27. The miss was one `reviewer-hypotheses-first` run whose review listed a finding as "Standards, blocker" with no class label, which the judge failed on all three votes; the review was otherwise right. That case also loads `hidden-failure-check`, and its other runs passed.
+- Roles and models unchanged.
+
 ## 0.4.1 (2026-10-11)
 
 Three flaky evals made reliable, and the three skills they exercise tightened where the runs showed agents skipping a step. Approved by the owner on 2026-10-11.

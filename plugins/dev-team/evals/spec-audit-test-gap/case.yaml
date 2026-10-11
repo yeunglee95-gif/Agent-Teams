@@ -8,7 +8,7 @@ description: >
   cases with exact values, and edits no app code.
 tags: [hidden-failure-check, spec-auditor, test-gap]
 runs: 3
-expected_outcome: audits/M7-conformance.md with a test-gap table; S7.3 High; tautological test flagged.
+expected_outcome: audits/M7-conformance.md with the fixed-shape test-gap table; S7.1 names its test; S7.2 tautological; S7.3 none and High with exact edge values.
 execution:
   max_turns: 40
   timeout_seconds: 800
