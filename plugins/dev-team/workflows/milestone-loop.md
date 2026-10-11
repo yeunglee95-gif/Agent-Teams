@@ -42,6 +42,7 @@ How Claude Code sessions map to milestones, so parallel work does not collide an
 - **Shared things.** Contract files change only through the architect. Each milestone writes its decisions into its own dated section of the memory file, so two sessions never edit the same lines.
 - **Messages between sessions** are heads-ups only; the files are the record.
 - **Retry cap.** After one failed repair, escalate: first the same role with more effort, then the owner or a stronger role. A Stop or SubagentStop hook that forces the agent to continue must carry a hard round cap.
+- **Fixer step-up.** The fixer runs on `sonnet`. When one of its repairs fails (the finding's test stays red, the gate goes red, or the reviewer's re-verification rejects the fix), the main session runs the next attempt on that finding with the fixer on `opus`, by passing the model for that one subagent call. It never switches the main session's model, so the session's prompt cache stays intact. The `opus` attempt gets the failed attempt's cause line and diff. If that attempt fails too, the finding goes to the owner (Same root cause twice). The next finding starts on `sonnet` again.
 - **Close.** The scribe writes a handoff note (decisions, open items, the next milestone's first step) where the app's `CLAUDE.md` says, or else beside the retro, then the retro, and closes the milestone's claim row. The next milestone starts in a fresh session from the `CLAUDE.md`, the memory file and that note.
 
 ## Pre-flight, before a lane starts (stage 4)
