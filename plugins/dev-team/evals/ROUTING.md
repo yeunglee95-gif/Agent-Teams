@@ -27,7 +27,7 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved b
 | Role | Current | Candidate | Passes (current, candidate) | Cost per passed run (current, candidate) | Decision |
 |---|---|---|---|---|---|
 | architect | opus | sonnet | 18 of 18, 18 of 18 (grill 6, 6; slice 6, 6; design-it-twice 6, 6) | $0.548, $0.236 (57% lower) | sonnet in 0.5.0; **back to opus in 0.5.1**, see "Held pending plan quality" |
-| fixer | opus | sonnet | 6 of 6, 6 of 6 | $0.285, $0.111 (61% lower) | **sonnet** |
+| fixer | opus | sonnet | 6 of 6, 6 of 6 | $0.285, $0.111 (61% lower) | **sonnet**, stepping up to opus after one failed repair (0.5.2) |
 | scribe | opus | sonnet | 6 of 6, 6 of 6 | $0.351, $0.137 (61% lower) | **sonnet** |
 | owner | opus | sonnet | 6 of 6, 3 of 6 (owner-builds-to-handoff 3, 0; tests-first-tautology 3, 3) | $0.465, $0.305 | keep opus |
 | owner | opus | opus, effort low | owner-builds-to-handoff 3 of 3, 2 of 3 | $0.761, $0.621 | keep opus |
@@ -55,6 +55,10 @@ Independent check by the lead session on 2026-10-11, same Claude Code version: t
 ## Held pending plan quality (0.5.1)
 
 On 2026-10-11 the owner put the architect back on opus. The architect's three cases check that it follows its process (questions, the lane table, design-it-twice structure), not whether its plans are good, and a weak plan costs far more downstream than the planning tokens save. The 20% cost rule does not fit a judgment role on its own. The architect stays on opus until a plan-quality bake-off on real past milestones (hindsight recall against what reviews later found, and a blind pairwise comparison) shows sonnet is at least as good. The bake-off result and its decision are recorded here when it lands.
+
+## Fixer step-up (0.5.2)
+
+On 2026-10-11 the owner kept the fixer on sonnet with a built-in step-up: after one failed repair, the next attempt on that finding runs on opus for that one subagent call, never by switching the session's model; a second failure goes to the owner. Why this fits the fixer and not the architect: every fix is checked hard (its test must turn green, the gate runs, the reviewer re-verifies), so a weak sonnet fix is caught and costs one retry, while a weak plan looks fine until later. The fixer's one eval case is a single small bug, so a fixer bake-off on real past findings with known fix commits is running to measure first-try pass rates and, above all, silent failures (the test passes but the cause is wrong), which a step-up cannot catch. Its result is recorded here when it lands.
 
 ## When to re-test
 

@@ -1,5 +1,11 @@
 # dev-team changelog
 
+## 0.5.2 (2026-10-11)
+
+- The fixer stays on `sonnet` with a built-in step-up, by the owner's decision: after one failed repair, the next attempt on that finding runs the fixer on `opus` for that one subagent call (never a session model switch), with the failed attempt's cause line and diff; a second failure goes to the owner. Written into the loop page (Sessions, "Fixer step-up"), `agents/fixer.md` and `evals/ROUTING.md`. A fixer bake-off on real past findings is measuring how often sonnet fails silently, the case a step-up cannot catch.
+- The scribe stays on `sonnet` (owner's decision); its work is mostly recording, and every retro proposal goes to the owner.
+- No eval case covers the step-up itself yet: it is the main session's behaviour, not a role's.
+
 ## 0.5.1 (2026-10-11)
 
 - The architect is back on `opus`, by the owner's decision. The 0.5.0 switch to sonnet rested on process evals (grill, slice, design-it-twice), which show the architect follows its steps but not whether its plans are good. It stays on opus until a plan-quality bake-off on real past milestones decides; see `evals/ROUTING.md`, "Held pending plan quality". No other role changes.

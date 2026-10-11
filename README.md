@@ -30,13 +30,13 @@ plugins/
 
 ## The dev team
 
-Ten roles and fourteen skills (0.5.1). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, spec check, black-box check, design check, review, fix and re-verify, release check, the owner's go, retro, watch. Design and design check are the design team's stages and run only for a milestone that changes screens. The owner gives every merge and deploy go; nothing in the loop merges on its own.
+Ten roles and fourteen skills (0.5.2). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, spec check, black-box check, design check, review, fix and re-verify, release check, the owner's go, retro, watch. Design and design check are the design team's stages and run only for a milestone that changes screens. The owner gives every merge and deploy go; nothing in the loop merges on its own.
 
 The loop page's Sessions section sets how sessions map to milestones: one main session per milestone with its model fixed for its life (a model switch drops the prompt cache; an effort change keeps it), reading delegated to a few substantial subagents, a claim row on the roadmap's claim board before any lane starts, a cross-milestone pre-flight against other milestones' claimed paths and open pull requests, a retry cap, and a close with a handoff note so the next milestone starts in a fresh session. The retro (`run-retro`) also reads what each stage cost and names the most expensive one.
 
 ### Models
 
-Each role's `model` is set from eval evidence, recorded in `plugins/dev-team/evals/ROUTING.md` with the method, the date and the Claude Code version: as of 0.5.1 the fixer, scribe and gate-runner run on `sonnet`, and the architect (held on opus until a plan-quality bake-off decides), owner, reviewer, spec-auditor, critic, security-reviewer and repo-auditor on `opus`. A cheaper setup is proposed only with eval evidence by that method, never switched mid-session, and one that failed goes in `routing-log.md` so it is not proposed again.
+Each role's `model` is set from eval evidence, recorded in `plugins/dev-team/evals/ROUTING.md` with the method, the date and the Claude Code version: as of 0.5.2 the fixer (stepping up to opus after one failed repair), scribe and gate-runner run on `sonnet`, and the architect (held on opus until a plan-quality bake-off decides), owner, reviewer, spec-auditor, critic, security-reviewer and repo-auditor on `opus`. A cheaper setup is proposed only with eval evidence by that method, never switched mid-session, and one that failed goes in `routing-log.md` so it is not proposed again.
 
 ### Evals
 
