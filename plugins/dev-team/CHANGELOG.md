@@ -1,5 +1,9 @@
 # dev-team changelog
 
+## 0.5.1 (2026-10-11)
+
+- The architect is back on `opus`, by the owner's decision. The 0.5.0 switch to sonnet rested on process evals (grill, slice, design-it-twice), which show the architect follows its steps but not whether its plans are good. It stays on opus until a plan-quality bake-off on real past milestones decides; see `evals/ROUTING.md`, "Held pending plan quality". No other role changes.
+
 ## 0.5.0 (2026-10-11)
 
 The cost pass: each role's model set from eval evidence, a cost view and a miss log in the retro, and session rules in the loop. Scope approved by the owner on 2026-10-11.

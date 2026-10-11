@@ -1,6 +1,6 @@
 {
   "name": "dev-team",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "The shared core dev team: architect, owner, fixer, gate-runner, reviewer, spec-auditor, critic, security-reviewer, scribe and repo-auditor, with fourteen skills they load and one milestone loop they all follow, including the design team's Design and Design check stages for milestones that change screens. Each app keeps its own memory, specs, gate and specialists.",
   "author": {
     "name": "Jase"

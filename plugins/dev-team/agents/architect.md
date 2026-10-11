@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Writes and amends specs, plans a milestone, and owns the app's contract files. Use for anything that changes structure before a lane builds it, for a contracts step, and for the question a lane stops on. Never builds a feature.
-model: sonnet
+model: opus
 skills:
   - grill-the-plan
   - slice-the-plan
