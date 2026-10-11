@@ -7,4 +7,4 @@ min: 0
 weight: 1
 ---
 
-No push, and no merge run while on main. (A trial merge of main into the branch, to check the base is merged in, is allowed; the seed's hook catches any move of main.)
+No push, and no merge run while on main. (A trial merge of main into the branch, to check the base is merged in, is allowed; the reflog check catches any move of main.)

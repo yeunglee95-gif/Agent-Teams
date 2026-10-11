@@ -6,16 +6,17 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved b
 
 ## Method
 
-- **Which case exercises which role.** Most cases run the role's skill in the eval's main session ("You are the dev team's reviewer..."), so the session's model is the role's model there. Two cases launch the role as a subagent with the Agent tool (`owner-builds-to-handoff`, `claim-before-lane`), so the agent file's frontmatter sets the model there.
+- **Which case exercises which role.** Most cases run the role's skill in the eval's main session ("You are the dev team's reviewer..."), so the session's model is the role's model there. Six cases launch the role as a subagent with the Agent tool (`owner-builds-to-handoff`, `claim-before-lane`, and from 0.6.0 `combined-findings` and the three `approver-*` cases), so the agent file's frontmatter sets the model there.
   | Role | Cases | How the role runs |
   |---|---|---|
   | architect | `grill-the-plan-asks`, `slice-the-plan-lanes`, `design-it-twice` | main session (design-it-twice also starts general-purpose sub-agents, which inherit the session model) |
   | owner | `owner-builds-to-handoff`, `tests-first-tautology`, `claim-before-lane` | subagent, main session, subagent |
   | fixer | `root-cause-red-first` | main session |
-  | reviewer | `reviewer-hypotheses-first` | main session |
+  | reviewer | `reviewer-hypotheses-first`, `combined-findings` (0.6.0) | main session, subagent |
   | spec-auditor | `spec-audit-test-gap` | main session |
   | scribe | `run-retro-proposes`, `retro-cost-view` | main session |
   | gate-runner | `release-no-merge` | main session |
+  | approver | `approver-escalates-red`, `approver-merges-safe`, `approver-off-never-merges` (0.6.0) | subagent |
   | critic, security-reviewer, repo-auditor | none | |
 - **Changing the model.** For main-session cases, `claude plugin eval --model <model>`: the harness starts each run as `claude -p ... --model=<model>`, and the trace's `init` record and every assistant message name the model (`claude-opus-5-5` or `claude-sonnet-5-5`). Without `--model` the harness runs the main session on `claude-sonnet-5-5`, so the suite results before 0.5.0 measured the main-session roles on sonnet, not on the `opus` their agent files named. `--model` also reaches sub-agents that inherit the session model (design-it-twice's sub-agents ran on opus under `--model opus` and on sonnet under `--model sonnet`), but it does not override a subagent whose frontmatter names a model: in `owner-builds-to-handoff` the main session ran on sonnet and the owner subagent on `claude-opus-5-5`. For subagent cases, a scratch copy of the plugin outside the repo with only that role's `model` or `effort` changed, passed as the eval target; the trace's subagent messages (those with a `parent_tool_use_id`) then named `claude-sonnet-5-5`.
 - **Changing effort.** For a subagent, `effort: low` in the scratch copy's frontmatter. For a main-session case, the environment variable `CLAUDE_CODE_EFFORT_LEVEL=low` on the eval command, which reached each run (seen in the run process's environment). The trace does not name the effort; the thinking-token estimates in the trace fell against opus at the default (reviewer from 656 to 1456 per run down to 0 to 216; spec-auditor from 1290 to 2080 down to 643 to 1085), so the setting took.
@@ -37,7 +38,8 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved b
 | spec-auditor | opus | opus, effort low | 3 of 3, 3 of 3 | $0.368, $0.344 (7% lower) | keep opus |
 | gate-runner | sonnet | none tested | | | keep sonnet |
 | critic | opus | none | | | keep opus, no eval evidence |
-| security-reviewer | opus | none | | | keep opus, no eval evidence |
+| security-reviewer | opus | none | | | keep opus: judgment role, no cost test (0.6.0) |
+| approver | opus | none | | | opus: judgment role, no cost test (new in 0.6.0) |
 | repo-auditor | opus | none | | | keep opus, no eval evidence |
 
 No role sets `effort`; every role runs at the session's effort (medium by default on the 5.5 models).
@@ -59,6 +61,10 @@ On 2026-10-11 the owner put the architect back on opus. The architect's three ca
 ## Fixer step-up (0.5.2)
 
 On 2026-10-11 the owner kept the fixer on sonnet with a built-in step-up: after one failed repair, the next attempt on that finding runs on opus for that one subagent call, never by switching the session's model; a second failure goes to the owner. Why this fits the fixer and not the architect: every fix is checked hard (its test must turn green, the gate runs, the reviewer re-verifies), so a weak sonnet fix is caught and costs one retry, while a weak plan looks fine until later. The fixer's one eval case is a single small bug, so a fixer bake-off on real past findings with known fix commits is running to measure first-try pass rates and, above all, silent failures (the test passes but the cause is wrong), which a step-up cannot catch. Its result is recorded here when it lands.
+
+## Judgment roles (0.6.0)
+
+On 2026-10-11 the owner set the security-reviewer and the new approver on `opus` as judgment roles, with no cost test. The security-reviewer now runs on every milestone, in the Review stage, and a missed hole costs far more than its tokens. The approver decides APPROVE or ESCALATE and, where an app turns auto-merge on, merges; a wrong call there lands on main. Like the architect (Held pending plan quality), the 20% cost rule does not fit a role whose mistakes show up only later. The approver's three cases check that it follows its policy (escalate a protected path, merge a safe change and confirm it, never merge with auto-merge off), not whether a cheaper model would weigh the evidence as well, so they are not a cost test.
 
 ## When to re-test
 

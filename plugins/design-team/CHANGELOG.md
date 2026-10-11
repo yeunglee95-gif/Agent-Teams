@@ -1,5 +1,9 @@
 # design-team changelog
 
+## 0.1.1 (2026-10-11)
+
+- Works with dev-team 0.6.0, whose loop runs the design check inside its Review stage, at the same time as the spec-auditor, critic, security-reviewer and reviewer, each in its own context. The `design-auditor` description and its "Where you sit" line now say so; its findings reach the fixer through the reviewer's combined findings table and it re-checks them by id after each fix round, at most two rounds. `README.md` updated to match. No change to the checklist, the report or the skills.
+
 ## 0.1.0 (2026-10-10)
 
 First release. Scope approved by the owner on 2026-10-10.

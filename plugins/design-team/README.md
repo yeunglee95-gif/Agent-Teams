@@ -13,13 +13,13 @@ One skill of the team's own, `design-handoff`, says what a hand-off holds; both 
 
 ## How it works with the dev team
 
-For a milestone that changes screens, the dev team's loop (`plugins/dev-team/workflows/milestone-loop.md`) has two stages for this team:
+For a milestone that changes screens, the dev team's loop (`plugins/dev-team/workflows/milestone-loop.md`, dev-team 0.6.0) has a stage and a part of a stage for this team:
 
 1. **Design**, after Plan and slice and before Build: the designer writes the hand-off. Gate: the owner approves it.
 2. The dev team builds to the hand-off. A gap in the design goes back to the designer; a lane never invents it.
-3. **Design check**, in the Check phase after Black-box check and before Review: the design-auditor writes its report. Gate: no blocker or major design finding open. The fixer fixes; the design-auditor re-checks its findings by id.
+3. **Design check**, in the dev team's Review stage: the design-auditor writes its report in its own context, at the same time as the dev team's spec-auditor, critic, security-reviewer and reviewer. The reviewer folds its findings into the one combined findings table (tagged `design-auditor D<N>`). The fixer fixes; the design-auditor re-checks its findings by id after each fix round, at most two rounds. A blocker or major still open after round 2 goes to the owner.
 
-Both stages are skipped for a milestone with no screen change. The owner (Jase, unless the app's `CLAUDE.md` names someone else) gives every merge, deploy, send and publish go.
+Both are skipped for a milestone with no screen change. The owner (Jase, unless the app's `CLAUDE.md` names someone else) gives every merge, deploy, send and publish go; the one exception is a merge the dev team's approver makes under an app's opt-in auto-merge setting, which never covers sending or publishing.
 
 The designer also serves marketing: a landing page, an email template or an ad gets a direction note and mocks from the app's design system first. Nothing goes out without the owner's go.
 
