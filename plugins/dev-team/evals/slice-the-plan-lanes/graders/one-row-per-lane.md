@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^\|[^|\n]*\b\w*\d+\w*\s*(?:to|-|–|,|and|&)\s*\w*\d+[^|\n]*\|\s*[`*]*(?:slice|expand|migrate|contract)[`*]*\s*\|'
+pattern: '^\|[^|\n]*\b\w*\d+\w*(?:\s+(?:to|and|&)\s+|\s*[,–]\s*|\s+-\s+)\w*\d+[^|\n]*\|\s*[`*]*(?:slice|expand|migrate|contract)[`*]*\s*\|'
 flags: m
 match: not_contains
 target:
