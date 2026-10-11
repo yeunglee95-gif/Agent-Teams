@@ -48,6 +48,10 @@ After the switch, the full suite (main sessions on sonnet, 3 runs each) scored 3
 
 Limits: 3 to 6 runs per arm is a small sample, and the main-session cases test a role's skills on a model, not the role's own agent text. The decisions hold for these cases on this version; a role whose eval misses grow on its new setting goes back to its old one.
 
+### Independent check
+
+Independent check by the lead session on 2026-10-11, same Claude Code version: the architect's cases on sonnet, `design-it-twice` 6 of 6, `grill-the-plan-asks` 6 of 6, `slice-the-plan-lanes` 6 of 6; `claim-before-lane` 3 of 3 and `retro-cost-view` 3 of 3; 24 of 24 for $5.34. With this, the architect on sonnet stands at 17 of 18 on `design-it-twice` across both checks.
+
 ## When to re-test
 
 - The settings in this file were measured once and are fixed per role; nothing is re-tested per task.
