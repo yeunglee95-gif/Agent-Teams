@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^[ \t]*(?:[-*][ \t]+)?\*{0,2}(?:Owns|Files)\b[^\n:]{0,25}:(?:(?![.;] )[^\n])*contracts\.ts'
+pattern: '^\|[^|\n]*\|\s*[`*]*(?:slice|expand|migrate|contract)[`*]*\s*\|[^|\n]*\|[^|\n]*contracts\.ts[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*$'
 flags: m
 match: not_contains
 target:

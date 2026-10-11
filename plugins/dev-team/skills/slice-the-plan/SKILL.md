@@ -29,7 +29,17 @@ For each lane, write:
 - **Blocked by:** the lanes that must finish first, or "none". Blocking edges are the lane order: lanes with nothing open ahead of them can run in parallel; a chain runs top to bottom.
 - **Contract shapes** it may add, if any, pre-signed in the plan; anything else stops and asks the architect.
 
-Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, under their own heading, not as lanes; no lane lists a contract file among the files it owns.
+The plan also holds one lane table, beside any prose, because the owner, the board and the checks read it:
+
+```
+| Lane | Kind | Delivers | Owns | Red tests | Blocked by |
+|---|---|---|---|---|---|
+| N1 | slice | S5.1 add a note | `src/db/notes.ts`, `src/api/notes.ts`, `src/ui/NoteEditor.tsx` | `tests/notes.test.ts` > "adds a note" | none |
+```
+
+One row per lane, never a row for a group of lanes. Kind is `slice`, `expand`, `migrate` or `contract`. Owns lists file paths. Red tests are `file > test name` entries. Blocked by lists lane ids, or `none`.
+
+Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, under their own heading, not as lanes or table rows; no lane lists a contract file among the files it owns.
 
 ## Wide refactors
 

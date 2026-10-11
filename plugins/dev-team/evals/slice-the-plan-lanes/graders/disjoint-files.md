@@ -6,10 +6,8 @@ focus:
 weight: 2
 ---
 
-This is a lane plan. Two lanes can run at the same time unless one is blocked by the other, directly or through a chain of "Blocked by" entries.
+Read only the lane table in this plan (columns Lane, Kind, Delivers, Owns, Red tests, Blocked by). Two lanes can run at the same time unless one is blocked by the other, directly or through a chain of Blocked by entries.
 
-Answer one question: do two lanes that can run at the same time both own the same file?
-
-Treat "the same files as N1" as naming N1's files. A file a lane only reads, or one it takes over after the lane it is blocked by, does not count. Steps that are not lanes (a contracts step, the final gate) do not count.
+Answer one question: do two lanes that can run at the same time both list the same file in Owns?
 
 PASS if no such pair exists. FAIL if one does, and name the two lanes and the file.

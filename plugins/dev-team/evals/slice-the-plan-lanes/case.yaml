@@ -7,8 +7,8 @@ description: >
   ownership, named red tests and blocked-by order, sequence the rename as expand,
   migrate, contract, keep the contracts step and the final gate as steps rather than
   lanes, and put the breakdown to the owner. No tracker is named, so nothing is
-  published. Structure is checked by regex; two short judge questions check disjoint
-  files and the owner's check.
+  published. Structure is checked by regex over the plan's lane table; two short judge
+  questions check disjoint files and the owner's check.
 tags: [slice-the-plan, architect]
 runs: 3
 expected_outcome: plans/M5-plan.md with vertical lanes and an expand-migrate-contract rename; owner asked to check.
