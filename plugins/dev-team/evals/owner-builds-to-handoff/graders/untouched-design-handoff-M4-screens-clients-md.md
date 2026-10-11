@@ -1,0 +1,11 @@
+---
+type: regex
+pattern: '^# Clients screen\n\n## Purpose\n\nA shop owner sees each client and how much they owe\.\n\n## Layout\n\nThe title "Clients" \(24px, `--color-text`\), then the list of client rows\. Each row on `--color-surface` with `--radius` corners, `--space-3` padding and `--space-2` between rows: the client name in `--color-text` on the left, the balance in `--color-text-muted` on the right\.\n\n## States\n\n- Populated: one row per client, in the order the store gives them\. The screen root has `data-testid="clients-screen"` and `data-state="populated"`; the list is a `ul` with `data-testid="clients-list"` and `aria-label="Clients"`; each row is an `li` with `data-testid="client-row"`\.\n- Empty: no clients\. The list is replaced by the line "No clients yet" \(`data-testid="clients-empty"`, `--color-text-muted`\) and a primary button "Add a client" \(`data-testid="add-client"`, background `--color-accent`, text `--color-bg`\)\. The screen root has `data-state="empty"`\.\n- The "Add a client" button: focus ring from DESIGN\.md, Focus; at least 44 by 44px\.\n\n## Tokens used\n\n`--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted`, `--color-accent`, `--space-2`, `--space-3`, `--radius`\.\n\n## Motion\n\nNone\.\n\n## Accessibility\n\nName on `--color-surface`: 15\.2:1\. Balance on `--color-surface`: 5\.8:1\. Button text `--color-bg` on `--color-accent`: 6\.6:1\.\n\n## Copy\n\n"Clients", "No clients yet", "Add a client"\. Balances as dollars with two decimals, from `src/money\.py`\.\n\n## Acceptance notes\n\n- A1 \(populated\): each row shows the client name and the balance, for example "Rosa''s Bakery" and "\$240\.00"\.\n- A2 \(populated\): the screen root has `data-state="populated"` and the list has one `client-row` per client\.\n- A3 \(empty\): with no clients, "No clients yet" and the button "Add a client" show in place of the list, and the screen root has `data-state="empty"`\.\n- A4 \(empty\): the button uses `--color-accent` with `--color-bg` text and the focus ring\.\n$'
+match: contains
+target:
+  source: file
+  path: design/handoff/M4/screens/clients.md
+weight: 1
+---
+
+`design/handoff/M4/screens/clients.md` is byte for byte as seeded (sha256 in `.git/seed.sha256`): the lane never edits the design system, the hand-off or the frozen contract.

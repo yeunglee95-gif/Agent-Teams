@@ -28,7 +28,13 @@ Find every place the change handles an error: try and catch, error callbacks, de
 
 On a change that touches auth, money, data loss or security, have a read-only sub-agent fill steps 1 to 3 from the spec rows, the diff range and the changed-file list only, so it is not anchored on the builder's reasoning.
 
-1. **Each spec row to its test.** One row per behavior the work claims. For each level (unit, component, end-to-end), the `path:line` of the test that asserts it, or `none`, or `n/a: <reason>`. Fill the unit column for every row first, then component, then end-to-end. A test that runs the code but asserts nothing about the row is `none`.
+The result is one table with these columns, one row per spec row, because the owner, the fixer and the checks read it:
+
+`| Spec row | Test (file > name, or none) | Level (unit, component, e2e) | Edge cases (exact values) | Rank (High, Medium, Low) | Note |`
+
+Test is the test that asserts the row, as `file > test name`, or `none`. Edge cases holds the row's exact values from step 2. Rank is the row's worst open gap, Low when none is open. A test flagged in step 3 stays in Test, and its row says `tautological` (or `cannot fail`) in Note. Other tables (edge-case classes, mutations) can follow; they do not replace this one.
+
+1. **Each spec row to its test.** One row per behavior the work claims. For each level (unit, component, end-to-end), the test that asserts it (`file > test name`, or `path:line`), or `none`, or `n/a: <reason>`. Fill the unit level for every row first, then component, then end-to-end. A test that runs the code but asserts nothing about the row is `none`.
 2. **Edge cases with exact values.** For each changed input or branch, mark each class pinned (`path:line`), gap (with the exact value that would show it, never "consider edge cases"), or n/a: limits (limit minus one, the limit, limit plus one; zero, null and empty), money and dates (rounding, time zone shift, month end), input (unicode, very long, formula injection in exports), volume (none, one, many, paging), access (signed out, another person's id, wrong plan), error paths (every catch and rejected promise), repeats and races (double submit, replay), interface states (loading, empty, error, disabled), accessibility (role and name, focus).
 3. **Test the tests.** Flag a test that asserts on its own mock, checks how the code is built instead of what it does, recomputes the expected value the way the code does (tautological: it can never disagree with the code), or cannot fail. For high-risk logic, name the change no test would catch (`>` to `>=`, a dropped branch).
 4. **Rank.** High: a spec row with no test at any level, or any gap in access, money, security or data loss. Medium: a partly covered branch, a change no test catches, a missing loading, empty or error state. Low: cosmetic, copy, logging.

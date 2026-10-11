@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: owner-builds-to-handoff
+description: >
+  A lane owner builds the clients screen (lane L1 of M4) to a design hand-off that designs the
+  populated and empty states. Spec S4.3 also needs an error state, which the hand-off leaves out.
+  The owner runs as the dev-team:owner subagent. It must write a red test and run it before the
+  first source edit, build both designed states with the hand-off's test ids, use only DESIGN.md
+  colors, try to load the design-system and emil-design-eng skills, send the error-state gap back
+  to the designer with a blocked-by line instead of designing it, and leave the hand-off,
+  DESIGN.md, the tokens and the contract unchanged.
+tags: [owner, design-handoff]
+runs: 3
+expected_outcome: Red test before the first source edit; populated and empty states built to the hand-off; no off-token color; error state sent back to the designer, not invented; seeded design files unchanged.
+execution:
+  max_turns: 60
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh
