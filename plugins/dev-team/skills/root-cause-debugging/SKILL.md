@@ -7,6 +7,8 @@ description: Use for any bug, failing test, red gate or behavior that differs fr
 
 No fix before the cause is found. A fix aimed at a symptom moves the bug somewhere else.
 
+The order holds even when the cause looks obvious: a red command, run (step 1); three to five ranked hypotheses, written down where they can be seen (step 3); probes, one at a time; then the fix (step 4). No source edit before that list is written.
+
 ## 1. Build a command that shows the bug red
 
 This comes before any theory. Make one command (a test run, a script, a request, a browser script) that drives the real code path and shows the exact symptom the report describes. Run it at least once and keep its output (secrets replaced with `<REDACTED>`). It must be:
@@ -32,7 +34,7 @@ Then shrink it: cut inputs, steps, config and data one at a time, re-running aft
 
 ## 3. Rank hypotheses, then test one at a time
 
-Write three to five hypotheses before testing any of them, ranked by likelihood. One hypothesis alone anchors on the first idea that fits. Each must be falsifiable: "If X is the cause, then changing Y makes the bug go away (or changing Z makes it worse)." One you cannot state that way is a hunch; sharpen it or drop it. Show the ranked list in your report or to whoever briefed you before testing; they may know one is already ruled out.
+Write three to five hypotheses before testing any of them, ranked by likelihood. One hypothesis alone anchors on the first idea that fits. Each must be falsifiable: "If X is the cause, then changing Y makes the bug go away (or changing Z makes it worse)." One you cannot state that way is a hunch; sharpen it or drop it. Write the ranked list down as a numbered list after the command is red and before your first probe or source edit: in the notes file your brief or the app's `CLAUDE.md` names for this work, or in your reply text if none is named (thinking it through does not count). Do this even when the code or the red output already seems to show the cause: an obvious cause is where anchoring happens. Whoever briefed you may know one is already ruled out.
 
 Then test them in order, one variable at a time, each probe tied to one prediction. If a hypothesis is wrong, move to the next; do not stack another change on top. If you do not understand something, say so.
 
@@ -40,11 +42,18 @@ Tag every temporary debug log with one unique prefix (for example `[DEBUG-a4f2]`
 
 ## 4. Fix
 
+- Before the first source edit, check that the ranked list from step 3 is written down. If it is not, write it now.
 - A failing test that reproduces the bug comes first (the `tests-first` skill), at a seam where the test exercises the real bug as it happens at the call site. If no such seam exists (the only test you could write is too shallow to catch it), that is itself a finding: report it, because the design is stopping the bug from being locked down.
 - One change, aimed at the cause. No "while I'm here" edits.
 - Re-run the test, the suite, and the command from step 1 on the original, unshrunk case (the `verify-before-done` skill).
 - State in the commit message which hypothesis was right.
-- Your report shows the evidence, not just the conclusion: the step 1 command exactly as you ran it with its red output, the ranked hypotheses and which one held, and the same command green after the fix.
+- Your report shows the evidence, not just the conclusion, in this shape:
+
+  ```
+  Red: `<the step 1 command, exactly as run>` -> <its red output>
+  Hypotheses, ranked before testing: 1. ... 2. ... 3. ... Held: <number>
+  Green: `<the same command>` -> <its output after the fix>
+  ```
 
 ## Three strikes
 

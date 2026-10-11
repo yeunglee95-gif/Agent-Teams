@@ -5,8 +5,10 @@ description: >
   rename of the field customerName to displayName that touches 40 files. The architect
   runs slice-the-plan. The lane plan must use vertical slices with disjoint file
   ownership, named red tests and blocked-by order, sequence the rename as expand,
-  migrate, contract, and put the breakdown to the owner. No tracker is named, so nothing
-  is published.
+  migrate, contract, keep the contracts step and the final gate as steps rather than
+  lanes, and put the breakdown to the owner. No tracker is named, so nothing is
+  published. Structure is checked by regex over the plan's lane table; two short judge
+  questions check disjoint files and the owner's check.
 tags: [slice-the-plan, architect]
 runs: 3
 expected_outcome: plans/M5-plan.md with vertical lanes and an expand-migrate-contract rename; owner asked to check.

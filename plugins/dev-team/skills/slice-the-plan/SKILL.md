@@ -29,7 +29,17 @@ For each lane, write:
 - **Blocked by:** the lanes that must finish first, or "none". Blocking edges are the lane order: lanes with nothing open ahead of them can run in parallel; a chain runs top to bottom.
 - **Contract shapes** it may add, if any, pre-signed in the plan; anything else stops and asks the architect.
 
-Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, not as lanes without tests or files.
+The plan also holds one lane table, beside any prose, because the owner, the board and the checks read it:
+
+```
+| Lane | Kind | Delivers | Owns | Red tests | Blocked by |
+|---|---|---|---|---|---|
+| N1 | slice | S5.1 add a note | `src/db/notes.ts`, `src/api/notes.ts`, `src/ui/NoteEditor.tsx` | `tests/notes.test.ts` > "adds a note" | none |
+```
+
+One row per lane, never a row for a group of lanes. Kind is `slice`, `expand`, `migrate` or `contract`. Owns lists file paths. Red tests are `file > test name` entries. Blocked by lists lane ids, or `none`.
+
+Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, under their own heading, not as lanes or table rows; no lane lists a contract file among the files it owns.
 
 ## Wide refactors
 
@@ -38,6 +48,8 @@ A wide refactor is one mechanical change (rename a field, retype a shared type) 
 1. **Expand:** add the new form beside the old, so nothing breaks.
 2. **Migrate:** move callers over in batches sized by how far the change reaches (one package or folder per batch), each batch its own lane blocked by the expand, with the gate green after each.
 3. **Contract:** delete the old form once nothing calls it, in a lane blocked by every migrate batch.
+
+When the old form also lives in a contract file, that file stays the architect's: the new form goes in with the contracts step before the lanes, and the old form comes out in a second contracts step after the contract lane. The contract lane is still a lane: it deletes the old form from the code.
 
 If even the batches cannot stay green alone, keep the order, put the batches on one integration branch, and promise green only at a final check lane they all block.
 

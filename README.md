@@ -28,7 +28,7 @@ plugins/
 
 ## The dev team
 
-Ten roles and fourteen skills (0.4.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, spec check, black-box check, design check, review, fix and re-verify, release check, the owner's go, retro, watch. Design and design check are the design team's stages and run only for a milestone that changes screens. The owner gives every merge and deploy go; nothing in the loop merges on its own.
+Ten roles and fourteen skills (0.4.1). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, spec check, black-box check, design check, review, fix and re-verify, release check, the owner's go, retro, watch. Design and design check are the design team's stages and run only for a milestone that changes screens. The owner gives every merge and deploy go; nothing in the loop merges on its own.
 
 ### Evals
 
@@ -38,7 +38,7 @@ Each new or changed skill has a behavior eval in `plugins/dev-team/evals/<case>/
 claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edit Agent --ablation none --judge-model sonnet --no-publish
 ```
 
-`--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list; `--judge-model sonnet` because the default judge was noisy on plan-length files. Cases that grant a shell need the eval sandbox (on Linux, `bubblewrap` and `socat`); without it every run is refused. The LLM-judged cases are not fully stable: expect an occasional failed run on `slice-the-plan-lanes` and `design-it-twice` from judge noise, and read the output before changing a skill. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
+`--scaffold` runs each case's `seed.sh` (bash in this repo); `--allow-tools` grants the tools the cases list; `--judge-model sonnet` because the default judge was noisy on plan-length files. Cases that grant a shell need the eval sandbox (on Linux, `bubblewrap` and `socat`); without it every run is refused. Most checks are deterministic (regex over the output files and the run trace, and tool use); each LLM judge answers one short question. On 0.4.1 the full suite passed 26 of 27 runs, twice, and the three reworked cases passed 6 of 6 (`design-it-twice`), 12 of 12 (`slice-the-plan-lanes`) and 11 of 12 (`root-cause-red-first`). Expect an occasional failed run on `root-cause-red-first` when the fixer writes its hypotheses only after the fix (a real skip that the trace check catches), and on the cases that still use one long judge (`spec-audit-test-gap`, `grill-the-plan-asks`); read the output before changing a skill. Add `--case <name>` for one case, or `--runs 1 --keep-temp` to debug. Results land in `plugins/dev-team/evals/results/`, which is not committed. A skill edit runs its own case and the cases of every role that loads it, before and after, and the proposal shows both.
 
 ## The design team
 
