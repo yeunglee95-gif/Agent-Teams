@@ -26,7 +26,7 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved b
 
 | Role | Current | Candidate | Passes (current, candidate) | Cost per passed run (current, candidate) | Decision |
 |---|---|---|---|---|---|
-| architect | opus | sonnet | 18 of 18, 18 of 18 (grill 6, 6; slice 6, 6; design-it-twice 6, 6) | $0.548, $0.236 (57% lower) | **sonnet** |
+| architect | opus | sonnet | 18 of 18, 18 of 18 (grill 6, 6; slice 6, 6; design-it-twice 6, 6) | $0.548, $0.236 (57% lower) | sonnet in 0.5.0; **back to opus in 0.5.1**, see "Held pending plan quality" |
 | fixer | opus | sonnet | 6 of 6, 6 of 6 | $0.285, $0.111 (61% lower) | **sonnet** |
 | scribe | opus | sonnet | 6 of 6, 6 of 6 | $0.351, $0.137 (61% lower) | **sonnet** |
 | owner | opus | sonnet | 6 of 6, 3 of 6 (owner-builds-to-handoff 3, 0; tests-first-tautology 3, 3) | $0.465, $0.305 | keep opus |
@@ -51,6 +51,10 @@ Limits: 3 to 6 runs per arm is a small sample, and the main-session cases test a
 ### Independent check
 
 Independent check by the lead session on 2026-10-11, same Claude Code version: the architect's cases on sonnet, `design-it-twice` 6 of 6, `grill-the-plan-asks` 6 of 6, `slice-the-plan-lanes` 6 of 6; `claim-before-lane` 3 of 3 and `retro-cost-view` 3 of 3; 24 of 24 for $5.34. With this, the architect on sonnet stands at 17 of 18 on `design-it-twice` across both checks.
+
+## Held pending plan quality (0.5.1)
+
+On 2026-10-11 the owner put the architect back on opus. The architect's three cases check that it follows its process (questions, the lane table, design-it-twice structure), not whether its plans are good, and a weak plan costs far more downstream than the planning tokens save. The 20% cost rule does not fit a judgment role on its own. The architect stays on opus until a plan-quality bake-off on real past milestones (hindsight recall against what reviews later found, and a blind pairwise comparison) shows sonnet is at least as good. The bake-off result and its decision are recorded here when it lands.
 
 ## When to re-test
 
