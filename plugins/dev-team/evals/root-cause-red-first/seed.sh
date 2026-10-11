@@ -8,6 +8,8 @@ cat > CLAUDE.md <<'MD'
 # Tally
 - Unit tests: `python3 -m unittest discover -s tests -t .`
 - Bugs: `BUGS.md`. Money is integer cents everywhere.
+- Fix notes: `fixes/<bug id>.md`, one file per bug.
+- Change files with the Edit or Write tool, not with shell commands, so every change shows in the session log.
 MD
 cat > BUGS.md <<'MD'
 # Bugs

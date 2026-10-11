@@ -26,7 +26,7 @@ When the architect is choosing the interface of a new or reshaped part and the f
 
 1. Write the problem down first: the constraints any interface must meet, the dependencies and their kinds (above), and a rough sketch that makes the constraints concrete.
 2. Send three or more sub-agents in parallel, each with the same technical brief (paths, coupling, what sits behind the seam, the glossary's terms) and a different constraint: the smallest interface (one to three entry points); the most flexible; the easiest for the most common caller; ports and adapters for anything across a seam. Each returns the interface (with its rules, order and errors), a usage example, what it hides, its dependency plan, and its trade-offs.
-3. Write each design down in a few lines (its interface and what it hides), then compare them by name on depth (how much each entry point does for the caller), locality (where a future change would land) and where the seams sit. Recommend one, or a mix, and say why. The designs and the comparison go in the plan or the design notes the app's `CLAUDE.md` names, so the owner and the reviewer can see what was weighed; a choice that is hard to reverse gets a decision record.
+3. Write each design down in a few lines (its interface and what it hides), then compare them by name on depth (how much each entry point does for the caller), locality (where a future change would land) and where the seams sit, under those three names so the reader can find each. Recommend one, or a mix, and say why. The designs and the comparison go in the plan or the design notes the app's `CLAUDE.md` names, so the owner and the reviewer can see what was weighed; a choice that is hard to reverse gets a decision record.
 
 ## For existing code
 

@@ -1,5 +1,16 @@
 # dev-team changelog
 
+## 0.4.1 (2026-10-11)
+
+Three flaky evals made reliable, and the three skills they exercise tightened where the runs showed agents skipping a step. Approved by the owner on 2026-10-11.
+
+- `root-cause-debugging`: the ranked hypotheses are written down after the red command and before the first probe or source edit, even when the cause looks obvious, in the notes file the brief or the app's `CLAUDE.md` names, or else in the reply text; a check before the first source edit; the report has a fixed shape (Red, Hypotheses ranked before testing, Green with the same command). Why: in 23 runs (5 on 0.4.0 and 18 with message-only wording), no agent wrote its hypotheses before the fix, and several listed them only afterwards in the report as if ranked first.
+- `slice-the-plan`: the contracts step and the final gate go under their own heading, and no lane owns a contract file. When the old form of a wide refactor lives in a contract file, the architect adds the new form in the contracts step and removes the old one in a second contracts step after the contract lane, which stays a lane. Why: 8 of 15 plans written with 0.4.0 put the contract file in a lane or ran the final gate as a lane.
+- `architecture-critique`: the design-it-twice comparison names depth, locality and seams under those three words. Why: one of 15 design notes compared by question and dropped depth and locality.
+- Evals: `design-it-twice`, `root-cause-red-first` and `slice-the-plan-lanes` replace their one long LLM judge with deterministic graders (regex over the notes, the plan and the run trace; tool use for the sub-agents and their constraints), plus one short judge question where one is still needed: the design comparison, the red and green command in the fix report, disjoint files in parallel lanes, and the owner's check. `root-cause-red-first` now checks on the trace that the red run and the ranked hypotheses come before the first source edit; its seed names a fix notes file and asks for edits by the Edit or Write tool, since the old order check missed a source edit made by a shell command.
+- Results on Claude Code 2.1.296, judge `sonnet`: `design-it-twice` 6 of 6; `slice-the-plan-lanes` 5 of 6, the miss a grader that counted lanes too strictly, fixed and re-graded 6 of 6; `root-cause-red-first` 5 of 6, the miss a real skip (hypotheses written after the fix and labeled "ranked before testing"), caught by the trace check. Full suite: 26 of 27 runs; the miss was one `spec-audit-test-gap` judge vote on an audit that looks correct, a case these changes do not touch.
+- Roles and models unchanged.
+
 ## 0.4.0 (2026-10-10)
 
 The loop gains the design team's two stages. Scope approved by the owner on 2026-10-10; ships with design-team 0.1.0 in the same repo.

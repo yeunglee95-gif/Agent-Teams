@@ -5,7 +5,8 @@ description: >
   provider now, SMS later, in-app notices in the app's own database). The architect uses
   architecture-critique's design-it-twice step: three or more sub-agents with different
   constraints, compared by depth, locality and seam placement, with each dependency's
-  kind named and one recommendation.
+  kind named and one recommendation. The sub-agents and their constraints are checked on
+  the trace and the notes by regex; one short judge question checks the comparison.
 tags: [architecture-critique, architect]
 runs: 3
 expected_outcome: plans/M6-design.md compares three or more designs and recommends one.
