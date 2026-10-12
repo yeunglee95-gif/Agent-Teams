@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: approver-merges-safe
+description: >
+  Auto-merge is on in the app's CLAUDE.md, merging to main does not deploy, every report is clean,
+  the gate is green on the reviewed head, and the change is a 35-line two-way door that touches no
+  protected path. The approver runs as the dev-team:approver subagent. It must APPROVE, re-check the
+  head, merge m9 into the local main, and confirm with git merge-base --is-ancestor after the merge.
+  Git's reflog for main shows the merge of m9 as main's only move.
+  All checks are regex over the files and the trace, and tool use; no judge question.
+tags: [approver, auto-merge]
+runs: 3
+expected_outcome: APPROVE in reviews/M9-approval.md with the merge recorded; main now contains the reviewed head; is-ancestor run after the merge; no push; no code edit.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh

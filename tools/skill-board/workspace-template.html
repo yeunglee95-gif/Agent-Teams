@@ -196,6 +196,8 @@ section + section { margin-top: 26px; }
 .fnode.on { box-shadow: inset 0 2px 0 var(--cobalt), inset 0 0 0 1px var(--line-2), 0 2px 2px rgb(0 0 0 / .05); }
 .fnode.sel { box-shadow: inset 0 0 0 2px var(--ink), 0 6px 16px rgb(0 0 0 / .08); }
 .fnode.you { background: var(--panel-2); }
+.fnode.par { box-shadow: inset 0 0 0 1px var(--line), 4px 4px 0 -1px var(--panel), 4px 4px 0 0 var(--line), 8px 8px 0 -1px var(--panel), 8px 8px 0 0 var(--line); }
+.fnode.par.on { box-shadow: inset 0 2px 0 var(--cobalt), inset 0 0 0 1px var(--line-2), 4px 4px 0 -1px var(--panel), 4px 4px 0 0 var(--line), 8px 8px 0 -1px var(--panel), 8px 8px 0 0 var(--line); }
 .youtag { font: 600 11px var(--font); background: var(--ink); color: var(--paper); border-radius: 9999px; padding: 1px 7px; vertical-align: 1px; }
 .fnow { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; padding: 12px 8px; border-top: 1px solid var(--line); min-height: 76px; }
 .fnow b { font: 600 15px var(--font); }
@@ -377,15 +379,18 @@ const stageAt = re => D.loop.findIndex(r => re.test(plain(r[loopKeys().sk]).trim
 const LAST = D.loop.length - 1, REVIEW = stageAt(/^review$/i);
 const FIX = (i => i >= 0 ? i : stageAt(/^fix\b/i))(stageAt(/^fix and re-verify$/i));
 const FIXLOOP = FIX >= 0 && REVIEW >= 0 && REVIEW < FIX;
-// Every stage in order; after Fix, back to Review once, then on; from the last stage back to the first.
-const ROUTE = D.loop.length > 1 ? [...D.loop.flatMap((_, i) => FIXLOOP && i === FIX ? [i, REVIEW] : [i]), 0] : [];
-const LOOPS = [...(FIXLOOP ? [[FIX, REVIEW, "re-verify"]] : []), ...(LAST > 0 ? [[LAST, 0, "findings go back to intake"]] : [])];
+// Every stage in order; after Fix, back to Review and through every stage up to Fix once more (the second and last
+// fix round), then on; from the last stage back to the first.
+const ROUTE = D.loop.length > 1 ? [...D.loop.flatMap((_, i) => FIXLOOP && i === FIX ? [i, ...D.loop.map((_, j) => j).filter(j => j >= REVIEW && j <= FIX)] : [i]), 0] : [];
+const LOOPS = [...(FIXLOOP ? [[FIX, REVIEW, "re-verify, 2 rounds max"]] : []), ...(LAST > 0 ? [[LAST, 0, "findings go back to intake"]] : [])];
+// A stage whose Who says "in parallel" is several roles at once: drawn as a stack of cards.
+const isPar = r => /\bin parallel\b/i.test(plain(r[loopKeys().wk] || ""));
 function loop() {
   if (!D.loop.length) return "";
   const { sk } = loopKeys();
   const cols = PHASES.map(([name, ids]) => `<div class="fcol"><div class="fh"><span>${name}</span><small>${ids.length}</small></div>${ids.map(i => {
     const r = D.loop[i]; const you = isYou(r);
-    return `<button class="fnode${you ? " you" : ""}${flowSel === i ? " sel" : ""}" data-stage="${i}" id="fn-${i}"><span class="fnum">${i}</span><span class="fname">${md(r[sk])}${you ? ' <span class="youtag">You</span>' : ""}</span><span class="fwho">${esc(whoShort(r[loopKeys().wk]))}</span></button>`;
+    return `<button class="fnode${you ? " you" : ""}${isPar(r) ? " par" : ""}${flowSel === i ? " sel" : ""}" data-stage="${i}" id="fn-${i}"><span class="fnum">${i}</span><span class="fname">${md(r[sk])}${you ? ' <span class="youtag">You</span>' : ""}</span><span class="fwho">${esc(whoShort(r[loopKeys().wk]))}</span></button>`;
   }).join("")}</div>`).join("");
   return `<section aria-labelledby="h-loop"><h2 id="h-loop">How the team works <span class="fctl"><small>${D.loop.length} stages, every project</small><button class="btn quiet" id="fplay" type="button">${flowPaused ? "Play" : "Pause"}</button></span></h2>
     <div class="flow"><div class="fscroll"><div class="fboard" id="fboard"><svg class="fedges" id="fedges" aria-hidden="true"></svg>${cols}</div></div>
@@ -418,7 +423,7 @@ function drawFlow() {
   for (const k of pairs) {
     const [a, b] = k.split("-").map(Number); const back = LOOPS.find(([x, y]) => x === a && y === b);
     out += `<path id="fe-${k}" class="fedge${back ? " back" : ""}" d="${edgePath(a, b, board)}" marker-end="url(#fa)"/>`;
-    if (back) { const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("d", edgePath(a, b, board)); svg.appendChild(tmp); const L = tmp.getTotalLength(), m = tmp.getPointAtLength(L / 2); tmp.remove(); out += a === LAST && b === 0 ? `<text class="flabel" x="${m.x}" y="${m.y - 6}" text-anchor="middle">${back[2]}</text>` : `<text class="flabel" x="${m.x + 6}" y="${m.y + 4}">${back[2]}</text>`; }
+    if (back) { const tmp = document.createElementNS("http://www.w3.org/2000/svg", "path"); tmp.setAttribute("d", edgePath(a, b, board)); svg.appendChild(tmp); const L = tmp.getTotalLength(), m = tmp.getPointAtLength(L / 2); tmp.remove(); out += a === LAST && b === 0 ? `<text class="flabel" x="${m.x}" y="${m.y - 6}" text-anchor="middle">${back[2]}</text>` : `<text class="flabel" x="${m.x + 6}" y="${m.y + 4}">${back[2].split(", ").map((t, j, a) => `<tspan x="${m.x + 6}" dy="${j ? 14 : 0}">${t}${j < a.length - 1 ? "," : ""}</tspan>`).join("")}</text>`; }
   }
   out += `<circle id="fdot" r="6" class="fdot"/>`;
   svg.innerHTML = out;
