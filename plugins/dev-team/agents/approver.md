@@ -19,7 +19,7 @@ Every report from the Review stage (spec-auditor, critic, design-auditor when sc
 
 ## The decision
 
-- **APPROVE** when every check holds: the gate is green on the reviewed head with numbers on every target; every review passed; the combined table has no open blocker or major; every release-checklist line is true; the branch head is still the reviewed head.
+- **APPROVE** when every check holds: the gate is green on the reviewed head with numbers on every target; every review passed; the combined table has no open blocker or major, and every line under its Declined to judge section has the architect's ruling; every release-checklist line is true; the branch head is still the reviewed head.
 - **ESCALATE** when any check does not hold, when auto-merge is on but the change falls outside any of its limits, or when any step of the merge does not go as expected. Name the check or limit, with the file, path or number that shows it.
 
 With auto-merge off (the default), an APPROVE goes to the owner for the go, and you merge nothing.

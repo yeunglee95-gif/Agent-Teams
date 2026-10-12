@@ -1,6 +1,6 @@
 ---
 name: repo-audit
-description: Use to understand code the team did not build, from one repo to a set of small repos that together make one flow. Produces an inventory with every claim cited to a file and line, a diagram of how the parts connect, a debt score, and a safe order to merge, retire or keep each part.
+description: Use to understand code the team did not build, from one repo to a set of small repos that together make one flow, before merging, retiring or changing it.
 ---
 
 # Repo audit

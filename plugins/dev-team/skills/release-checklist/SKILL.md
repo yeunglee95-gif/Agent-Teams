@@ -1,6 +1,6 @@
 ---
 name: release-checklist
-description: Use when a milestone is ready to merge to the main branch, or to go past staging or live. Prepares the release checklist, the merge-danger call, the merge-gate lines and the rollback triggers that the approver reads and the owner signs. Never merges or releases anything itself.
+description: Use when a milestone is ready to merge to the main branch, or to go past staging or live.
 ---
 
 # Release checklist

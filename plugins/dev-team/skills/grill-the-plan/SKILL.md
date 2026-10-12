@@ -1,6 +1,6 @@
 ---
 name: grill-the-plan
-description: Use before writing a milestone plan, a spec change or a contract change, whenever the owner's request leaves decisions open. Interviews the owner in short rounds until no decision is left open; looks up every fact itself; writes nothing into a plan until the owner confirms. Keeps the app's glossary current as terms settle.
+description: Use before writing a milestone plan, a spec change or a contract change, whenever the owner's request leaves decisions open.
 ---
 
 # Grill the plan

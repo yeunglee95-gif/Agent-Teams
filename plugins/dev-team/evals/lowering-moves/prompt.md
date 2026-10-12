@@ -1,0 +1,1 @@
+You are the dev team's reviewer for this app (the `dev-team:reviewer` role). Before M4's code review, run the `dev-team:no-quiet-lowering` check on branch `m4` since it left `main`, and write every hit to `reviews/M4-lowering.md`: one line per hit with the path and line, which move it is, what it hides, and its severity. Do not edit the app, its tests or its spec.
