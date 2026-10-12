@@ -1,5 +1,9 @@
 # dev-team changelog
 
+## Unreleased
+
+- Eval `root-cause-red-first`: `green-after-fix` no longer needs the blank line unittest prints between `Ran N tests` and `OK`. A 0.6.0 full-suite run fixed the bug and ran the suite green, but piped the output through `grep`, which drops that line, so the check failed a correct run. The check now accepts one or more line breaks there, needs `OK` as a whole word, and no longer counts `Ran 0 tests`. Checked offline on 13 kept traces (all still pass), a grep-piped copy (now passes), and copies that end red, run zero tests, print `OKAY`, or go green only before the source edit (all fail).
+
 ## 0.6.0 (2026-10-11)
 
 The review loop runs its reviewers at once, merges their findings into one list, caps fixing at two rounds, and ends with an approver. Scope approved by the owner on 2026-10-11, after comparing this loop with a published "software factory" loop (spec writer, builder, four parallel reviews, wait for all, at most two fix rounds, an approver that merges or escalates). Eleven roles, fourteen skills, fifteen stages.
