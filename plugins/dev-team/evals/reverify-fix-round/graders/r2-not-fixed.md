@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^[^\n]*\bR2\b[^\n]*\bnot[ _-]?fixed\b|^[^\n]*\bnot[ _-]?fixed\b[^\n]*\bR2\b'
+pattern: '^[^\n]*\bR2\b[^\n]*\bnot[ _-]?fixed\b|^[^\n]*\bnot[ _-]?fixed\b[^\n]*\bR2\b|^\|\s*(?:R2|C2)\b[^|\n]*\|\s*\**no\**\s*\|'
 flags: mi
 target:
   source: file

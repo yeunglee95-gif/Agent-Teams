@@ -6,13 +6,13 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0; bake-offs for 0.
 
 ## Method
 
-- **Which case exercises which role.** Most cases run the role's skill in the eval's main session ("You are the dev team's reviewer..."), so the session's model is the role's model there. Six cases launch the role as a subagent with the Agent tool (`owner-builds-to-handoff`, `claim-before-lane`, and from 0.6.0 `combined-findings` and the three `approver-*` cases), so the agent file's frontmatter sets the model there.
+- **Which case exercises which role.** Most cases run the role's skill in the eval's main session ("You are the dev team's reviewer..."), so the session's model is the role's model there. Seven cases launch the role as a subagent with the Agent tool (`owner-builds-to-handoff`, `claim-before-lane`, from 0.6.0 `combined-findings` and the three `approver-*` cases, and from 0.7.0 `reverify-fix-round`), so the agent file's frontmatter sets the model there.
   | Role | Cases | How the role runs |
   |---|---|---|
   | architect | `grill-the-plan-asks`, `slice-the-plan-lanes`, `design-it-twice` | main session (design-it-twice also starts general-purpose sub-agents, which inherit the session model) |
   | owner | `owner-builds-to-handoff`, `tests-first-tautology`, `claim-before-lane` | subagent, main session, subagent |
   | fixer | `root-cause-red-first` | main session |
-  | reviewer | `reviewer-hypotheses-first`, `combined-findings` (0.6.0) | main session, subagent |
+  | reviewer | `reviewer-hypotheses-first`, `combined-findings` (0.6.0), `reverify-fix-round` and `lowering-moves` (0.7.0) | main session, subagent, subagent, main session |
   | spec-auditor | `spec-audit-test-gap` | main session |
   | scribe | `run-retro-proposes`, `retro-cost-view` | main session |
   | gate-runner | `release-no-merge` | main session |

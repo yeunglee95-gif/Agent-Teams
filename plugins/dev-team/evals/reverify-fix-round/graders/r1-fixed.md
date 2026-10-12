@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^(?![^\n]*\bnot[ _-]?fixed\b)[^\n]*\bR1\b[^\n]*\bfixed\b'
+pattern: '^(?![^\n]*\bnot[ _-]?fixed\b)[^\n]*\bR1\b[^\n]*\bfixed\b|^\|\s*(?:R1|C1)\b[^|\n]*\|\s*\**yes\**\s*\|'
 flags: mi
 target:
   source: file
@@ -8,4 +8,4 @@ target:
 weight: 1
 ---
 
-The review gives R1 a fixed verdict.
+The review gives R1 a fixed verdict (`fixed`, or `yes` in the verified-fixed table).
