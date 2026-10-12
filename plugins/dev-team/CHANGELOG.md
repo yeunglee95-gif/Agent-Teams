@@ -1,8 +1,19 @@
 # dev-team changelog
 
-## Unreleased
+## 0.7.0 (2026-10-12)
 
+Ideas from three outside sources, read at pinned commits and rewritten in this team's voice: obra/superpowers (bb92a77), garrytan/gstack (70fab3e) and forrestchang/andrej-karpathy-skills (2c60614). Scope approved by the owner on 2026-10-12. What was taken and from where is in `THIRD_PARTY.md`; what was looked at and not taken is in `skills/REJECTED.md`.
+
+- **A fix round closes with verdicts.** Each source re-checks its fixed findings by id with `fixed` (and the `path:line` or run that shows it) or `not fixed`; "attempted" is not fixed. Each lists new breakage in the fix diff as new findings. Before the re-checks the reviewer sorts the fix diff: a behavior, test or build change outside the fixed findings' paths gets a full pass from the reviewer and the security-reviewer in the same round; a docs-only change keeps the reviews (loop page, Limits on fixing; reviewer, spec-auditor, security-reviewer).
+- **Four more ways to lower the bar**, in `no-quiet-lowering` (now nine moves): acceptance text rewritten to meet the work (`acceptance edited`, the original line still checked, only the owner accepts the new text), product code that branches on a test or CI signal, a snapshot regenerated without its test changing, and proof of a weaker kind than the claim. The spec-auditor builds rows from the spec as it stood at the branch point and preloads the skill.
+- **Declined to judge.** The reviewer and the spec-auditor list every behavior they set aside as outside the spec, with the reason; the combined findings file gathers them and the architect rules on each before the fix round (a row, or "not required" in the memory file). The approver checks every line has a ruling. Findings are graded by what a person using the app gets, not by whether the spec names the input.
+- **Plans name their blind spots and seams.** `slice-the-plan` adds an Interfaces line per lane (consumes and produces, by exact name and signature, spelled the same across lanes) and a Review Focus section (up to five inputs or failure modes the spec implies that no red test covers, each pinned by a new red test in the owning lane); every Review-stage brief carries the list. The lane-table header is unchanged.
+- **Clean start, full report.** A lane runs the unit suite in its new worktree before the first edit; a red baseline holds it with `blocked-by:`. `tests-first` runs the whole suite and names every red seen, even one the lane did not cause; names the app change that would make a test fail before writing its body; and mocks carry the full data shape.
+- **Security findings need evidence.** A supported finding has an attacker-controlled entry point, a boundary crossed, the impact shown and the defenses checked; anything less is a hypothesis listed apart. A supported finding is searched for at every sibling entry point, and the report opens with complete, partial or not assessed.
+- **Simple and surgical** for the owner and the fixer: every changed line traces to the brief or the finding; no unasked features or abstractions; nearby code is not improved or restyled; dead code they did not make is reported, not deleted.
+- **Skill descriptions say when to use the skill, not what it does**, for all fourteen skills (superpowers found agents follow a summarized workflow in the description and skip the body).
 - Eval `root-cause-red-first`: `green-after-fix` no longer needs the blank line unittest prints between `Ran N tests` and `OK`. A 0.6.0 full-suite run fixed the bug and ran the suite green, but piped the output through `grep`, which drops that line, so the check failed a correct run. The check now accepts one or more line breaks there, needs `OK` as a whole word, and no longer counts `Ran 0 tests`. Checked offline on 13 kept traces (all still pass), a grep-piped copy (now passes), and copies that end red, run zero tests, print `OKAY`, or go green only before the source edit (all fail).
+- Evals: see the 0.7.0 results below.
 
 ## 0.6.0 (2026-10-11)
 

@@ -1,6 +1,6 @@
 ---
 name: hidden-failure-check
-description: Use when reviewing a change, and in the spec-auditor's sweep. Write your own hypotheses from the spec and the raw diff before reading the builder's report; find errors that fail quietly; build the test-gap table (each spec row to the test that asserts it, edge cases with exact values, ranked High, Medium, Low); label every finding by class and axis; on a re-review, re-check earlier findings by id first.
+description: Use when reviewing a change or re-reviewing after a fix, and in the spec-auditor's sweep.
 ---
 
 # Hidden-failure check

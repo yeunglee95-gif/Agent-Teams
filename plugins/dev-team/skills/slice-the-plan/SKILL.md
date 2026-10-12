@@ -1,6 +1,6 @@
 ---
 name: slice-the-plan
-description: Use when turning an agreed plan or spec into lanes for a milestone. Cuts the work into thin vertical slices, each a lane with its own files and named red tests, orders lanes by what blocks what, sequences wide refactors as expand then migrate then contract, and has the owner check the breakdown before any lane starts.
+description: Use when turning an agreed plan or spec into lanes for a milestone, after every open decision is closed and before any lane starts.
 ---
 
 # Slice the plan
@@ -28,6 +28,7 @@ For each lane, write:
 - **Red tests it starts from:** each by file and title, asserting on the stable hooks the app's `CLAUDE.md` names. "Done" is these tests green in a gate the owner ran.
 - **Blocked by:** the lanes that must finish first, or "none". Blocking edges are the lane order: lanes with nothing open ahead of them can run in parallel; a chain runs top to bottom.
 - **Contract shapes** it may add, if any, pre-signed in the plan; anything else stops and asks the architect.
+- **Interfaces:** what it consumes from lanes ahead of it and what it produces for lanes after it, by exact name and signature (a function, an export, a store action, a route, a test id). A name one lane produces is spelled the same in every lane that consumes it; check this across the plan before the owner check.
 
 The plan also holds one lane table, beside any prose, because the owner, the board and the checks read it:
 
@@ -40,6 +41,10 @@ The plan also holds one lane table, beside any prose, because the owner, the boa
 One row per lane, never a row for a group of lanes. Kind is `slice`, `expand`, `migrate` or `contract`. Owns lists file paths. Red tests are `file > test name` entries. Blocked by lists lane ids, or `none`.
 
 Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, under their own heading, not as lanes or table rows; no lane lists a contract file among the files it owns.
+
+## Review Focus
+
+Under its own heading, the plan lists up to five inputs or failure modes the spec implies but no lane's red tests exercise, the ones most likely to hurt a person using the app, most likely first: one line each, naming the input or condition and what a reasonable person would expect. The spec says what the app must do, not everything it will meet; its silence on an input is not permission for that input to break the app. For each line, add the red test that pins it to the lane that owns the code. An empty section means you checked and found none, not that you skipped the check. The Review stage reviewers get this list word for word.
 
 ## Wide refactors
 
@@ -70,3 +75,5 @@ The lane plan goes where the app's `CLAUDE.md` says milestone plans live. Publis
 ## Source
 
 Adapted from `skills/engineering/to-tickets/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; tickets became lanes with disjoint file ownership and named red tests; blocking edges became lane order; the quiz step goes to the owner; the reviewer's plan critique added before lanes start; publishing to a tracker only when the app's `CLAUDE.md` names one, never with a ready-for-agent label; the setup-skill pointer and ticket templates removed. License text: `../../licenses/mattpocock-skills-MIT.txt`.
+
+The Interfaces line and the Review Focus section are adapted from `skills/writing-plans/SKILL.md` (the task Interfaces block and the Review Focus section) in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit bb92a77741419a4ab5f06e711a283343f1ada0c3. Changed: tasks became lanes; the tests go to the owning lane's red tests; the list goes to the Review stage. License text: `../../licenses/obra-superpowers-MIT.txt`.

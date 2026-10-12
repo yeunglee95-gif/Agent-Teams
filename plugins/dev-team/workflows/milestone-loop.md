@@ -32,7 +32,7 @@ A finding at any stage goes back to the stage that owns it (a spec gap to the ar
 
 ## Review: five at once (stage 7)
 
-The main session starts every reviewer at the same time, each as its own subagent with its own brief: the spec-auditor, the critic, the design-auditor (only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
+The main session starts every reviewer at the same time, each as its own subagent with its own brief, and every brief carries the plan's Review Focus list word for word: the spec-auditor, the critic, the design-auditor (only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
 
 ## Combine findings (stage 8)
 
@@ -47,6 +47,8 @@ Nothing moves until every report from stage 7 is filed. Then the reviewer, whose
 - **Where**: `path:line`, or the screen, target and language, or both.
 - **Kind**: `behavior` when the fix changes what the code does (logic, state, data, a contract, an engine or run path, anything security); `surface` when it changes only what is shown or named (copy, labels, i18n keys, styling, layout, docs) and no test of behavior moves. A security-reviewer finding is always `behavior`; when unsure, `behavior`. The Kind picks the fixer's first model (Fixer step-up).
 - **Status**: `open`; `disputed: <why>` when the reviewer checked it against the code or the build and finds it wrong (it goes back to its source to confirm or withdraw, never to the fixer as written); `deferred` for scope the plan defers; after a fix round, `fixed <sha>` once its source re-verified it, or `open` again.
+
+Below the table, a **Declined to judge** section gathers every behavior a reviewer set aside as outside the spec or plan, with its source and reason. The architect rules on each line before stage 9: it becomes a row (`open`, graded by what a person using the app gets if it ships), or it is recorded as not required, with the reason, in the memory file. A finding is graded by its effect, not by whether the spec names the input; the spec says what the app must do, not everything it will meet.
 
 Rows are ranked: every blocker, then every major, then every minor. The reviewer adds no new finding of its own here; a finding it missed goes into its own report first, with its next id.
 
@@ -78,6 +80,8 @@ The lane owner answers five questions and writes the answers in the lane's first
 4. **Unclear?** The spec row or red test is missing, or it contradicts the current code (cite `path:line`). Unclear goes back to the architect; a missing screen, state or token in the design hand-off goes back to the designer. The lane never decides it.
 5. **Too big?** Likely to change more lines than the app's `CLAUDE.md` allows for one lane, or spanning many areas at once. Too big goes back to the architect to split.
 
+After **proceed**, the lane's first act in its new worktree is a clean-start check: the unit suite runs before the first edit, and a red baseline holds the lane with `blocked-by:` naming the failing tests.
+
 Outcomes: **proceed**; **hold** (the item stops with a `blocked-by:` line and one sentence on why); or **sequence** (it waits for the named lane). A lane with no recorded answer is not started.
 
 ## Blocked items
@@ -94,6 +98,10 @@ One set of limits for stage 9 and for any repair. A repair **fails** when its te
 | Two attempts per finding | a `behavior` row: both attempts on `opus`; a `surface` row: the first on `sonnet`, the second on `opus`; the second always gets the first's cause line and diff (Fixer step-up) | a second failure sends the finding to the owner with both attempts, whatever its cause |
 | Two fix rounds per milestone | one round is the fixer on every open row of the combined table, then the gate on the new head, then each reviewer whose findings were fixed re-checking them by id | after round 2, any open blocker or major sends the milestone to the owner with the table; open minors stay listed for the approver |
 | Same root cause twice | outside a fix round (a gate, a lane's build, a review), the same item failing twice in a row with the same cause line; a different cause resets the count | the item goes to the owner with both attempts |
+
+**How a round closes.** Each source re-checks its own fixed findings by id and gives each one a verdict: `fixed`, with the `path:line` or test run that shows the defect is gone, or `not fixed`, with what still shows it. "Attempted" is not fixed. Each source also reports any **new breakage in the fix diff** (something the fix itself broke, with severity and `path:line`), which enters the table as a new row. Something noticed outside the fix diff goes into that source's own report as a new finding with its next id and into the table, and does not reopen the round on its own.
+
+**Sort the fix diff.** Before the re-checks, the reviewer sorts the round's diff (`git diff <head the reviews saw>..<new head>`) by path. A change to behavior, tests or build inputs outside the paths of the findings it fixed gets a full review pass of that part by the reviewer and the security-reviewer in the same round, as if it were new work. A change only to docs or release metadata keeps the earlier reviews. The sort and its outcome are one line in the reviewer's verified-fixed table.
 
 These sit on top of the three-strikes rule in `root-cause-debugging` and the retry cap in Sessions. A repair that turns a check green by adding an exception, an allow-list or baseline entry, or a narrower rule to a ruling test (a test that holds one of the app's rules across the code, such as a banned-terms list, a duplicate set or a form-file map) is not a fix: it fails as a repair unless the architect signed off the rule change in the memory file before the fixer's commit. The reviewer checks for it when it re-verifies (the `no-quiet-lowering` skill, "An exception appeared").
 

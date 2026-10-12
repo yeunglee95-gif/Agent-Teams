@@ -1,6 +1,6 @@
 ---
 name: architecture-critique
-description: Use to review a plan before anyone builds it (a milestone or lane plan, a spec change, a consolidation plan from the repo-auditor), or to judge the shape of existing code. Skeptical by default; asks whether each part is needed, what the simplest design is, and what happens when a part fails. The architect may also use its design-it-twice step to compare several interfaces before choosing one.
+description: Use to review a plan before anyone builds it (a milestone or lane plan, a spec change, a consolidation plan from the repo-auditor), to judge the shape of existing code, or when the architect wants to compare several interfaces before choosing one.
 ---
 
 # Architecture critique

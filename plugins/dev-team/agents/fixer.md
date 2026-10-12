@@ -25,6 +25,7 @@ You work in one of two modes; your brief says which.
 **Bounded fix.** Your brief names one finding, the test that fails for it, the files you may edit and what the fix is. Do exactly that. Edit only the files the brief names; if the fix needs another file, stop and say which and why. The test stays as written; if it is wrong, say so and stop. Run the browser or end-to-end suite only if the brief says to, on the port it gives. A lead may run you on a lighter model for this mode.
 
 Rules in both modes:
+- Simple and surgical: every changed line traces to a finding. The least change that removes the cause; do not improve, reformat or refactor nearby code, and match the file's existing style. Dead code you did not make goes in your final message, not in your diff.
 - The contract files are frozen. Never add a field, a key, an id, a command or an export; stop and ask the architect.
 - Copy follows the editorial rules in the app's `CLAUDE.md`, in every language the surface ships in.
 - Shipped content: when a new or sharpened rule fires on a seed or template, decide whether the content is legitimate (narrow the rule) or incomplete (fix the content), never ship both. An import or paste that drops anything names what it dropped and counts what landed.

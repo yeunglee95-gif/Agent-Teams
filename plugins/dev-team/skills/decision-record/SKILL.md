@@ -1,6 +1,6 @@
 ---
 name: decision-record
-description: Use when a technical choice will be hard to undo (a framework, a data store, an outside service, a repo split or merge, a contract shape). Writes the decision record the owner signs: the options, the trade-offs, the choice, and what it makes harder later.
+description: Use when a technical choice will be hard to undo: a framework, a data store, an outside service, a repo split or merge, a contract shape.
 ---
 
 # Decision record

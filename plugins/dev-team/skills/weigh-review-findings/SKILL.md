@@ -1,6 +1,6 @@
 ---
 name: weigh-review-findings
-description: Use when taking findings from a review, a security review, a critic report or the owner, before changing any code. Check each finding against the code, ask about unclear ones first, push back with evidence when one is wrong, then fix one at a time.
+description: Use when taking findings from a review, a security review, a critic report or the owner, before changing any code.
 ---
 
 # Weigh review findings

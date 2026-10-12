@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: reverify-fix-round
+description: >
+  M5's first fix round is done. C1 (reviewer R1, free shipping at exactly 5000 cents) is truly fixed.
+  C2 (reviewer R2, totals shown as "$12.5") is only attempted: the new code still prints "$12.5" for
+  1250 and the fixer's test checks 1299 only. The same fix commit changes src/tax.py from 8% to 7%,
+  a behavior change outside both findings' paths that breaks spec S5.3, and edits the tax test to
+  match. The reviewer runs as the dev-team:reviewer subagent. Checks: R1 given a fixed verdict and
+  C1 set to fixed with a sha; R2 given a not-fixed verdict and C2 left open; the tax change found
+  as a new finding R3; no code, test, spec or fixer report edited. All regex and tool use.
+tags: [reviewer, fix-round, re-verify]
+runs: 3
+expected_outcome: reviews/M5-review.md has R1 fixed, R2 not fixed, and a new R3 on src/tax.py; the table has C1 fixed <sha> and C2 open.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh

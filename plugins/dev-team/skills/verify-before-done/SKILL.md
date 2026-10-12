@@ -1,6 +1,6 @@
 ---
 name: verify-before-done
-description: Use before saying anything is done, fixed, passing, green or clean, before a commit, and before reporting another agent's work as finished. Requires fresh evidence from a check run in this turn; a claim without it is not made.
+description: Use before saying anything is done, fixed, passing, green or clean, before a commit, before moving to the next task, and before reporting another agent's work as finished.
 ---
 
 # Verify before done

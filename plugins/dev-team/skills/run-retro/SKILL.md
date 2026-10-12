@@ -1,6 +1,6 @@
 ---
 name: run-retro
-description: Use at the close of every milestone, after the owner's go or stop. Reads what went wrong in the milestone (review findings, fixes, gate failures, critic reports, the owner's rejections) and what each stage cost, and writes a proposal list for the owner, preferring a deterministic check over more prose. Proposes only; never edits a skill, hook or CLAUDE.md itself.
+description: Use at the close of every milestone, after the owner's go or stop.
 ---
 
 # Run retro

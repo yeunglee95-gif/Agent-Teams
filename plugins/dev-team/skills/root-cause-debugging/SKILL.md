@@ -1,6 +1,6 @@
 ---
 name: root-cause-debugging
-description: Use for any bug, failing test, red gate or behavior that differs from the spec, before proposing a fix. First build one fast command that shows the bug red; then rank several hypotheses and prove the cause; fix the cause, not the symptom; stop after three failed fixes and question the design.
+description: Use for any bug, failing test, red gate or behavior that differs from the spec, before proposing a fix.
 ---
 
 # Root-cause debugging

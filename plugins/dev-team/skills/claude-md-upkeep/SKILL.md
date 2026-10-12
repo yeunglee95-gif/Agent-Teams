@@ -1,6 +1,6 @@
 ---
 name: claude-md-upkeep
-description: Use at the close of a milestone, and whenever an agent stopped to ask because the app's CLAUDE.md did not say something. Audits each CLAUDE.md against the code, reports a score and proposed changes, and applies only the changes the owner approves.
+description: Use at the close of a milestone, and whenever an agent stopped to ask because the app's CLAUDE.md did not say something.
 ---
 
 # CLAUDE.md upkeep
