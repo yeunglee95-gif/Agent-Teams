@@ -38,13 +38,14 @@ The main session starts every reviewer at the same time, each as its own subagen
 
 Nothing moves until every report from stage 7 is filed. Then the reviewer, whose own report is already written, reads the others and builds one table, because it re-verifies fixes later and already reads the code. It goes in `<milestone>-findings.md` beside the reviews, unless the app's `CLAUDE.md` names another place, and the fixer, the approver and the checks all read it:
 
-`| ID | Severity | Source | Finding | Where | Status |`
+`| ID | Severity | Source | Finding | Where | Kind | Status |`
 
 - **ID**: `C1`, `C2`, and on; never reused in the milestone.
 - **Severity**: blocker, major or minor. When sources disagree on one finding, the highest wins.
 - **Source**: every role, by its exact role name (`spec-auditor`, `critic`, `design-auditor`, `security-reviewer`, `reviewer`), and its own finding id, separated by semicolons (for example `critic Ana 1-1; reviewer R2; spec-auditor S9.1`). A finding two reports share is one row with both sources, never two rows.
 - **Finding**: one sentence.
 - **Where**: `path:line`, or the screen, target and language, or both.
+- **Kind**: `behavior` when the fix changes what the code does (logic, state, data, a contract, an engine or run path, anything security); `surface` when it changes only what is shown or named (copy, labels, i18n keys, styling, layout, docs) and no test of behavior moves. A security-reviewer finding is always `behavior`; when unsure, `behavior`. The Kind picks the fixer's first model (Fixer step-up).
 - **Status**: `open`; `disputed: <why>` when the reviewer checked it against the code or the build and finds it wrong (it goes back to its source to confirm or withdraw, never to the fixer as written); `deferred` for scope the plan defers; after a fix round, `fixed <sha>` once its source re-verified it, or `open` again.
 
 Rows are ranked: every blocker, then every major, then every minor. The reviewer adds no new finding of its own here; a finding it missed goes into its own report first, with its next id.
@@ -64,7 +65,7 @@ How Claude Code sessions map to milestones, so parallel work does not collide an
 - **Shared things.** Contract files change only through the architect. Each milestone writes its decisions into its own dated section of the memory file, so two sessions never edit the same lines.
 - **Messages between sessions** are heads-ups only; the files are the record.
 - **Retry cap.** After one failed repair, escalate: first the same role with more effort, then the owner or a stronger role. A Stop or SubagentStop hook that forces the agent to continue must carry a hard round cap.
-- **Fixer step-up.** The fixer runs on `sonnet`. When one of its repairs fails, the main session runs the next attempt on that finding with the fixer on `opus`, by passing the model for that one subagent call. It never switches the main session's model, so the session's prompt cache stays intact. The `opus` attempt gets the failed attempt's cause line and diff. How many attempts and rounds there are, and what goes to the owner, is in Limits on fixing. The next finding starts on `sonnet` again.
+- **Fixer step-up.** The fixer's first attempt runs on `opus` for a `behavior` row and on `sonnet` for a `surface` row (the combined table's Kind). When a `sonnet` repair fails, the main session runs the next attempt on that finding with the fixer on `opus`, by passing the model for that one subagent call. It never switches the main session's model, so the session's prompt cache stays intact. The `opus` attempt gets the failed attempt's cause line and diff. How many attempts and rounds there are, and what goes to the owner, is in Limits on fixing. The next `surface` finding starts on `sonnet` again. A `behavior` row that fails on `opus` gets one more `opus` attempt with the first's cause line and diff.
 - **Close.** The scribe writes a handoff note (decisions, open items, the next milestone's first step) where the app's `CLAUDE.md` says, or else beside the retro, then the retro, and closes the milestone's claim row. The next milestone starts in a fresh session from the `CLAUDE.md`, the memory file and that note.
 
 ## Pre-flight, before a lane starts (stage 4)
@@ -90,11 +91,13 @@ One set of limits for stage 9 and for any repair. A repair **fails** when its te
 
 | Limit | How it counts | When it is reached |
 |---|---|---|
-| Two attempts per finding | the first attempt on `sonnet`; after one failure, the second on `opus` with the first's cause line and diff (Fixer step-up) | a second failure sends the finding to the owner with both attempts, whatever its cause |
+| Two attempts per finding | a `behavior` row: both attempts on `opus`; a `surface` row: the first on `sonnet`, the second on `opus`; the second always gets the first's cause line and diff (Fixer step-up) | a second failure sends the finding to the owner with both attempts, whatever its cause |
 | Two fix rounds per milestone | one round is the fixer on every open row of the combined table, then the gate on the new head, then each reviewer whose findings were fixed re-checking them by id | after round 2, any open blocker or major sends the milestone to the owner with the table; open minors stay listed for the approver |
 | Same root cause twice | outside a fix round (a gate, a lane's build, a review), the same item failing twice in a row with the same cause line; a different cause resets the count | the item goes to the owner with both attempts |
 
-These sit on top of the three-strikes rule in `root-cause-debugging` and the retry cap in Sessions. A finding's second attempt can fall in round 1 (its test stayed red) or round 2 (its re-verification rejected it); either way it never gets a third.
+These sit on top of the three-strikes rule in `root-cause-debugging` and the retry cap in Sessions. A repair that turns a check green by adding an exception, an allow-list or baseline entry, or a narrower rule to a ruling test (a test that holds one of the app's rules across the code, such as a banned-terms list, a duplicate set or a form-file map) is not a fix: it fails as a repair unless the architect signed off the rule change in the memory file before the fixer's commit. The reviewer checks for it when it re-verifies (the `no-quiet-lowering` skill, "An exception appeared").
+
+A finding's second attempt can fall in round 1 (its test stayed red) or round 2 (its re-verification rejected it); either way it never gets a third.
 
 ## Halts
 

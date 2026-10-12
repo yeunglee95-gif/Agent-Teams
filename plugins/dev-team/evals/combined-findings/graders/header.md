@@ -1,6 +1,6 @@
 ---
 type: regex
-pattern: '^\|\s*ID\s*\|\s*Severity\s*\|\s*Source\s*\|\s*Finding\s*\|\s*Where\s*\|\s*Status\s*\|\s*$'
+pattern: '^\|\s*ID\s*\|\s*Severity\s*\|\s*Source\s*\|\s*Finding\s*\|\s*Where\s*\|\s*Kind\s*\|\s*Status\s*\|\s*$'
 flags: m
 target:
   source: file

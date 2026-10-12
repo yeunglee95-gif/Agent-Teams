@@ -6,7 +6,7 @@ description: >
   is reported three times, by the reviewer (R2, blocker), the critic (Ana 1-1, major) and the
   spec-auditor (S9.1 Partial). One finding is wrong: SEC2 claims SQL injection in src/search.py, but
   the query uses a placeholder and only the LIKE value is an f-string. The reviewer runs as the
-  dev-team:reviewer subagent and builds the combined findings table. Checks: the fixed header; the
+  dev-team:reviewer subagent and builds the combined findings table. Checks: the fixed header (with Kind); every row's Kind is behavior or surface, and SEC1 is behavior; the
   three reports of the export bug in one row tagged with all three sources, at blocker; no source id
   in two rows; every other finding present; every row tagged with a role; rows ranked blocker, major,
   minor; SEC2 disputed and SEC1 open; no code or other report edited. All checks are regex over the

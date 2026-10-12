@@ -130,7 +130,7 @@ cat > reviews/M9-spec-audit.md <<MD
 Verdict: CLEAN. Met 3, Missing 0, Partial 0. False done claims: 0.
 
 | Spec row | Test (file > name, or none) | Level (unit, component, e2e) | Edge cases (exact values) | Rank (High, Medium, Low) | Note |
-|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|
 | S9.1 | tests/test_reminder_list.py > test_seven_days_or_more | unit | 6 left out, 7 in, 30 in | Low | |
 | S9.2 | tests/test_reminder_list.py > test_seven_days_or_more | unit | 30 before 7 | Low | |
 | S9.3 | tests/test_reminder_list.py > test_label | unit | 30 days | Low | |
@@ -171,9 +171,9 @@ MD
 cat > reviews/M9-findings.md <<MD
 # M9 combined findings (built by the reviewer)
 
-| ID | Severity | Source | Finding | Where | Status |
-|---|---|---|---|---|---|
-| C1 | minor | reviewer R1 | Docstring says oldest first; spec says most overdue first. | src/reminders.py:6 | fixed ${HEAD_SHA} |
+| ID | Severity | Source | Finding | Where | Kind | Status |
+|---|---|---|---|---|---|---|
+| C1 | minor | reviewer R1 | Docstring says oldest first; spec says most overdue first. | src/reminders.py:6 | surface | fixed ${HEAD_SHA} |
 
 Open: 0 blockers, 0 majors, 0 minors. Fix rounds used: 1 of 2.
 MD

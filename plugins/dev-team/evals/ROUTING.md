@@ -2,7 +2,7 @@
 
 The one home for each dev-team role's `model` and `effort`, and the evidence behind them. Agent files carry the setting; this file says why. Failed cheaper setups go in the miss log next to it, `routing-log.md`.
 
-Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved by the owner (Jase) on 2026-10-11.
+Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0; bake-offs for 0.6.0 under "Bake-offs". Scope approved by the owner (Jase) on 2026-10-11.
 
 ## Method
 
@@ -27,8 +27,8 @@ Measured 2026-10-11 on Claude Code 2.1.296, for dev-team 0.5.0. Scope approved b
 
 | Role | Current | Candidate | Passes (current, candidate) | Cost per passed run (current, candidate) | Decision |
 |---|---|---|---|---|---|
-| architect | opus | sonnet | 18 of 18, 18 of 18 (grill 6, 6; slice 6, 6; design-it-twice 6, 6) | $0.548, $0.236 (57% lower) | sonnet in 0.5.0; **back to opus in 0.5.1**, see "Held pending plan quality" |
-| fixer | opus | sonnet | 6 of 6, 6 of 6 | $0.285, $0.111 (61% lower) | **sonnet**, stepping up to opus after one failed repair (0.5.2) |
+| architect | opus | sonnet | 18 of 18, 18 of 18 (grill 6, 6; slice 6, 6; design-it-twice 6, 6) | $0.548, $0.236 (57% lower) | sonnet in 0.5.0; back to opus in 0.5.1; **opus confirmed by the plan bake-off (0.6.0)** |
+| fixer | opus | sonnet | 6 of 6, 6 of 6 | $0.285, $0.111 (61% lower) | sonnet with step-up (0.5.2); **from 0.6.0 by the row's Kind: `behavior` on opus, `surface` on sonnet with the step-up**, see "Bake-offs" |
 | scribe | opus | sonnet | 6 of 6, 6 of 6 | $0.351, $0.137 (61% lower) | **sonnet** |
 | owner | opus | sonnet | 6 of 6, 3 of 6 (owner-builds-to-handoff 3, 0; tests-first-tautology 3, 3) | $0.465, $0.305 | keep opus |
 | owner | opus | opus, effort low | owner-builds-to-handoff 3 of 3, 2 of 3 | $0.761, $0.621 | keep opus |
@@ -61,6 +61,16 @@ On 2026-10-11 the owner put the architect back on opus. The architect's three ca
 ## Fixer step-up (0.5.2)
 
 On 2026-10-11 the owner kept the fixer on sonnet with a built-in step-up: after one failed repair, the next attempt on that finding runs on opus for that one subagent call, never by switching the session's model; a second failure goes to the owner. Why this fits the fixer and not the architect: every fix is checked hard (its test must turn green, the gate runs, the reviewer re-verifies), so a weak sonnet fix is caught and costs one retry, while a weak plan looks fine until later. The fixer's one eval case is a single small bug, so a fixer bake-off on real past findings with known fix commits is running to measure first-try pass rates and, above all, silent failures (the test passes but the cause is wrong), which a step-up cannot catch. Its result is recorded here when it lands.
+
+## Bake-offs (0.6.0)
+
+Run 2026-10-11 and 2026-10-12 on real past OS Flow milestones and findings, Claude Code 2.1.296; about $75. They settle the two items held above.
+
+**Architect, plan quality.** Four past milestones, three plans per model each (24 plans), from the milestone's brief at its start commit. Hindsight recall (the share of ten issues that reviews later found which the plan foresaw, judged per issue): opus 0.46, sonnet 0.48, within noise (sd 0.12 and 0.10). Blind pairwise judging, each pair in both orders by an opus judge: opus 7, sonnet 4, 1 tie; each milestone but one went to opus. Opus plans more often carried the `blocked-by:` column (9 of 12 against 3 of 12) and a red-test column per lane (4 of 12 against 1 of 12). Cost per plan $2.39 against $0.84. Decision: **the architect stays on opus.** A plan's misses show up only in the build, and the head-to-head and the plan structure favour opus; the $1.55 a plan is small against one wasted lane. Open item for the next retro: only 3 of 24 plans used the exact lane-table header the `slice-the-plan` skill asks for (all three opus), so the skill's table is not landing; the eval case passes because it checks a looser shape.
+
+**Fixer, first-try fixes.** Five past findings with known fix commits, three runs per model each (30 runs), each graded by the real fix's held-back test and a root-cause check against the fix commit. True cause fixed and the proving check passed: opus 9 of 15, sonnet 6 of 15 (sonnet's first-try pass was 7 of 15, one of which fixed the symptom). The gap is in findings about what the code does: on a finding whose review prescribed the wrong fix (a seed edit, where the engine was the cause), opus fixed the engine 3 of 3 and sonnet followed the prescription 0 of 3, a failure the gate cannot see when the prescribed check passes. On copy and naming findings (duplicate i18n keys, a banned term on a surface) the two passed at the same rate and sonnet cost about a fifth. Cost per run $1.43 against $0.35. Both models sometimes turned a ruling test green by adding an exception or editing the rule instead of fixing the code (opus 3 runs, sonnet 2). Decisions: **the combined table gains a Kind column (`behavior` or `surface`); a `behavior` row's fixer runs on opus from the first attempt, a `surface` row on sonnet with the 0.5.2 step-up**; and an exception, allow-list or baseline entry, or narrowed rule added to a ruling test is not a fix without the architect's sign-off, which the reviewer checks on re-verify (the loop page, Limits on fixing).
+
+Limits: four milestones and five findings from one app, three runs a cell; the recall measure is coarse and the judges are models. Re-run when the models change (When to re-test).
 
 ## Judgment roles (0.6.0)
 
