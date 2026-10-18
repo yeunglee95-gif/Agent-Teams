@@ -4,13 +4,14 @@ This team copies no outside skill. The one skill in `skills/` (`design-handoff`)
 
 ## Referenced, not copied
 
-Each skill below is synced to Jase's account (in a session it is listed as `anthropic-skills:<name>`) and preloaded by plain name in the role's `skills:` list. The version, license and author columns say exactly what the synced files show, read on 2026-10-10; nothing is filled in from elsewhere.
+Each skill below is synced to Jase's account (in a session it is listed as `anthropic-skills:<name>`) and preloaded by plain name in the role's `skills:` list. The version, license and author columns say exactly what the synced files show, read on 2026-10-10 (frontend-design on 2026-10-18); nothing is filled in from elsewhere.
 
 | Skill | Where it lives | Version, license and author as found | Role | What for |
 |---|---|---|---|---|
 | impeccable | Jase's account skills (`anthropic-skills:impeccable`) | `version: '4.1.1'` in the frontmatter; no license or author field in `SKILL.md`; two detector scripts (`scripts/detector/detect-antipatterns.mjs` and `scripts/detector/detect-antipatterns-browser.js`) carry "Copyright (c) 2026 Paul Bakaus" and "SPDX-License-Identifier: Apache-2.0" headers | designer; design-auditor | designer: `shape` mode and craft guidance; design-auditor: `audit` mode only (craft, tokens, designed versus built) |
 | ui-ux-pro-max | Jase's account skills (`anthropic-skills:ui-ux-pro-max`) | no license or version found in the synced files | designer; design-auditor | designer: palettes, font pairings, stack guidance; design-auditor: WCAG 2.2 accessibility checks only |
 | design-system | Jase's account skills (`anthropic-skills:design-system`) | `license: MIT`; `metadata.author: claudekit`; `metadata.version: "1.0.0"` | designer | three-layer tokens (primitive, semantic, component), day and night, component state tables |
+| frontend-design | Jase's account skills (`anthropic-skills:frontend-design`) | `license: Complete terms in LICENSE.txt`; `LICENSE.txt` is the Apache License 2.0; no version or author field (read on 2026-10-18) | designer | the two-pass plan (palette, type, layout, principles reviewed against the brief) for marketing pieces; its list of generated-look defaults as a self-check on every screen; never the app's fonts, palette or radius |
 | emil-design-eng | Jase's account skills (`anthropic-skills:emil-design-eng`) | no license or version found in the synced files (one file, `SKILL.md`; its description names Emil Kowalski's design philosophy, not an author or license) | design-auditor | motion and interaction checks only |
 
 Why they are referenced and not copied: impeccable is 153 files (3.6 MB) and runs its own node scripts; ui-ux-pro-max is 73 files (3.9 MB) with search data and scripts; emil-design-eng shows no license, so it cannot be copied. A role whose skill does not load works from its own text: the designer from the `design-handoff` skill and the app's design system, the design-auditor from the core checklist in its role file.

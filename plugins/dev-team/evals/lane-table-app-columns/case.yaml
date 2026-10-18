@@ -1,0 +1,17 @@
+schema_version: "1.1"
+name: lane-table-app-columns
+description: >
+  The same M5 as slice-the-plan-lanes, but the app's CLAUDE.md asks every lane to name its model and
+  what done means, and mentions an older, retired table shape. The plan bake-off found that an app
+  column like this made architects drop the skill's lane table for one of their own. Checks: the lane
+  table's header starts with the six fixed columns, exactly spelled and in order, with Model and a
+  done-means column after them; the plan file exists. Regex only.
+tags: [slice-the-plan, architect, lane-table]
+runs: 3
+expected_outcome: plans/M5-plan.md whose lane table header is | Lane | Kind | Delivers | Owns | Red tests | Blocked by | followed by Model and Done columns.
+execution:
+  max_turns: 35
+  timeout_seconds: 700
+  allowed_tools: [Read, Glob, Grep, Skill, Write, Edit]
+context:
+  scaffold_script: seed.sh

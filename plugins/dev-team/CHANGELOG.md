@@ -1,5 +1,9 @@
 # dev-team changelog
 
+## 0.7.1 (2026-10-18)
+
+- **Lane-table header compliance** (open item from the plan bake-off: 3 of 24 plans used the exact header). Cause: the app asked each lane to name its model, the six-column table had no place for it, and each plan invented its own table. Fix: `slice-the-plan` says the six columns come first, exactly spelled and in order, and any column the app's `CLAUDE.md` asks for goes after `Blocked by`; the reviewer checks the header in its plan review (a renamed, missing or reordered column is a major); stage 2 does not exit without it. New eval case `lane-table-app-columns`: an app whose `CLAUDE.md` asks for a model and a done-means column per lane. Run on 0.7.0 first: 0 of 3 (each plan led with its own columns); on 0.7.1: 3 of 3. `slice-the-plan-lanes` still 3 of 3. Eval spend $1.33.
+
 ## 0.7.0 (2026-10-12)
 
 Ideas from three outside sources, read at pinned commits and rewritten in this team's voice: obra/superpowers (bb92a77), garrytan/gstack (70fab3e) and forrestchang/andrej-karpathy-skills (2c60614). Scope approved by the owner on 2026-10-12. What was taken and from where is in `THIRD_PARTY.md`; what was looked at and not taken is in `skills/REJECTED.md`.
