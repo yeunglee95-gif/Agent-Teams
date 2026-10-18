@@ -12,7 +12,7 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 |---|---|---|---|---|
 | 0 | Intake | the owner, or a finding from Watch (stage 14) | the owner moves the item from the backlog to ready; nothing else does | Plan |
 | 1 | Grill the plan | architect, `grill-the-plan` | the owner confirms no open decision is left | Plan |
-| 2 | Plan and slice | architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan | the owner approves the breakdown; every reviewer plan finding answered | Plan |
+| 2 | Plan and slice | architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan | the owner approves the breakdown; every reviewer plan finding answered; the plan's lane table header starts with the six fixed columns (`slice-the-plan`) | Plan |
 | 3 | Design | the design team's designer, `design-handoff`: screens, states, tokens used and acceptance notes per screen, extending the app's design system | the owner approves the design hand-off | Plan |
 | 4 | Pre-flight per lane | each lane owner, with the checklist below; the milestone's claim row written first (Sessions) | each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane | Build |
 | 5 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane; a lane that builds a designed screen builds to the hand-off | the lane's named red tests are green in a gate the lane ran | Build |

@@ -13,7 +13,7 @@
     {
       "name": "design-team",
       "source": "./plugins/design-team",
-      "description": "The shared design team: a designer who extends the app's design system and writes the hand-off the dev team builds from, and a read-only design-auditor who checks the build against it. Four design skills on the owner's account are referenced, not copied."
+      "description": "The shared design team: a designer who extends the app's design system and writes the hand-off the dev team builds from, and a read-only design-auditor who checks the build against it. Five design skills on the owner's account are referenced, not copied."
     }
   ]
 }

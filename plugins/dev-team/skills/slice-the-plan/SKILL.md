@@ -38,6 +38,8 @@ The plan also holds one lane table, beside any prose, because the owner, the boa
 | N1 | slice | S5.1 add a note | `src/db/notes.ts`, `src/api/notes.ts`, `src/ui/NoteEditor.tsx` | `tests/notes.test.ts` > "adds a note" | none |
 ```
 
+The six columns come first, spelled exactly as above and in this order, even where the app's older plans used another table. A column the app's `CLAUDE.md` asks for (the model a lane runs on, what done means, an estimate) goes after `Blocked by`, never instead of one of the six, between them or under another name. Before the owner check, confirm the header line starts `| Lane | Kind | Delivers | Owns | Red tests | Blocked by |`.
+
 One row per lane, never a row for a group of lanes. Kind is `slice`, `expand`, `migrate` or `contract`. Owns lists file paths. Red tests are `file > test name` entries. Blocked by lists lane ids, or `none`.
 
 Every lane delivers behavior and starts from at least one red test. Two kinds of work are not lanes: the contract change (the architect's contracts step, done in one commit before the lanes start) and the final full gate (the gate-runner's stage after the lanes). Put them in the plan as those steps, under their own heading, not as lanes or table rows; no lane lists a contract file among the files it owns.
