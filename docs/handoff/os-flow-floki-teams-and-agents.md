@@ -129,13 +129,16 @@ Install counts on a registry are not quality; every skill gets the same read.
 |---|---|---|
 | **Floki: draft and change** | n8n-io/skills (Apache-2.0) `n8n-workflow-lifecycle-official` (plan stage) and `n8n-error-handling-official` ("Non-negotiables", "When error handling can be looser"); czlonkowski/n8n-skills (MIT) `n8n-workflow-patterns` ("The 6 Core Patterns") | Archetype skeletons for drafts; error paths by default in unattended flows |
 | **Floki: doctor** | n8n-io `references/REVIEW_CHECKLIST.md` (must, should, nice tiers; "Cross-cutting first"); czlonkowski `n8n-validation-expert/FALSE_POSITIVES.md`; n8n-io `n8n-loops-official` (no-cap loop rule only); `n8n-subworkflows-official` ("When NOT to extract") | Severity tiers and when not to flag |
+| **Floki: doctor, agent flows** | affaan-m/ecc (MIT) `skills/agent-architecture-audit` (12-layer failure table, evidence phase); `skills/loop-design-check` (a machine-checkable goal with a must-not boundary; "Action 2", five ways a loop fails) | Checks for flows that contain agents and loops, not only plain steps |
 | **Floki: tool suggestions** | anthropics/skills (Apache-2.0) `claude-api` `shared/prompt-audit.md` (tool descriptions); `mcp-builder` `reference/mcp_best_practices.md` ("Tool Design") | A rubric for a good tool and its description |
 | **Architect team: interview** | n8n-io lifecycle plan stage; the interview structure of anthropics `doc-coauthoring` (no license file: idea only); the dev team's `grill-the-plan` | Intent, audience and constraints first; a gap check before drafting |
 | **Agent building (Architect, Team designer)** | n8n-io `n8n-agents-official` ("Agent, workflow, or AI Agent node?"), `n8n-ai-nodes-official` (`SYSTEM_PROMPT.md`, `TOOLS.md`, `HUMAN_REVIEW.md`, approvals with real values) | When a step needs an agent; what goes in instructions versus a tool description; approvals that show real values |
 | **Team designer** | wshobson/agents (MIT) `team-composition-patterns` ("Custom Team Guidelines", sizing); anthropics `claude-api` multi-agent "When to use it"; anthropics `skill-creator` (writing skills, with evals) | Smallest team, one lead, no overlapping roles, full context handed to each member; skill authoring |
-| **Business consultant** | anthropics `discernment-nudge` (follow-up questions tied to specific claims) | Needs a skill written from Jase's own consulting method; nothing strong found |
-| **Knowledge architect** | Not yet searched | Section 11 |
-| **Business teams** | To be sourced per preset | Section 9 |
+| **Business consultant** | anthropics `discernment-nudge` (follow-up questions tied to specific claims) | Needs a skill written from Jase's own consulting method; ECC's `product-lens` Mode 1 (seven diagnostic questions with an anti-goal) and `council` are the closest outside material |
+| **Knowledge architect** | affaan-m/ecc (MIT) `skills/living-docs-governance` (four document roles, one owner per fact, a delete-zone, linked docs treated as untrusted evidence); `agents/rag-pipeline-reviewer.md` (retrieval eval policy: baseline, thresholds, query slices) | Structure and freshness; how to test retrieval. A dedicated search is still due (section 11) |
+| **Business teams: approvals** | affaan-m/ecc (MIT) `skills/operator-approval-loop`, without its timed auto-approval | An approval tied to a hash of the exact draft, so a changed draft needs a new approval; a receipt per send |
+| **Business teams** | To be sourced per preset; for ecommerce, affaan-m/ecc (MIT) `returns-reverse-logistics`, `inventory-demand-planning`, `marketing-campaign`, `customer-billing-ops` as seeds after a domain check | Section 9 |
+| **Team designer: skill evals** | affaan-m/ecc (MIT) `skills/skill-comply` (the method only: a skill tested under supportive, neutral and competing prompts) | How a new skill is shown to work before it ships |
 
 ## 9. Industry presets
 
@@ -174,7 +177,7 @@ Jase's own businesses are the first presets to build and test against: two ecomm
 
 ## 11. Open questions for Jase
 
-- **Knowledge architect skills:** no search done yet (RAG, knowledge-base structure, taxonomy, retrieval evaluation).
+- **Knowledge architect skills:** ECC gives structure and retrieval-eval policy; a dedicated search (RAG, knowledge-base structure, taxonomy) is still due.
 - **Business consultant:** your own consulting method is the best source; a short interview with you could seed its skill.
 - **Which presets first:** your two ecommerce businesses and the B2B service business, or a general set?
 - **Hosting run mode:** the Agent SDKs need a full server process; OS Flow's AI endpoints run on Cloudflare Pages Functions, which cannot host them. Where the run adapters live (the existing bridge, a container service) is not verified here.
@@ -185,4 +188,5 @@ Jase's own businesses are the first presets to build and test against: two ecomm
 - OS Flow code and specs at the time of writing: `app/src/domain/aiEdit/*.ts`, `app/functions/ai/_lib/*.ts`, `flokiRoute.ts`, `app/bridge/claude.ts`, spec 11, 12, 13 §6.6, 15 §1 and §4, the M3C gauntlet reviews.
 - Anthropic Claude API reference (Agent Skills on the Messages API with the code-execution container; the Claude Agent SDK as Claude Code's harness), read 2026-10-18.
 - OpenAI: "Skills" guide (developers.openai.com/api/docs/guides/tools-skills) and the Agents SDK sandbox Skills capability (openai.github.io/openai-agents-python/ref/sandbox/capabilities/skills/), read 2026-10-19.
+- ECC (affaan-m/ecc, MIT, 76aaa77): 311 skills in `skills/` (the 1,062 SKILL.md count includes translations and harness copies); about a third worth adapting. Not taken: its hooks (on by default when installed as a plugin), session observation and self-evolving skills, auto-update to latest, timed auto-approval, the merge queue that pushes main, and the boilerplate prompt block in every agent.
 - Skill candidates read at: n8n-io/skills 27b6b9f (Apache-2.0), czlonkowski/n8n-skills c640094 (MIT), anthropics/skills dbd4588, wshobson/agents (MIT).
