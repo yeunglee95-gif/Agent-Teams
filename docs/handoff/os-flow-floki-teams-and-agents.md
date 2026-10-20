@@ -1,6 +1,6 @@
 # Floki, teams and agents
 
-_From the Agent Teams session, draft 3, 2026-10-21, at Jase's request. It extends spec 11 (AI Edit), spec 12 (Ask AI), spec 13 (Run agent teams), spec 15 (Start a build), spec 16 (Team room) and the M5 row of spec 01 (AI teammates, a-132). OS Flow's session owns where it lands, its numbering and its milestone order. Nothing here is built. Section 16 lists what Jase still has to decide._
+_From the Agent Teams session, draft 4, 2026-10-21, at Jase's request. It extends spec 11 (AI Edit), spec 12 (Ask AI), spec 13 (Run agent teams), spec 15 (Start a build), spec 16 (Team room) and the M5 row of spec 01 (AI teammates, a-132). OS Flow's session owns where it lands, its numbering and its milestone order. Nothing here is built. Section 16 lists what Jase still has to decide._
 
 ## 1. Abstract
 
@@ -17,7 +17,8 @@ Floki is the AI teammate every business gets built in: its front door, its flow 
 | 2026-10-18 | Floki is the front door and owns quick jobs; long jobs go to specialists behind him; live routing belongs to the flows and the run engine | Jase agreed |
 | 2026-10-19 | AI teammates are M5's first item: a person's own AI is added to a business like a person, with an AI badge, permissions picked from read, draft, edit and run, and a revocable token per business; it connects through OS Flow's MCP server on its own subscription and never counts as a person on a gate (a-132) | OS Flow MEMORY |
 | 2026-10-19 | One door for AI: Floki and the MCP server act through one list of OS Flow actions, so permissions, audit and the gate rule are enforced once | OS Flow MEMORY |
-| 2026-10-20 | Floki builds tools inside OS Flow (small ones from a chat on a block) and plugins (larger interactive apps that connect to outside services such as Higgsfield or kie.ai) | Jase |
+| 2026-10-20 | Floki builds tools inside OS Flow (small ones from a chat on a block) and apps (larger interactive pieces that connect to outside services such as Higgsfield or kie.ai) | Jase |
+| 2026-10-21 | "Plugin" is renamed **App** (a-064's term replaced); a Website team runs a loop that improves the site from analytics; Floki's chat gets an effort control and voice input | Jase |
 | 2026-10-20 | More default teams; a service-business preset that covers what Salesforce covers; a Knowledge architect and a Business consultant built from research, not only from Jase's view | Jase |
 | standing | Floki never decides a gate; he starts, pauses or stops runs only behind a confirm card; his edits are drafts | spec 13 §6.6 |
 | standing | The owner approves every merge, send, spend and publish | spec 16, Agent-Teams |
@@ -49,7 +50,7 @@ Rules that follow:
 | **Tool** | One action a block calls, through a connector or inside OS Flow | Floki, from a block | "Create invoice in Xero" |
 | **Widget** | One piece of the fixed kit: number, list, table, chart, form field, button, note, file drop, approval card | OS Flow | |
 | **Interface** (was "in-app tool") | Widgets composed into a screen on a block, a desk task or a home section; stored as a declarative spec (data, never code). Built by asking Floki in a chat on the block | Floki, in design mode | An approval card showing the draft and its numbers; an intake form; a results table |
-| **App** (a-064 calls this **Plugin**; renaming proposed) | Installable code that adds its own screens and blocks, built on connectors and skills under one contract; its block opens into its own flow like a subflow. Made by OS Flow, by a business for itself, or by someone else and shared | OS Flow's app builder team (section 4), a business's own builder, or an outside developer; installed only on the owner's approval | An AI video or image editor on Higgsfield or kie.ai; Coldmail |
+| **App** (was **Plugin** in a-064; renamed 2026-10-21) | Installable code that adds its own screens and blocks, built on connectors and skills under one contract; its block opens into its own flow like a subflow. Made by OS Flow, by a business for itself, or by someone else and shared | OS Flow's app builder team (section 4), a business's own builder, or an outside developer; installed only on the owner's approval | An AI video or image editor on Higgsfield or kie.ai; Coldmail |
 | **Team template** | A packaged team (lead, members, skills, way of working) from the catalog, which a business adds and edits | Team designer; vetted catalog | The Sales team template |
 | **Skill** | Reusable know-how an agent loads when a task calls for it: a SKILL.md folder (section 9) | Team designer; vetted catalog | "Short-form video hooks" |
 | **Knowledge (brain)** | What agents can look up: sources, structure, retrieval, freshness | Knowledge architect | Product catalog, brand voice, past proposals |
@@ -131,7 +132,7 @@ Why share the definition: one place to improve a skill; the agent that designed 
 | **Keep the business's memory** | Planned (a-088, a-092, a-093) | Floki.md (identity, standing rules, current state) and a memory folder per business; decisions committed to the memory files, through the person's harness first, with guards |
 | **Prepare desk tasks** | Planned (2026-10-12) | Prepares approvals, replies, documents to sign or check on Your desk; the person presses send or sign |
 | **Find** | Planned (VISION 2026-10-12) | Search first, then a cited answer, filtered by the asker's access, never revealing that hidden things exist |
-| **Chat like Claude** | Planned (2026-10-18) | Attach images and files; see the context in use and the usage; reach every file built in the thread |
+| **Chat like Claude** | Planned (2026-10-18; additions 2026-10-21) | Attach images and files; see the context in use and the usage; reach every file built in the thread; an effort control (quick, standard, deep) that sets how hard Floki thinks and is shown with its cost; voice input (speak a request, see it transcribed before it is sent); the model in use shown, with the business's allowed choices |
 | **In rooms** | Planned (2026-10-17) | Floki is private per person; @Floki in a team room answers or runs, never builds; flows are built in Floki, published into a room and run there |
 
 **Routing.** Today `flokiRoute.ts` routes by regex, and its misroute was the M3c release hold (R6-E-1). The router becomes a small classifier call that returns one of change, ask, doctor, build interface, app brief, or hand off to a named specialist, with its reason shown on a handoff. A mode the person selected always wins over the classifier.
@@ -193,6 +194,14 @@ Partly. A brought AI teammate can take tasks in a flow (its permissions allow ru
 1. **Availability.** A teammate on a laptop is offline when the laptop sleeps. A cloud session (Claude Code on the web, Codex cloud) is not tied to a laptop, but it still has to be started or scheduled by its owner.
 2. **Anthropic's terms for subscriptions.** Anthropic's Claude Code legal page (read 2026-10-21) says subscription sign-in "is designed to support ordinary use of Claude Code", that Pro and Max limits "assume ordinary, individual usage", and that developers building products, including with the Agent SDK, "should use API key authentication". It does not permit a product "to route requests through Free, Pro, or Max plan credentials on behalf of their users", or to "collect, store, or intermediate Claude.ai credentials or session tokens". It does allow a platform to host the unmodified Claude Code binary where each end user signs in with their own subscription, under Anthropic's Commercial Terms. So: a person's own Claude Code doing their share of a team's work is fine; a business's always-on production flows running on one person's Max plan is not ordinary individual use; and OS Flow must never store a person's Claude sign-in token on its servers.
 3. **Responsibility.** A business's production flows should not stop because one member's subscription lapses, hits a limit or leaves the business.
+
+**Running while a laptop sleeps, without OS Flow's API credits.** Three ways:
+
+| Way | Where it runs | Paid by | Limits |
+|---|---|---|---|
+| **The business's own API key** in OS Flow's hosted runner | OS Flow's hosted runner (R2, option B) | The business, directly to Anthropic or OpenAI | None beyond the provider's rate limits; the cleanest path for production |
+| **The teammate's own cloud**: Claude Code on the web with a scheduled routine, or Codex cloud tasks, pulling assigned tasks from OS Flow through its MCP server | The AI vendor's cloud | The teammate's subscription | Subscription limits assume ordinary, individual use; the teammate sets up the schedule; good for a person's share of the work, not a whole business's flows |
+| **An always-on box**: the packaged bridge on a mini PC (the OS Flow Station brief, 2026-10-19) | The business's own hardware | The owner's subscription or API key | Same terms as the bridge; the Station brief recommends confirming with Anthropic sales first |
 
 **So:** OS Flow hosts its own agents for production runs (R2, then option B), billed by API key in the business's credits, the same shape as Kylon. AI teammates do assigned work on their owners' accounts, and a business with no hosted credits can still run its flows through teammates and its own bridge, with the limits above shown in Run settings. The existing bridge's plan mode (`claude -p` with a subscription token) stays on the person's own machine only, run by that person; check it against these terms before it is offered to teams.
 
@@ -273,6 +282,7 @@ Every team and agent exists once in a catalog; a preset is a selection. Onboardi
 | **Sales** | Sales lead | Inbound qualifier (speed to lead), Discovery and call prep, Proposal and SOW writer, Contract reviewer | KWP `small-business/speed-to-lead`, `proposal-builder`, `contract-review`, `sales/call-prep`; mbfinotti `sales-discovery-questions` |
 | **Delivery** (services) | Delivery manager | Onboarding lead, Project manager (status reports, change requests), Resource and time planner | mbfinotti/revops-skills@2dedb39 (MIT) `sales-to-cs-handoff`; KWP `operations` status report, change request, capacity plan. **Gap:** client onboarding, weekly status, scope change, utilisation and retainer burn-down need skills written for OS Flow |
 | **Client success** | Account manager | Support and ticket triage, Health and renewals, Reviews and advocacy, Knowledge base writer | KWP `sales/account-plan`, `renewal-radar`, `customer-health`, `customer-support/ticket-triage`, `kb-article`, `small-business/review-reputation`, `ticket-deflector` |
+| **Website** | Conversion strategist | Analytics analyst (PostHog, Microsoft Clarity, GA), Web designer (works with the design team), Web developer (ships changes through the site's own builder or the dev team), Copywriter (shared with Marketing) | coreyhaines31 `cro`, `page-cro`, `signup-flow-cro`, `ab-testing`, `analytics`, `conversion-tracking`, `site-architecture`; PostHog's own skills for instrumentation (license to check); the design team's `frontend-design`; the dev team for code changes |
 | **Store operations** (ecommerce) | Operations lead | Catalog manager, Inventory planner, Returns and fulfilment | KWP `small-business/inventory-planner`, `restock`; ecc `returns-reverse-logistics`, `inventory-demand-planning` (after a domain check) |
 | **Customer support** (ecommerce) | Support lead | Support agent (replies drafted, sent at a gate), Returns desk | KWP `customer-support/*`, `ticket-deflector` |
 | **Finance** | Finance ops | Invoicing, Collections, Bills, Cash and P&L reporter, Tax prep | KWP `small-business/invoice-chase`, `pay-the-bills`, `cash-flow-snapshot`, `close-month`, `tax-prep`; KWP `finance/variance-analysis` |
@@ -282,15 +292,28 @@ Every team and agent exists once in a catalog; a preset is a selection. Onboardi
 
 The strongest single source is anthropics/knowledge-work-plugins' `small-business` plugin (44 skills, Apache-2.0): every send is drafted and waits for approval, with no auto-send mode, which matches OS Flow's gates. Its skills share voice and style files, so it is used as a unit, unmodified, on the "used as published" track (9.4). It is one plugin for a business owner (44 skills and a router across functions), not split into teams; the same repo's role plugins (sales, marketing, customer support, finance, legal, human resources, operations, product management, data, design, engineering, productivity, enterprise search) are split by function and map to OS Flow's teams. The small-business plugin has changed four times since June 2026 (launched 2026-09-15); most of the repo's frequent commits are version bumps of partner plugins, so updates are steady but not weekly. Not taken: deanpeters' finance and pricing skills (CC BY-NC-SA, non-commercial), ecc `lead-intelligence` (browser control of LinkedIn, terms-of-service risk), alirezarezvani `customer-success-manager` (SaaS scoring scripts).
 
+**The Website team's improvement loop.** A flow, run weekly, built to the dev team's loop rules (a goal a machine can check, a boundary, an independent judge, a person flips done):
+
+1. The Analytics analyst reads the week's numbers (conversion by page and step, drop-offs, rage clicks and dead clicks from Clarity, session recordings flagged by PostHog) and names the biggest leak, with evidence.
+2. The Conversion strategist writes one hypothesis and one change, with the metric it should move and by how much.
+3. The Web designer and Copywriter prepare the change; the Web developer builds it behind a test (an A/B split or a staged rollout).
+4. **Gate:** the owner approves the change before it goes live.
+5. The test runs for a fixed time or sample size set in advance; the analytics decide, not the team that made the change.
+6. **Gate:** the owner keeps or reverts the change. Every change and result is logged, so the next round starts from what was learned.
+
+Boundaries the loop never crosses on its own: no change goes live without the owner's approval; no dark patterns (fake scarcity, hidden costs, pre-ticked boxes); no change to tracking or consent banners without the owner; no price change (that is the Business consultant's and the owner's call).
+
+**Why its own team, not inside Creative studio or Marketing.** Creative studio makes assets (video, images, ads); Marketing brings people to the site; the Website team owns what happens once they arrive, measured by conversion. It borrows from both: the Copywriter from Marketing, assets from Creative studio, and engineering from the dev team.
+
 ### 11.3 Presets
 
 | Preset | Teams |
 |---|---|
 | **General (any business)** | Marketing, Sales, Client success, Finance, Ops |
-| **Service and consulting** | Growth, Marketing, Sales, Delivery, Client success, Finance, Ops |
-| **Ecommerce, direct to consumer** | Marketing, Creative studio, Store operations, Customer support, Finance, Ops |
+| **Service and consulting** | Growth, Marketing, Website, Sales, Delivery, Client success, Finance, Ops |
+| **Ecommerce, direct to consumer** | Marketing, Creative studio, Website, Store operations, Customer support, Finance, Ops |
 | **Ecommerce, wholesale / B2B** | The direct-to-consumer set plus Growth and Sales |
-| **Software product** | Product and engineering, Marketing, Sales, Client success, Finance, Ops |
+| **Software product** | Product and engineering, Marketing, Website, Sales, Client success, Finance, Ops |
 | **Freelancer or consultant (one person)** | One team, "My business": a lead plus Prospector, Proposal writer, Project manager, Invoicing and collections, Content writer |
 | **Creator** | Creative studio, Marketing (social and newsletter), Finance (light), a Partnerships agent for brand deals |
 | **Personal** | One team, "My day": Inbox manager, Calendar and errands, Personal finance, Research and learning |
@@ -360,7 +383,7 @@ From the reviews behind this spec: ECC's hooks (on by default when installed as 
 
 - **Hosting:** keep Managed Agents first and add the Cloudflare sandbox runner after it (section 8.4)? Its price and alpha status need checking first.
 - **Interview:** the Business consultant's first run is an interview with Jase (twelve questions, per business), and Jase's numbers stay in his businesses, never in the catalog.
-- **Apps:** confirm the rename from "plugin" (a-064); who may install an app a person built in one business into another; whether apps can be shared to the app store with the same three tiers as skills (private, shared, verified).
+- **Apps:** who may install an app a person built in one business into another; whether apps can be shared to the app store with the same three tiers as skills (private, shared, verified).
 - **Brought AI teammates as team members:** may a brought AI hold a member role in a team's run-mode work (assigned tasks), or only design-mode help?
 
 ## 17. Sources
