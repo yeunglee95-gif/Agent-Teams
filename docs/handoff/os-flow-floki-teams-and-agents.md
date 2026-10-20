@@ -1,59 +1,81 @@
 # Floki, teams and agents
 
-_From the Agent Teams session, 2026-10-19, at Jase's request. A draft for OS Flow: it extends spec 11 (AI Edit), spec 12 (Ask AI), spec 13 (Run agent teams), spec 15 (Start a build) and spec 16 (Team room). OS Flow's session owns where it lands, its numbering and its milestone order. Nothing here is built. Section 11 lists what Jase still has to decide._
+_From the Agent Teams session, draft 2, 2026-10-20, at Jase's request. It extends spec 11 (AI Edit), spec 12 (Ask AI), spec 13 (Run agent teams), spec 15 (Start a build), spec 16 (Team room) and the M5 row of spec 01 (AI teammates, a-132). OS Flow's session owns where it lands, its numbering and its milestone order. Nothing here is built. Section 16 lists what Jase still has to decide._
 
 ## 1. Abstract
 
-Floki is the front door to OS Flow and its flow engineer. He does the frequent, quick jobs himself (edit a flow, answer about it, check its structure) and hands long jobs to specialist agents behind him. Every agent, Floki included, works in one of two modes: **design mode** (proposes changes in the app; acts on nothing) and **run mode** (does business work inside a flow, with only the tools that flow grants). Live work is routed between teams by the flows' own rules, run by the run engine, never by a model's judgment. Skills are standard SKILL.md folders (the open Agent Skills format), so one skill works in Floki, in agents running on Claude or OpenAI, and in Claude Code. A business picks an industry and answers a few questions; a preset of default teams appears, drawn from one catalog, each team editable and forkable.
+Floki is the AI teammate every business gets built in: its front door, its flow engineer and its builder of in-app tools. He does the frequent, quick jobs himself (edit a flow, answer about it, check its structure, build a small tool on a block) and hands long jobs to specialist teams behind him (build a whole flow from a goal, design the business's brain, design teams and skills, review the business, build a plugin). A person can also add their own AI (Claude Code, Codex, any MCP client) to a business like a teammate; it acts through the same list of actions Floki uses. Every agent works in one of two modes: **design mode** (proposes changes in the app; acts on nothing) and **run mode** (does business work inside a flow, with only what that flow grants). Live work is routed between teams by the flows' own rules, run by the run engine, never by a model's judgment. Skills are standard SKILL.md folders, so one skill works in Floki, in agents running on Claude or OpenAI, and in Claude Code. A business picks an industry and answers a few questions; a preset of default teams appears from one catalog, each team editable and forkable.
 
 ## 2. Decisions carried in
 
 | Date | Decision | Source |
 |---|---|---|
+| 2026-10-11 | Connector: access to an outside service, no screens. Skill: know-how. Plugin: a bundle that adds screens and blocks, built on connectors and skills. Tool: one action a block calls (a-064). A plugin's block opens into its own flow like a subflow; Coldmail is the first plugin (a-063) | OS Flow MEMORY |
+| 2026-10-12 | Floki composes business-home sections only from a fixed widget kit, stored as a declarative spec (data, never code) | OS Flow VISION 2026-10-12 |
+| 2026-10-17 | Bring-your-own agents (a teammate's Claude Code or Codex) join rooms as members through the agent API | OS Flow MEMORY |
 | 2026-10-18 | Floki is "the expert of creating workflow, diagnosing, building agentflow"; skills are defined before any are installed | Jase |
-| 2026-10-18 | Floki is the front door and owns quick jobs; long jobs go to specialists behind him; live routing between teams belongs to the flows and the run engine, not to Floki | Jase agreed to the recommendation, with the build/run question below |
-| 2026-10-19 | Teams, agents and sub-agents are defined in one table (section 3); a team has one lead | Jase asked; this draft proposes |
-| 2026-10-19 | Industry presets of default teams, built from one catalog and from vetted outside skills | Jase |
-| 2026-10-19 | Skills: a loader inside Floki; the Agent SDK for run mode; one SKILL.md library for both (section 7) | Jase agreed to draft it this way |
-| standing | Floki never decides a gate and only starts, pauses or stops runs behind a confirm card; his edits are drafts | spec 13 §6.6 |
+| 2026-10-18 | Floki is the front door and owns quick jobs; long jobs go to specialists behind him; live routing belongs to the flows and the run engine | Jase agreed |
+| 2026-10-19 | AI teammates are M5's first item: a person's own AI is added to a business like a person, with an AI badge, permissions picked from read, draft, edit and run, and a revocable token per business; it connects through OS Flow's MCP server on its own subscription and never counts as a person on a gate (a-132) | OS Flow MEMORY |
+| 2026-10-19 | One door for AI: Floki and the MCP server act through one list of OS Flow actions, so permissions, audit and the gate rule are enforced once | OS Flow MEMORY |
+| 2026-10-20 | Floki builds tools inside OS Flow (small ones from a chat on a block) and plugins (larger interactive apps that connect to outside services such as Higgsfield or kie.ai) | Jase |
+| 2026-10-20 | More default teams; a service-business preset that covers what Salesforce covers; a Knowledge architect and a Business consultant built from research, not only from Jase's view | Jase |
+| standing | Floki never decides a gate; he starts, pauses or stops runs only behind a confirm card; his edits are drafts | spec 13 §6.6 |
 | standing | The owner approves every merge, send, spend and publish | spec 16, Agent-Teams |
 
 ## 3. Definitions
 
+### 3.1 People, AIs and groups
+
 | Term | What it is | Example |
 |---|---|---|
-| **Floki** | OS Flow's own assistant: the front door and flow engineer. One per workspace; belongs to no team | "Add an approval before the email goes out" |
-| **Team** | A group with one purpose, one **lead**, shared knowledge and a default way of working (its factory, spec 16 addendum) | Marketing team |
-| **Agent** | One role with a job, a model, skills, tools and knowledge. It is either a team's **lead** (plans, assigns, combines) or a **member** (does one kind of work). Leads and members are both agents | Marketing strategist (lead); Video editor (member) |
-| **Sub-agent** | A temporary helper an agent starts for one task and drops when it is done. It has no standing identity, is not listed in the Team room and owns nothing | The video editor starts three helpers to cut three lengths of one clip |
-| **Skill** | A reusable know-how package an agent loads when a task calls for it: a SKILL.md folder (section 7) | "Short-form video hooks" |
-| **Tool / connector** | Access to an outside system, granted per flow | Shopify, Meta Ads, Gmail |
-| **Knowledge (brain)** | What agents can look up: sources, their structure and how they are retrieved | Product catalog, brand voice, past campaigns |
-| **Flow** | A defined process that runs agents and tools, with gates | "New product launch" |
-| **Gate** | A step where a person approves before the flow goes on | "Approve ad spend over $500" |
-| **Run** | One execution of a flow, pinned to the versions of everything it uses | Launch run #41 |
-| **Mode** | Design (in the app, proposes) or run (inside a flow, acts through granted tools) | Section 5 |
+| **Member** | Anyone with a seat in a business: a **person** or an **AI teammate** | Jase; Jase's Claude Code |
+| **Person** | A human member. Only a person can approve at a gate | A co-founder |
+| **AI teammate** | An AI added to a business like a person, with an AI badge and permissions from read, draft, edit and run. Two kinds: **Floki** (built in, one per business) and **brought AI** (a person's own Claude Code, Codex, Cursor or other MCP client, on its own subscription) | "Codex on Alice's laptop" |
+| **Team** | A group with one purpose, one **lead**, shared knowledge and a default way of working (its factory, spec 16 addendum). Its members can be agents, people and AI teammates | Marketing team |
+| **Agent** | One role with a job, a model, skills, tools and knowledge, run by OS Flow. Either a team's **lead** (plans, assigns, combines) or a **member** (one kind of work) | Marketing strategist (lead); Video editor (member) |
+| **Sub-agent** | A temporary helper an agent starts for one task and drops when done. No standing identity, not listed in the Team room, owns nothing | The video editor starts three helpers to cut three lengths |
 
-Two rules follow from the table:
-- **One lead per team.** Several orchestrators in one group produce competing plans. The lead plans and combines; members do the work.
-- **Members are standing; sub-agents are not.** A role someone will want to see, improve and reuse is a member. Spec 15's "crew" is a team in these terms; OS Flow should use one word, **team**.
+Rules that follow:
+- **One lead per team.** Several orchestrators in one group produce competing plans.
+- **Members are standing; sub-agents are not.** A role someone will want to see, improve and reuse is a member.
+- **An agent and an AI teammate differ in who runs them.** OS Flow runs an agent, with the model and skills its role names. A brought AI runs on its owner's machine and subscription and reaches OS Flow only through the action list (section 7).
+- Spec 15's "crew" is a team in these terms; OS Flow uses one word, **team**.
+
+### 3.2 What agents and people work with
+
+| Term | What it is | Who builds it | Example |
+|---|---|---|---|
+| **Connector** | Access to an outside service: a key, its data and its actions. No screens | Set up by a person; Floki can guide it | Shopify, Gmail, Higgsfield, kie.ai |
+| **Tool** | One action a block calls, through a connector or inside OS Flow | Floki, from a block | "Create invoice in Xero" |
+| **In-app tool** | A small interface or action built inside OS Flow, composed from a fixed widget kit and stored as a declarative spec (data, never code). Built by asking Floki in a chat on a block | Floki, in design mode | An approval card showing the draft and its numbers; a results table; a document check |
+| **Plugin** | A larger interactive app inside OS Flow that adds its own screens and blocks, built on connectors and skills under one contract; its block opens into its own flow like a subflow | Floki starts it; the plugin builder team (section 4) builds it as code, reviewed and approved | An AI video editor or image editor on Higgsfield or kie.ai; Coldmail |
+| **Skill** | Reusable know-how an agent loads when a task calls for it: a SKILL.md folder (section 9) | Team designer; vetted catalog | "Short-form video hooks" |
+| **Knowledge (brain)** | What agents can look up: sources, structure, retrieval, freshness | Knowledge architect | Product catalog, brand voice, past proposals |
+| **Flow** | A defined process that runs agents and tools, with gates | Floki, Architect team, people | "New client onboarding" |
+| **Gate** | A step where a person approves before the flow goes on | Part of a flow | "Approve the proposal before it is sent" |
+| **Run** | One execution of a flow, pinned to the versions of everything it uses | The run engine | Onboarding run #12 |
+| **Mode** | Design (in the app, proposes) or run (inside a flow, acts through granted tools) | Section 5 | |
+
+**In-app tool or plugin?** If it can be composed from the widget kit and needs no code (fields, tables, buttons, an approval card, a chart), it is an in-app tool, built in one Floki turn and previewed like any change. If it needs its own editor, live media, a canvas or custom logic (a video timeline, an image editor), it is a plugin: real code, built and reviewed like any other code, installed with an approval.
 
 ## 4. Who does what
 
 | Who | Design mode (in the app) | Run mode (inside flows) | Can act on the world | Decides gates |
 |---|---|---|---|---|
-| **Floki** | Edits flows (Change), answers about them (Ask), runs the structural Flow doctor, suggests tools, hands long jobs to specialists | Does no business work; may start, pause or stop runs behind a confirm card | No | Never |
+| **Floki** (built-in AI teammate) | Edits flows; answers about them; runs the structural Flow doctor; builds in-app tools from a block chat; composes business-home sections; starts a plugin brief; hands long jobs to specialists | Does no business work; starts, pauses or stops runs behind a confirm card | No | Never |
+| **Brought AI teammate** (Claude Code, Codex, any MCP client) | Whatever its permissions allow (read, draft, edit), through the same action list as Floki | Run, if granted: starts runs a person could start | Only through the action list | Never counts as a person |
 | **Architect team** (Interviewer lead, Researcher, Architect) | Builds a whole flow from a goal, after an interview; returns it as Floki change previews (spec 15) | No | No | No |
-| **Business consultant** | Reviews whether a flow serves the business goal: wrong process, missing step, a better route | Can run as a reviewer step inside a flow | No | No |
-| **Knowledge architect** | Designs the brain: sources, structure, retrieval, freshness rules | Runs upkeep flows (re-index, freshness checks) | Only through tools the flow grants | No |
-| **Team designer** | Creates teams, agents and skills in the Team room; sizes teams | No | No | No |
-| **Business teams** (marketing, sales, support, operations, by preset) | Suggest changes to their own team, which the owner approves | The main workers | Only through tools the flow grants | No |
+| **Knowledge architect** | Designs the brain: sources, structure, retrieval, freshness, access | Runs upkeep flows (re-index, freshness checks, retrieval evals) | Only through granted tools | No |
+| **Team designer** | Creates teams, agents and skills in the Team room; sizes teams; tests new skills | No | No | No |
+| **Business consultant** | Diagnoses the business: finds the one constraint holding back profit and the few changes that move it (section 12) | Runs as a scheduled review (weekly scorecard) | No | No |
+| **Plugin builder** (the dev team and design team, hosted) | Builds plugins from Floki's brief: design hand-off, code, tests, review | No | No; a plugin is installed only on the owner's approval | No |
+| **Business teams** (by preset, section 11) | Suggest changes to their own team, which the owner approves | The main workers | Only through tools the flow grants | No |
 | **Run engine** (code, not an agent) | None | Routes work between steps and teams by the flow's rules; executes granted tools | Yes, as the flow grants | No; it waits at every gate |
-| **The owner** | Approves every build and every change to a team | Approves at gates | Yes | Always |
+| **The owner and other people** | Approve every build, team change, plugin install | Approve at gates | Yes | Always |
 
-**The structural doctor and the business consultant are different jobs.** "Is the flow built right?" (dead ends, error paths, a gate nobody can approve, an uncapped loop, cost) is engineering and stays with Floki, after the free deterministic checks. "Does the flow serve the business?" is the consultant's.
+**The structural doctor and the business consultant are different jobs.** "Is the flow built right?" is Floki's. "Does the business make money, and what is holding it back?" is the consultant's.
 
-**Floki routes conversations; flows route work.** Handing a chat to a specialist is Floki's job. Moving live business work between teams is the flow's, so it is predictable and every decision is in the run's record.
+**Floki routes conversations; flows route work.**
 
 ## 5. Design mode and run mode
 
@@ -61,132 +83,236 @@ One agent definition (job, skills, knowledge, model, way of working) serves both
 
 | | Design mode | Run mode |
 |---|---|---|
-| Works on | Drafts of flows, teams, knowledge structure | Real tasks: leads, orders, posts, files |
-| Acts on the world | No; it proposes, and the owner applies | Yes, only through the tools the flow grants |
+| Works on | Drafts of flows, teams, tools, knowledge structure | Real tasks: leads, orders, posts, files |
+| Acts on the world | No; it proposes, and a person applies | Yes, only through the tools the flow grants |
 | Output | A change preview | Results, at gates |
 | Context | The canvas, specs, notes | The run's inputs and the knowledge it is pointed at |
 | Judged by | Whether the build is sound | Outcomes and cost per run |
-| Version | The latest draft | Pinned (`team@version/role`, spec 16 addendum §5); a run never changes mid-flight |
+| Version | The latest draft | Pinned (`team@version/role`); a run never changes mid-flight |
 
-**Why share the definition:** one place to improve a skill; the agent that designed a step knows how it behaves when it runs; a third as many definitions to keep.
-
-**Why separate the modes:** a design-mode agent with send or spend tools is one bad prompt from acting on a draft; runs must pin versions; build context is large and runs should be narrow; when something fails, the record must show whether the design or the run was wrong.
-
-**A third place to run:** building a new app outside OS Flow uses the same role definition in Claude Code (the dev-team plugin), with its own permissions there.
+Why share the definition: one place to improve a skill; the agent that designed a step knows how it runs; fewer definitions. Why separate the modes: safety (no send or spend tools near drafts), pinned runs, small run context, and a record that shows whether the design or the run was wrong. Building a new app outside OS Flow uses the same role in Claude Code (the dev-team plugin).
 
 ## 6. Floki's jobs
 
 | Job | Today (code) | Next |
 |---|---|---|
-| **Change**: turn a request into a change set; draft a whole flow on an empty canvas | `domain/aiEdit/editPrompt.ts`, `propose_changes` | Draft archetypes (section 8); error paths wired by default in unattended flows |
-| **Ask**: answer with cited blocks, at most one suggested change | `askPrompt.ts`, `answer_question` | Optional follow-up questions tied to specific claims |
-| **Flow doctor**: deterministic checks, then an AI review with findings and tool cards | `domain/flowDoctor/`, `doctorPrompt.ts`, `report_findings` | Severity tiers (must, should, nice); a false-positive rule so it does not cry wolf; reruns on real runs' costs and failures (spec 15 §4 "Not yet") |
-| **Suggest a tool for a step** | Doctor rule 10 | Tool descriptions judged by a written rubric |
-| **Sketch a tool card** | `sketchPrompt.ts`, `draw_sketch` | Unchanged |
-| **Hand off** | None | A visible handoff ("Handing this to the Team designer"), one click to undo; the specialist's result comes back as a Floki change preview |
+| **Change**: a request becomes a change set; drafts a whole flow on an empty canvas | `domain/aiEdit/editPrompt.ts`, `propose_changes` | Draft archetypes (section 10); error paths by default in unattended flows |
+| **Ask**: answers with cited blocks, at most one suggested change | `askPrompt.ts`, `answer_question` | Follow-up questions tied to specific claims |
+| **Flow doctor**: deterministic checks, then an AI review | `domain/flowDoctor/`, `doctorPrompt.ts`, `report_findings` | Severity tiers; a rule for when not to flag; checks for agents and loops; reruns on real runs' costs and failures |
+| **Build an in-app tool from a block chat** | Sketch only (`draw_sketch`, static, never wired to data) | A widget-kit spec wired to the block's data, previewed and applied like any change; reviewed by the doctor for gates and permissions |
+| **Compose business-home sections** | Planned (VISION 2026-10-12) | From the fixed widget kit only |
+| **Start a plugin** | None | Floki interviews, writes the plugin brief (screens, blocks, connectors, data, gates) and hands it to the plugin builder team; the result comes back for the owner's install approval |
+| **Set up connectors** | None | Guides a person through connecting a service; never sees or stores the key itself |
+| **Hand off** | None | A visible handoff ("Handing this to the Knowledge architect"), one click to undo; the specialist's result comes back as a Floki change preview |
+| **Onboard a business and start a project** | Planned (2026-10-19: one big prompt, suggestions from the profile and brain, then interview rounds) | Picks the preset (section 11) from the onboarding answers |
 
-**Routing.** Today `flokiRoute.ts` routes by regex, and its misroute is the current release hold (R6-E-1: "When…" flow descriptions routed to Ask). The router becomes a small classifier call that returns one of: change, ask, doctor, sketch, or hand off to a named specialist, with its reason shown when it hands off. The selected Change mode always wins over the classifier.
+**Routing.** Today `flokiRoute.ts` routes by regex, and its misroute was the M3c release hold (R6-E-1). The router becomes a small classifier call that returns one of change, ask, doctor, build tool, plugin brief, or hand off to a named specialist, with its reason shown on a handoff. A mode the person selected always wins over the classifier.
 
-## 7. Skills
+## 7. AI teammates
 
-### 7.1 Why Floki cannot load skills today
+Built on a-132 and the one-door decision (both 2026-10-19).
 
-Skills are a feature of the harness around a model, not of the model. A harness lists each skill's name and description, gives the model a way to load the full text when a task needs it, and (for skills with scripts) a filesystem to run them. Floki is one model call with a system prompt, one strict output tool and the messages, so there is nothing to list or load from.
+| | Floki | Brought AI teammate |
+|---|---|---|
+| Who runs it | OS Flow, on the business's credits (falls back to OpenRouter, then the bridge) | Its owner, on their own subscription and machine |
+| How it reaches OS Flow | Directly | OS Flow's MCP server, with a revocable token per business |
+| What it can do | Design-mode jobs in section 6 | What its permissions allow: read, draft, edit, run |
+| The action list | The same list for both; a test checks the two never drift | |
+| Gates | Never decides one | Never counts as a person; it can prepare a gate's material, not approve it |
+| Audit | Every action logged with "Floki" | Every action logged with the AI's name and the person who added it |
+| Skills | Loaded by OS Flow (section 9) | Its own harness loads them; OS Flow can offer the business's skill folders for download so a brought AI works the same way |
 
-### 7.2 One format: SKILL.md
+**Brought AIs as team members.** A brought AI can be named as a member of a team (for example, Alice's Codex in the Delivery team) and assigned tasks the same way a person is. It cannot hold a gate seat or a lead role that approves work.
 
-Every skill in OS Flow is a folder with a `SKILL.md` (frontmatter `name` and `description`, then instructions), plus optional `references/`, `scripts/` and `assets/`. This is the open Agent Skills standard (agentskills.io). Anthropic's API and Claude Code read it; OpenAI's API and Agents SDK read it too (their docs: "Skills are compatible with the open Agent Skills standard"). One skill therefore works in Floki, in specialists and business agents on Claude or OpenAI, and in Claude Code.
+## 8. Hosting run mode
 
-**Portability rule:** a skill made of instructions and references works everywhere. A skill that runs scripts needs a sandbox (a code-execution container or an Agent SDK workspace) and works only where one exists. Catalog skills are instruction-only unless they say otherwise in their frontmatter.
+### 8.1 What exists today
 
-### 7.3 How each place loads them
+- The conductor is a Cloudflare Workflow (its own `os-flow-conductor` Worker with a D1 log), and `/run/*` endpoints are Pages Functions with a 30-second wall clock (spec 13; spec 06).
+- A step that needs a real agent (tools, files, long work) goes to the **bridge**: a small Node program that runs the Claude Agent SDK or `claude -p` on a "harness host" and only makes outbound calls (`app/bridge/claude.ts`). The harness host has been Jase's laptop; that bridge was paused on 2026-10-11.
+- The plan (M3C-M4-PLAN §3.4b and §3.4c): R0 direct API calls for text-only blocks; R1 Run settings; R2 hosted runs on Claude Managed Agents "so a team runs with no computer awake"; R3 a packaged bridge installed with `npx` and paired by a short code.
 
-| Where | How it loads skills | Models | Why this way |
+### 8.2 Why it matters
+
+An agent SDK (Claude's or OpenAI's) is a long-running program that needs a real Linux process, a working folder and minutes of time. Cloudflare Workers and Pages Functions cannot give it that: no child processes, no real filesystem, 128 MB of memory, and a 30-second limit on Pages Functions. So text-only steps can run in the Workers OS Flow already has, but agent steps need somewhere else. Today that somewhere is a laptop, which means a business's flows stop when the laptop sleeps.
+
+### 8.3 Options
+
+| Option | Runs | Who pays for compute | Fit |
 |---|---|---|---|
-| **Floki** (design mode, quick turns) | A loader we write: the server lists skill names and descriptions in the prompt and includes a skill's full text by route (the doctor always gets the review skill) or when Floki asks with a `load_skill` step | Any, including the OpenRouter fallback | No container and no added delay; keeps one structured answer per turn |
-| **Specialists and business agents in run mode, on Claude** | The Claude Agent SDK, which loads SKILL.md folders as Claude Code does; OS Flow's bridge (`app/bridge/claude.ts`) already runs it | Claude | Long jobs with tools and files |
-| **The same agents, on OpenAI** | The OpenAI Agents SDK's sandbox Skills capability (a local skills directory, loaded lazily with `load_skill`), or the Responses API's `shell` tool with skills attached | OpenAI | Same skill folders; the business chose OpenAI |
-| **Any other model** (DeepSeek and others via OpenRouter) | The same loader as Floki's, with OS Flow's own tool loop | Any | Neither vendor SDK runs them |
-| **A skill that must run code** | Anthropic's Agent Skills on the API (code-execution container) or OpenAI's hosted shell | Claude or OpenAI | Only when the skill needs a sandbox |
+| **A. Claude Managed Agents** (planned R2) | Claude only; Anthropic runs the loop and a sandbox per session | The business's Anthropic account | The fastest path for Claude; no use for OpenAI or other models |
+| **B. Cloudflare Containers / Sandbox SDK** | Any SDK: Claude Agent SDK, OpenAI Agents SDK, or OS Flow's own loop; one Linux sandbox per session, sleeping between steps, shut down after | OS Flow's Cloudflare account (Workers Paid), passed through in credits | Same platform as the conductor; one place for every provider. Cloudflare publishes a Managed Agents template on it, marked alpha |
+| **C. The business's own bridge** (planned R3) | Any SDK, on the business's machine or server | The business | For businesses that want their data on their own machines, and for brought AI teammates |
+| **D. A separate server (VPS, Modal)** | Any | OS Flow | Breaks spec 01's "No VMs" line |
 
-**The run adapter decides, the skill does not.** A run step names a role (`team@version/role`) and a model. The run engine picks the adapter for that model's provider and hands it the role's skill folders. A business switching an agent from Claude to OpenAI changes the adapter, not the skills.
+### 8.4 Recommendation
 
-**What does not carry across providers:** Claude-only or OpenAI-only features (server tools, specific container limits, provider-hosted skill IDs). Skills are stored in OS Flow, not uploaded to one vendor, so no provider holds the only copy.
+It is a decision and a milestone, not a redesign: the conductor already orchestrates steps; only where an agent step executes changes. Keep R2 (Managed Agents) as the first hosted path for Claude, since it is planned and needs the least code. Add **option B** as the provider-neutral hosted runner right after it, because a business that picks OpenAI or another model for its agents needs it, and it keeps everything on Cloudflare. Keep **option C** for businesses that bring their own compute. Before committing to B: verify its price per session-hour, its cold-start time, and whether the template has left alpha.
 
-### 7.4 Where skills come from and how they are vetted
+## 9. Skills
 
-Shipping a skill inside OS Flow to other businesses is redistributing it. Every catalog skill:
-1. comes from a pinned commit, with its license recorded (MIT or Apache-2.0: adaptable with attribution; no license file: the idea only, in our own words);
-2. is rewritten in OS Flow's terms (blocks, wires, gates, flows), never installed as published;
-3. passes a small eval before it ships, with a failing baseline first;
-4. is recorded in a provenance file and, if rejected, in a rejections file with the reason.
+### 9.1 Why Floki cannot load skills today
 
-Install counts on a registry are not quality; every skill gets the same read.
+Skills are a feature of the harness around a model. A harness lists each skill's name and description, gives the model a way to load the full text, and (for skills with scripts) a filesystem. Floki is one model call with a system prompt, one strict output tool and the messages.
 
-## 8. Skills by role (shortlist; nothing installed)
+### 9.2 One format: SKILL.md
 
-| Role | Skill sources to adapt | What it gives |
+Every skill is a folder with a `SKILL.md` (frontmatter `name` and `description`, then instructions) and optional `references/`, `scripts/` and `assets/`: the open Agent Skills standard. Anthropic's API and Claude Code read it; OpenAI's API and Agents SDK read it too. One skill therefore works in Floki, in OS Flow's agents on Claude or OpenAI, in brought AI teammates, and in Claude Code.
+
+**Portability rule:** instruction-only skills work everywhere. A skill that runs scripts needs a sandbox and works only where one exists. Catalog skills are instruction-only unless their frontmatter says otherwise.
+
+### 9.3 How each place loads them
+
+| Where | How | Models |
 |---|---|---|
-| **Floki: draft and change** | n8n-io/skills (Apache-2.0) `n8n-workflow-lifecycle-official` (plan stage) and `n8n-error-handling-official` ("Non-negotiables", "When error handling can be looser"); czlonkowski/n8n-skills (MIT) `n8n-workflow-patterns` ("The 6 Core Patterns") | Archetype skeletons for drafts; error paths by default in unattended flows |
-| **Floki: doctor** | n8n-io `references/REVIEW_CHECKLIST.md` (must, should, nice tiers; "Cross-cutting first"); czlonkowski `n8n-validation-expert/FALSE_POSITIVES.md`; n8n-io `n8n-loops-official` (no-cap loop rule only); `n8n-subworkflows-official` ("When NOT to extract") | Severity tiers and when not to flag |
-| **Floki: doctor, agent flows** | affaan-m/ecc (MIT) `skills/agent-architecture-audit` (12-layer failure table, evidence phase); `skills/loop-design-check` (a machine-checkable goal with a must-not boundary; "Action 2", five ways a loop fails) | Checks for flows that contain agents and loops, not only plain steps |
-| **Floki: tool suggestions** | anthropics/skills (Apache-2.0) `claude-api` `shared/prompt-audit.md` (tool descriptions); `mcp-builder` `reference/mcp_best_practices.md` ("Tool Design") | A rubric for a good tool and its description |
-| **Architect team: interview** | n8n-io lifecycle plan stage; the interview structure of anthropics `doc-coauthoring` (no license file: idea only); the dev team's `grill-the-plan` | Intent, audience and constraints first; a gap check before drafting |
-| **Agent building (Architect, Team designer)** | n8n-io `n8n-agents-official` ("Agent, workflow, or AI Agent node?"), `n8n-ai-nodes-official` (`SYSTEM_PROMPT.md`, `TOOLS.md`, `HUMAN_REVIEW.md`, approvals with real values) | When a step needs an agent; what goes in instructions versus a tool description; approvals that show real values |
-| **Team designer** | wshobson/agents (MIT) `team-composition-patterns` ("Custom Team Guidelines", sizing); anthropics `claude-api` multi-agent "When to use it"; anthropics `skill-creator` (writing skills, with evals) | Smallest team, one lead, no overlapping roles, full context handed to each member; skill authoring |
-| **Business consultant** | anthropics `discernment-nudge` (follow-up questions tied to specific claims) | Needs a skill written from Jase's own consulting method; ECC's `product-lens` Mode 1 (seven diagnostic questions with an anti-goal) and `council` are the closest outside material |
-| **Knowledge architect** | affaan-m/ecc (MIT) `skills/living-docs-governance` (four document roles, one owner per fact, a delete-zone, linked docs treated as untrusted evidence); `agents/rag-pipeline-reviewer.md` (retrieval eval policy: baseline, thresholds, query slices) | Structure and freshness; how to test retrieval. A dedicated search is still due (section 11) |
-| **Business teams: approvals** | affaan-m/ecc (MIT) `skills/operator-approval-loop`, without its timed auto-approval | An approval tied to a hash of the exact draft, so a changed draft needs a new approval; a receipt per send |
-| **Business teams** | To be sourced per preset; for ecommerce, affaan-m/ecc (MIT) `returns-reverse-logistics`, `inventory-demand-planning`, `marketing-campaign`, `customer-billing-ops` as seeds after a domain check | Section 9 |
-| **Team designer: skill evals** | affaan-m/ecc (MIT) `skills/skill-comply` (the method only: a skill tested under supportive, neutral and competing prompts) | How a new skill is shown to work before it ships |
+| **Floki** | A loader OS Flow writes: names and descriptions in the prompt; a skill's full text included by route (the doctor always gets the review skill) or on a `load_skill` step | Any, including the OpenRouter fallback |
+| **Agents in run mode, Claude** | The Claude Agent SDK (bridge, hosted sandbox) or Managed Agents | Claude |
+| **Agents in run mode, OpenAI** | The OpenAI Agents SDK's sandbox Skills capability, or the Responses API's `shell` tool with skills attached | OpenAI |
+| **Agents on any other model** | The same loader as Floki's, with OS Flow's own tool loop | Any |
+| **Brought AI teammates** | Their own harness, from skill folders the business downloads | Their own |
 
-## 9. Industry presets
+The run adapter decides, not the skill: a run step names a role and a model, and the run engine picks the adapter for that model's provider. Skills are stored in OS Flow, not uploaded to one vendor.
 
-**One catalog, presets on top.** Every agent and team exists once in a catalog. An industry preset is a selection from it. "Video editor" exists once and appears in the Ecommerce, Creator and Agency presets; a fix reaches all three.
+### 9.4 Where catalog skills come from
 
-**Onboarding asks three or four questions, not only the industry.** Industry alone guesses wrong (a B2B wholesale ecommerce business needs outbound sales; a direct-to-consumer brand does not):
-1. Who buys: consumers or businesses?
-2. How do sales happen: self-serve, inbound, outbound?
-3. Which channels: web store, marketplaces, social, retail, events?
-4. How big is the team?
+Shipping a skill inside OS Flow to other businesses is redistributing it. Every catalog skill comes from a pinned commit with its license recorded (MIT or Apache-2.0: adaptable with attribution; non-commercial licenses such as CC BY-NC-SA: excluded; no license file: idea only); is rewritten in OS Flow's terms; passes a small eval with a failing baseline first, tried three ways (a prompt that asks for it, a neutral one, one that pushes against it); and is recorded with its provenance. Install counts are not quality.
 
-**Defaults are editable copies that track their source.** A business can remove, edit or fork any default team. A fork records the catalog version it came from (spec 16 addendum's factory versions), so improvements can be offered later without overwriting the business's edits.
+### 9.5 Bringing your own skills
 
-**Example: Ecommerce, direct to consumer, web store and social, small team**
+| Tier | Who sees it | Checks before it can run | Who is responsible |
+|---|---|---|---|
+| **Private** | The business that added it | Automatic: valid SKILL.md; size limits; a secrets scan; a scan for instructions that try to override rules or send data out; scripts flagged | The business |
+| **Shared** (offered to the catalog) | Every business, once accepted | The private checks, plus the catalog process in 9.4: license, rewrite, eval, provenance | OS Flow, once accepted |
+| **Verified** | Every business | Maintained by OS Flow, with evals re-run on each model change | OS Flow |
 
-| Team | Lead | Members |
+Rules for every tier:
+- **A skill is know-how, never authority.** It cannot grant a tool, a connector, a permission or a gate; those come from the flow and the member's permissions.
+- **Scripts run only in a sandbox** with no secrets mounted, and only where the business allowed scripts.
+- **Pinned versions.** A business runs a fixed version; an update shows the diff and waits for the owner's acceptance.
+- **Revocable.** A shared skill found unsafe is withdrawn from the catalog and flagged in every business that uses it.
+
+## 10. Skills by role (shortlist; nothing installed)
+
+Sources were read at pinned commits; licenses are from each repo's LICENSE file.
+
+| Role | Sources to adapt | What it gives |
 |---|---|---|
-| Marketing | Marketing strategist | Copywriter, Video editor, Ads specialist, Email marketer |
-| Store operations | Operations lead | Catalog manager, Inventory planner |
-| Customer support | Support lead | Support agent (replies drafted, sends at a gate) |
-| Not included | | Outbound sales team (no outbound motion), lead-generation calling |
+| **Floki: draft and change** | n8n-io/skills@27b6b9f (Apache-2.0) `n8n-workflow-lifecycle-official` (plan stage), `n8n-error-handling-official`; czlonkowski/n8n-skills@c640094 (MIT) `n8n-workflow-patterns` | Archetype skeletons; error paths by default |
+| **Floki: doctor** | n8n-io `references/REVIEW_CHECKLIST.md`, `n8n-loops-official` (no-cap loop), `n8n-subworkflows-official`; czlonkowski `n8n-validation-expert/FALSE_POSITIVES.md`; affaan-m/ecc@76aaa77 (MIT) `agent-architecture-audit`, `loop-design-check` | Severity tiers, when not to flag, checks for agents and loops |
+| **Floki: tools and plugin briefs** | anthropics/skills@dbd4588 (Apache-2.0) `claude-api` (tool descriptions), `mcp-builder` ("Tool Design"); OS Flow's design team for plugin screens | A rubric for good tools; plugin briefs a builder can work from |
+| **Architect team** | n8n-io lifecycle plan stage; the interview structure of anthropics `doc-coauthoring` (no license file: idea only); the dev team's `grill-the-plan`; n8n-io `n8n-agents-official`, `n8n-ai-nodes-official` | Interview first; when a step needs an agent; instructions versus tool descriptions; approvals with real values |
+| **Knowledge architect** | qdrant/skills@d2127f6 (Apache-2.0) `qdrant-search-quality` (metric by use, golden set, confidence interval on gains, held-out confirmation, symptom-to-strategy table); anthropics/knowledge-work-plugins@a266ab8 (Apache-2.0) `enterprise-search` (source authority by query type, freshness to confidence, dedup and what not to dedup, citations, conflicts) and `kb-article` (audit cadence, lifecycle); yonatangross/orchestkit@accece5 (MIT) `golden-dataset`, `rag-retrieval`; jeffallan/claude-skills@36f3fe8 (MIT) `rag-architect` (rules only, not its code); inkeep/open-knowledge-skills@efde8d3 (MIT) provenance and supersede chains; ecc `living-docs-governance` | Design, freshness, provenance and retrieval evals. **Gap:** access-controlled retrieval (permission-trimmed results, inherited source permissions, no leakage across businesses in caches or statistics) has no good skill; OS Flow writes its own |
+| **Team designer** | wshobson/agents (MIT) `team-composition-patterns`; anthropics `claude-api` multi-agent guidance; anthropics `skill-creator`; ecc `skill-comply` (method) | Team sizing, one lead, no overlap; skill authoring and three-way skill tests |
+| **Business consultant** | Section 12 | |
+| **Plugin builder** | Agent-Teams dev-team and design-team plugins (ours) | Plugins built and reviewed like any code |
+| **Business teams** | Section 11 | |
 
-Jase's own businesses are the first presets to build and test against: two ecommerce businesses and one B2B service business.
+## 11. Default teams
 
-## 10. Phases
+### 11.1 One catalog, presets on top
+
+Every team and agent exists once in a catalog; a preset is a selection. Onboarding asks three or four questions beyond the industry (who buys; how sales happen: self-serve, inbound, outbound; which channels; team size). Defaults are editable copies that track their catalog version, so improvements can be offered later without overwriting a business's edits.
+
+### 11.2 The catalog
+
+| Team | Lead | Members | Main skill sources |
+|---|---|---|---|
+| **Growth** | Growth strategist (ICP and offer) | Prospector, Outbound rep, Partnerships and referrals | KWP `small-business/lead-finder`; coreyhaines31/marketingskills@e85f3cb (MIT) `prospecting`, `cold-email`; mbfinotti/sales-skills@1ef6888 (MIT) `sales-outbound-sequence` |
+| **Marketing** | Marketing lead | SEO specialist, Content writer, Social and LinkedIn manager, Email and newsletter | coreyhaines31 `seo-audit`, `content-strategy`, `copywriting`, `social`; KWP `small-business/social-content-engine`, `seo-ai-visibility`; ecc `marketing-campaign`, `brand-voice` |
+| **Creative studio** | Creative director | Video editor, Image designer, Ad creative | Uses plugins (AI video and image editors on Higgsfield, kie.ai); the design team's `frontend-design` for direction |
+| **Sales** | Sales lead | Inbound qualifier (speed to lead), Discovery and call prep, Proposal and SOW writer, Contract reviewer | KWP `small-business/speed-to-lead`, `proposal-builder`, `contract-review`, `sales/call-prep`; mbfinotti `sales-discovery-questions` |
+| **Delivery** (services) | Delivery manager | Onboarding lead, Project manager (status reports, change requests), Resource and time planner | mbfinotti/revops-skills@2dedb39 (MIT) `sales-to-cs-handoff`; KWP `operations` status report, change request, capacity plan. **Gap:** client onboarding, weekly status, scope change, utilisation and retainer burn-down need skills written for OS Flow |
+| **Client success** | Account manager | Support and ticket triage, Health and renewals, Reviews and advocacy, Knowledge base writer | KWP `sales/account-plan`, `renewal-radar`, `customer-health`, `customer-support/ticket-triage`, `kb-article`, `small-business/review-reputation`, `ticket-deflector` |
+| **Store operations** (ecommerce) | Operations lead | Catalog manager, Inventory planner, Returns and fulfilment | KWP `small-business/inventory-planner`, `restock`; ecc `returns-reverse-logistics`, `inventory-demand-planning` (after a domain check) |
+| **Customer support** (ecommerce) | Support lead | Support agent (replies drafted, sent at a gate), Returns desk | KWP `customer-support/*`, `ticket-deflector` |
+| **Finance** | Finance ops | Invoicing, Collections, Bills, Cash and P&L reporter, Tax prep | KWP `small-business/invoice-chase`, `pay-the-bills`, `cash-flow-snapshot`, `close-month`, `tax-prep`; KWP `finance/variance-analysis` |
+| **Ops / RevOps** | Chief of staff | CRM steward, Reporting and forecast analyst, SOP writer, Inbox manager | KWP `small-business/crm-autopilot`, `inbox-manager`, `report-builder`, `sales/forecast`; coreyhaines31 `revops` |
+| **People** | People lead | Recruiter, Onboarding, Payroll prep | KWP `small-business/hiring-screener`, `job-post-builder`, `payroll-prep` |
+| **Product and engineering** | Architect | The Agent-Teams dev team and design team | Ours |
+
+The strongest single source is anthropics/knowledge-work-plugins' `small-business` plugin (44 skills, Apache-2.0): every send is drafted and waits for approval, with no auto-send mode, which matches OS Flow's gates. Its skills share voice and style files, so it is adapted as a unit. Not taken: deanpeters' finance and pricing skills (CC BY-NC-SA, non-commercial), ecc `lead-intelligence` (browser control of LinkedIn, terms-of-service risk), alirezarezvani `customer-success-manager` (SaaS scoring scripts).
+
+### 11.3 Presets
+
+| Preset | Teams |
+|---|---|
+| **General (any business)** | Marketing, Sales, Client success, Finance, Ops |
+| **Service and consulting** | Growth, Marketing, Sales, Delivery, Client success, Finance, Ops |
+| **Ecommerce, direct to consumer** | Marketing, Creative studio, Store operations, Customer support, Finance, Ops |
+| **Ecommerce, wholesale / B2B** | The direct-to-consumer set plus Growth and Sales |
+| **Software product** | Product and engineering, Marketing, Sales, Client success, Finance, Ops |
+
+### 11.4 Which first
+
+Build the catalog skeleton as a general set, then prove each preset on Jase's own businesses as an ordinary user of OS Flow: the service and consulting business first (the best skill coverage and Salesforce-equivalent map), then the two ecommerce businesses. A preset ships to other businesses only after it has run real work in one of Jase's. Nothing of Jase's own data enters the catalog: the pattern does, the brief does not.
+
+## 12. The Business consultant
+
+### 12.1 What it is for
+
+To find the one constraint holding back profit in a small business and the few changes that move it, from the business's numbers, not from opinions. No outside skill does constraint-first diagnosis; OS Flow writes this one, drawing on the sources below.
+
+### 12.2 Diagnostic sequence
+
+0. **Goals and guardrails:** the owner's target (profit, owner pay, hours, exit), runway, hours worked. Output: a problem statement, "from X to Y by date Z".
+1. **Cash triage:** bank balance, monthly burn, days of cash. Under 30 days of cash: stabilise cash before anything else.
+2. **Contribution P&L** per business, then per product, channel or client: variable versus fixed costs; contribution margin after product cost, fulfilment and fees, and after ad spend (ecommerce), or margin and effective hourly rate per client (services); winners and losers by profit, not revenue; break-even volume.
+3. **Driver tree and sensitivity:** the profit change from +1% price, volume, variable cost and fixed cost; levers ranked.
+4. **Locate the constraint**, testing in order: each sale loses money (pricing or cost); each sale earns but there are too few (demand or funnel); demand exists but delivery or the owner's time is capped (capacity); profitable but no cash (cash cycle). Output: one named constraint with its evidence.
+5. **Deep dive on that branch only:** funnel stage rates, the pricing waterfall, buyer and churned-customer interviews, or utilisation and realisation.
+6. **Exploit before elevate:** at most three changes, each with expected profit change, cost and a test.
+7. **Stop doing:** what to drop so the constraint gets the attention.
+8. **Cash discipline** once the plan is set.
+9. **Cadence:** a weekly scorecard of three to five numbers; re-diagnose when the constraint moves; test the final recommendation against a four-voice council before presenting it.
+
+### 12.3 Methods and their usual misreadings
+
+Theory of Constraints (spending to expand before using the constraint fully); the profit equation (pushing volume when each unit loses money; a 1% price rise typically moves operating profit about three times more than 1% more volume); issue trees (overlapping branches, data before hypotheses); unit economics (lifetime value on revenue instead of margin, blended rather than per-cohort figures); ecommerce margin after ads (trusting platform-reported return on ad spend; ignoring returns and fees); the cash conversion cycle (a profitable P&L with a shrinking bank balance); service capacity (billable utilisation of roughly 70 to 80% tends to maximise profit; scope creep and the owner's unbilled time are missed); Pareto by contribution (overhead spread by revenue share hides loss-makers); jobs to be done (explains conversion and repeat rates the numbers cannot).
+
+### 12.4 Sources to adapt
+
+nexscope-ai/ecommerce-skills@ee0fb29 (MIT) `ecommerce-growth-strategy` (intake and unit-economics health check; fix its payback formula, which ignores repeat purchases); alirezarezvani/claude-skills@19392f7 (MIT) `cfo-advisor` (its questions and red flags only; its scripts are not run); bytedance/deer-flow@cb1d782 (MIT) `consulting-analysis` (a hypothesis per section; no invented data); openaccountant/skills@f5abe38 (MIT) `client-profitability` (per-client P&L; replace its revenue-share overhead allocation); KWP `finance/variance-analysis` (price, volume and mix); ecc `council` (the final check). Method references: TOC Institute (five focusing steps); Marn, Roegner and Zawada, "The power of pricing" (McKinsey Quarterly 2003); McKinsey, the seven-step problem-solving process; JPMorgan Chase Institute, "Cash is King"; SPI Research on billable utilisation; Christensen et al., "Know Your Customers' Jobs to Be Done" (HBR 2016); Michalowicz, *Profit First* (a practitioner method, not tested in controlled studies).
+
+## 13. Knowledge architect: what it owns
+
+- **Sources:** which systems feed the brain, each with an owner, an authority level by question type (a policy question trusts the policy document; a status question trusts the latest update), and a freshness rule.
+- **Structure:** document types, a glossary of the business's own terms and codenames, chunking by document type, metadata on every chunk (source, date, owner, section, permissions), and supersede chains so an old version points to its replacement.
+- **Retrieval:** keyword, vector or hybrid chosen per question type; reranking only after checking the ranking ceiling; citations on every claim; conflicts surfaced, never silently resolved.
+- **Access:** results trimmed to what the asking member may see; permissions inherited from the source system; nothing shared across businesses in caches or statistics.
+- **Evaluation:** a labelled test set per business, metrics chosen by use, a gain counted only when its confidence interval clears zero, confirmed on held-out questions, and re-run on every retrieval change; a regression beyond the business's threshold blocks the change.
+- **Upkeep flows (run mode):** re-index, a monthly stale check, a quarterly accuracy audit, dedup with a list of what must not be merged (different conclusions, versions over time).
+
+## 14. Phases
 
 | Phase | What | Depends on |
 |---|---|---|
-| P0 | This spec agreed; the words in section 3 used everywhere ("team", not "crew") | Jase |
-| P1 | Floki's router becomes a classifier with a visible handoff; fixes R6-E-1 | spec 11 |
-| P2 | The skill loader in Floki; the doctor and draft skills from section 8, each with an eval and a failing baseline | P1 |
-| P3 | Design and run modes as permission profiles on one agent definition; run steps pinned to `team@version/role` | spec 13, spec 16 addendum |
-| P4 | Run adapters: Claude Agent SDK first (the bridge exists), then OpenAI Agents SDK, then the loader for other models | P3 |
-| P5 | Catalog and presets; the onboarding questions; forks that track their source | P3 |
-| P6 | Specialists one at a time, each with its skills: Architect team (spec 15 already orders it), Team designer, Knowledge architect, Business consultant | P2, P4 |
+| P0 | This spec agreed; the words in section 3 used everywhere | Jase |
+| P1 | Floki's router becomes a classifier with visible handoffs | spec 11 |
+| P2 | The skill loader in Floki; the doctor and draft skills, each with an eval and a failing baseline | P1 |
+| P3 | In-app tools from a block chat, on the widget kit | P1 |
+| P4 | Design and run modes as permission profiles; run steps pinned to `team@version/role` | spec 13, spec 16 addendum |
+| P5 | AI teammates (M5's first item, a-132) on the one action list | spec 01 M5 |
+| P6 | Hosted runs: Managed Agents (R2), then the provider-neutral sandbox runner (section 8) | P4 |
+| P7 | Catalog and presets; onboarding questions; forks that track their source; the service preset proven on Jase's service business first | P4 |
+| P8 | Specialists one at a time: Architect team (spec 15 orders it), Knowledge architect, Business consultant, Team designer, Plugin builder | P2, P6 |
+| P9 | Bring-your-own skills: private tier, then the shared catalog process | P2 |
 
-## 11. Open questions for Jase
+## 15. Not taken
 
-- **Knowledge architect skills:** ECC gives structure and retrieval-eval policy; a dedicated search (RAG, knowledge-base structure, taxonomy) is still due.
-- **Business consultant:** your own consulting method is the best source; a short interview with you could seed its skill.
-- **Which presets first:** your two ecommerce businesses and the B2B service business, or a general set?
-- **Hosting run mode:** the Agent SDKs need a full server process; OS Flow's AI endpoints run on Cloudflare Pages Functions, which cannot host them. Where the run adapters live (the existing bridge, a container service) is not verified here.
-- **Whether businesses may bring their own skills** into the catalog, and how those are vetted.
+From the reviews behind this spec: ECC's hooks (on by default when installed as a plugin, including a log of every tool's input and output), its self-rewriting skills, auto-update to latest, timed auto-approval and a merge queue that pushes main; gstack's autoplan and one-step ship flow; superpowers' session-start hook; any skill under a non-commercial license.
 
-## 12. Sources
+## 16. Open questions for Jase
 
-- OS Flow code and specs at the time of writing: `app/src/domain/aiEdit/*.ts`, `app/functions/ai/_lib/*.ts`, `flokiRoute.ts`, `app/bridge/claude.ts`, spec 11, 12, 13 §6.6, 15 §1 and §4, the M3C gauntlet reviews.
-- Anthropic Claude API reference (Agent Skills on the Messages API with the code-execution container; the Claude Agent SDK as Claude Code's harness), read 2026-10-18.
-- OpenAI: "Skills" guide (developers.openai.com/api/docs/guides/tools-skills) and the Agents SDK sandbox Skills capability (openai.github.io/openai-agents-python/ref/sandbox/capabilities/skills/), read 2026-10-19.
-- ECC (affaan-m/ecc, MIT, 76aaa77): 311 skills in `skills/` (the 1,062 SKILL.md count includes translations and harness copies); about a third worth adapting. Not taken: its hooks (on by default when installed as a plugin), session observation and self-evolving skills, auto-update to latest, timed auto-approval, the merge queue that pushes main, and the boilerplate prompt block in every agent.
-- Skill candidates read at: n8n-io/skills 27b6b9f (Apache-2.0), czlonkowski/n8n-skills c640094 (MIT), anthropics/skills dbd4588, wshobson/agents (MIT).
+- **Hosting:** keep Managed Agents first and add the Cloudflare sandbox runner after it (section 8.4)? Its price and alpha status need checking first.
+- **Interview:** the Business consultant's first run is an interview with Jase (twelve questions, per business), and Jase's numbers stay in his businesses, never in the catalog.
+- **Plugins:** who may install a plugin a person built in one business into another business, and whether plugins can be shared to the catalog like skills.
+- **Brought AI teammates as team members:** may a brought AI hold a member role in a team's run-mode work (assigned tasks), or only design-mode help?
+
+## 17. Sources
+
+- OS Flow code and specs: `app/src/domain/aiEdit/*.ts`, `app/functions/ai/_lib/*.ts`, `flokiRoute.ts`, `app/bridge/claude.ts`, spec 01, 06, 11, 12, 13, 15, 16; MEMORY.md and `memory/vision-and-knowledge.md`, `memory/runs-and-bridge.md` on branch `fix/r50-derivations` at 9b9abc51 (2026-10-20); `routine/M3C-M4-PLAN.md`.
+- Anthropic Claude API reference (Agent Skills on the Messages API; the Claude Agent SDK), read 2026-10-18.
+- OpenAI: the Skills guide (developers.openai.com/api/docs/guides/tools-skills) and the Agents SDK sandbox Skills capability, read 2026-10-19.
+- Cloudflare: Workers limits (developers.cloudflare.com/workers/platform/limits), Sandboxes and the Claude Managed Agents template (developers.cloudflare.com/sandbox/tutorials/claude-managed-agents/), read 2026-10-20.
+- Salesforce's 2026 product line: Forrester on Dreamforce 2026; Certinia PSA product pages; TechTarget on Salesforce's SMB suites.
+- Skill repos at the commits named in sections 10 to 12. The ECC count of 1,062 SKILL.md files includes translations and harness copies; 311 are distinct skills.
