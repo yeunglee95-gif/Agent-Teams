@@ -49,7 +49,7 @@ Where the app's `CLAUDE.md` says retro output goes. One row per proposal, most s
 | # | Class | Seen (ids, milestones) | Remedy type | Exact change | What it would have caught | Cost |
 |---|---|---|---|---|---|---|
 
-"Exact change" is a quoted rule, a named check with the command that runs it, or a quoted line to add or remove, with its file path. A skill edit also names the eval that must pass before and after it (the plugin's `evals/`). End with one line to the owner: how many proposals, and which one you would take if only one.
+"Exact change" is a quoted rule, a named check with the command that runs it, or a quoted line to add or remove, with its file path. A skill edit also names the eval that must pass before and after it (the plugin's `evals/`), and that eval tries the rule three ways: a prompt that asks for it, a neutral prompt that does not mention it, and a prompt that pushes against it (a deadline, a lead saying "skip it this once"). A rule that holds only when the prompt asks for it is not working yet. End with one line to the owner: how many proposals, and which one you would take if only one.
 
 ## Never
 
@@ -60,3 +60,5 @@ Where the app's `CLAUDE.md` says retro output goes. One row per proposal, most s
 ## Source
 
 Adapted from `skills/engineering/retro/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; the input is the milestone's own finding, fixer, gate, critic and owner records instead of session logs; "review agent" mapped to this team's reviewer and "automated checks" to the gate-runner's gate; a class seen in two milestones must produce a proposal; output is a proposal list the owner approves item by item, never an edit; the `writing-for-agents` step and the tool-economy and no-op sections shortened to one line each. License text: `../../licenses/mattpocock-skills-MIT.txt`.
+
+The three-prompt test for skill edits (0.8.0) is adapted from the supportive, neutral and competing scenarios in `skills/skill-comply/SKILL.md` in affaan-m/ecc (MIT, Copyright (c) 2026 Affaan Mustafa), commit 76aaa77df6adc5b889e689007bf99b9a4f74af34: the method only; its runner and scripts are not taken. License text: `../../licenses/affaan-m-ecc-MIT.txt`.
