@@ -20,6 +20,15 @@ Every skill in `skills/` names its source, commit, license and what was changed 
 | slice-the-plan | mattpocock/skills `skills/engineering/to-tickets`; obra/superpowers `skills/writing-plans` (Interfaces line and Review Focus, 0.7.0) | 49dd158d1076134a641b33efb035946536778336; bb92a77741419a4ab5f06e711a283343f1ada0c3 | MIT, Copyright (c) 2026 Matt Pocock; MIT, Copyright (c) 2025 Jesse Vincent |
 | `workflows/milestone-loop.md` (not a skill) | EricTechPro/super-board `skills/super-board/references/run.md` and `run-workflow.md` (pre-flight, `blocked-by:` sweep, root-cause cap, halt) | 35e215615c98fa5da011368e764f38f86959bf95 | MIT, Copyright (c) 2026 Eric Tech |
 
+## Adapted in 0.8.0 from affaan-m/ecc
+
+| Where | Adapted from | Commit | License |
+|---|---|---|---|
+| `skills/architecture-critique` ("For a loop or automation") | `skills/loop-design-check/SKILL.md` (Action 2 and the red lines) | 76aaa77df6adc5b889e689007bf99b9a4f74af34 | MIT, Copyright (c) 2026 Affaan Mustafa |
+| `skills/claude-md-upkeep` ("One owner per fact") | `skills/living-docs-governance/SKILL.md` (sections 2, 4, 5) | 76aaa77df6adc5b889e689007bf99b9a4f74af34 | MIT, Copyright (c) 2026 Affaan Mustafa |
+| `skills/run-retro` (three-prompt test for skill edits) | `skills/skill-comply/SKILL.md` (scenarios at three strictness levels; method only) | 76aaa77df6adc5b889e689007bf99b9a4f74af34 | MIT, Copyright (c) 2026 Affaan Mustafa |
+| `skills/no-quiet-lowering` (checker config, move 3) | `scripts/hooks/config-protection.js` (idea only, as a diff check) | 76aaa77df6adc5b889e689007bf99b9a4f74af34 | MIT, Copyright (c) 2026 Affaan Mustafa |
+
 ## Agent and loop text adapted in 0.7.0
 
 | Where | Adapted from | Commit | License |

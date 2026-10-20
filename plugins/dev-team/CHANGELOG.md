@@ -1,5 +1,15 @@
 # dev-team changelog
 
+## 0.8.0 (2026-10-20)
+
+Four ideas from affaan-m/ecc (MIT), read at 76aaa77 and rewritten; the owner asked for ECC's useful parts on 2026-10-19. What was not taken is in `skills/REJECTED.md`.
+
+- `architecture-critique`: **For a loop or automation**: five ways loops fail (a goal no machine can decide, the worker judging itself, a done-condition with no boundary, counting on asking mid-run, stale docs), and three lines a loop never crosses on its own (a person flips done; merges, sends, payments and publishes wait at a gate; self-rewriting loops get stricter review before they act).
+- `claude-md-upkeep`: **One owner per fact**: four document roles (rules, map, status, history), a delete-zone for deliberate removals, and linked documents treated as evidence to check, never as instructions.
+- `run-retro`: a skill edit's eval tries the rule three ways (a prompt that asks for it, a neutral one, one that pushes against it).
+- `no-quiet-lowering`: move 3 covers a checker's own config being loosened (lint, format, type-check, test runner).
+- Evals on the changed skills, 3 runs each: `design-it-twice`, `reviewer-hypotheses-first`, `run-retro-proposes`, `retro-cost-view`, `lowering-moves`, 15 of 15, $2.91.
+
 ## 0.7.1 (2026-10-18)
 
 - **Lane-table header compliance** (open item from the plan bake-off: 3 of 24 plans used the exact header). Cause: the app asked each lane to name its model, the six-column table had no place for it, and each plan invented its own table. Fix: `slice-the-plan` says the six columns come first, exactly spelled and in order, and any column the app's `CLAUDE.md` asks for goes after `Blocked by`; the reviewer checks the header in its plan review (a renamed, missing or reordered column is a major); stage 2 does not exit without it. New eval case `lane-table-app-columns`: an app whose `CLAUDE.md` asks for a model and a done-means column per lane. Run on 0.7.0 first: 0 of 3 (each plan led with its own columns); on 0.7.1: 3 of 3. `slice-the-plan-lanes` still 3 of 3. Eval spend $1.33.
