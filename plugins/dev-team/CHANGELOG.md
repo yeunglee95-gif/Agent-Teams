@@ -8,6 +8,7 @@ Four ideas from affaan-m/ecc (MIT), read at 76aaa77 and rewritten; the owner ask
 - `claude-md-upkeep`: **One owner per fact**: four document roles (rules, map, status, history), a delete-zone for deliberate removals, and linked documents treated as evidence to check, never as instructions.
 - `run-retro`: a skill edit's eval tries the rule three ways (a prompt that asks for it, a neutral one, one that pushes against it).
 - `no-quiet-lowering`: move 3 covers a checker's own config being loosened (lint, format, type-check, test runner).
+- Evals on the changed skills, 3 runs each: `design-it-twice`, `reviewer-hypotheses-first`, `run-retro-proposes`, `retro-cost-view`, `lowering-moves`, 15 of 15, $2.91.
 
 ## 0.7.1 (2026-10-18)
 
