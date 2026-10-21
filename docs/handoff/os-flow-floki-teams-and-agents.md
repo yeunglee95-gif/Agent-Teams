@@ -330,7 +330,18 @@ Build the catalog skeleton as a general set, then prove each preset on Jase's ow
 
 To find the one constraint holding back profit in a small business and the few changes that move it, from the business's numbers, not from opinions. No outside skill does constraint-first diagnosis; OS Flow writes this one, drawing on the sources below.
 
-### 12.2 Diagnostic sequence
+### 12.2 How the consultant gathers information (Jase, 2026-10-21)
+
+Learned from the first real interview, with Jase on his service business:
+
+1. **Brain dump first.** One large box and a few macro prompts: what is wrong with the business right now; what you are trying to achieve; how fast; your plan to get there; what you have already tried. Details are welcome but not required. Most owners already know where they struggle; the consultant starts from their account, not from a blank diagnosis.
+2. **Tailored follow-ups second.** Questions drawn from the dump, not a fixed list. Numbers are asked as exact rough figures in free text ("roughly what does the business cost per month?"), never as multiple-choice ranges. When the owner does not know a number, the consultant says where to find it and waits for it.
+3. **Ask why before recommending a change.** Anything that looks wrong (a low price, an odd channel) may be deliberate. The consultant asks the reason first; a recommendation that the owner already rejected for a good reason is noise.
+4. **Test the owner's own hypotheses with numbers.** The owner usually knows where it hurts; the consultant's job is to find which of those problems binds profit first, and to say so, with one honest challenge where the numbers disagree with the owner's view.
+5. **Specific, not generic.** Every recommendation names the owner's own channels, contracts, tools and numbers. Advice that would fit any business ("fill the top of the funnel") is not finished.
+
+### 12.3 Diagnostic sequence
+
 
 0. **Goals and guardrails:** the owner's target (profit, owner pay, hours, exit), runway, hours worked. Output: a problem statement, "from X to Y by date Z".
 1. **Cash triage:** bank balance, monthly burn, days of cash. Under 30 days of cash: stabilise cash before anything else.
@@ -343,11 +354,11 @@ To find the one constraint holding back profit in a small business and the few c
 8. **Cash discipline** once the plan is set.
 9. **Cadence:** a weekly scorecard of three to five numbers; re-diagnose when the constraint moves; test the final recommendation against a four-voice council before presenting it.
 
-### 12.3 Methods and their usual misreadings
+### 12.4 Methods and their usual misreadings
 
 Theory of Constraints (spending to expand before using the constraint fully); the profit equation (pushing volume when each unit loses money; a 1% price rise typically moves operating profit about three times more than 1% more volume); issue trees (overlapping branches, data before hypotheses); unit economics (lifetime value on revenue instead of margin, blended rather than per-cohort figures); ecommerce margin after ads (trusting platform-reported return on ad spend; ignoring returns and fees); the cash conversion cycle (a profitable P&L with a shrinking bank balance); service capacity (billable utilisation of roughly 70 to 80% tends to maximise profit; scope creep and the owner's unbilled time are missed); Pareto by contribution (overhead spread by revenue share hides loss-makers); jobs to be done (explains conversion and repeat rates the numbers cannot).
 
-### 12.4 Sources to adapt
+### 12.5 Sources to adapt
 
 nexscope-ai/ecommerce-skills@ee0fb29 (MIT) `ecommerce-growth-strategy` (intake and unit-economics health check; fix its payback formula, which ignores repeat purchases); alirezarezvani/claude-skills@19392f7 (MIT) `cfo-advisor` (its questions and red flags only; its scripts are not run); bytedance/deer-flow@cb1d782 (MIT) `consulting-analysis` (a hypothesis per section; no invented data); openaccountant/skills@f5abe38 (MIT) `client-profitability` (per-client P&L; replace its revenue-share overhead allocation); KWP `finance/variance-analysis` (price, volume and mix); ecc `council` (the final check). Method references: TOC Institute (five focusing steps); Marn, Roegner and Zawada, "The power of pricing" (McKinsey Quarterly 2003); McKinsey, the seven-step problem-solving process; JPMorgan Chase Institute, "Cash is King"; SPI Research on billable utilisation; Christensen et al., "Know Your Customers' Jobs to Be Done" (HBR 2016); Michalowicz, *Profit First* (a practitioner method, not tested in controlled studies).
 
