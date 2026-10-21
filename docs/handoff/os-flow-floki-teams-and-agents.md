@@ -349,6 +349,16 @@ Learned from the first real interview, with Jase on his service business:
 - **Quick advice:** one question in one area (pricing a new offer, a YouTube channel, whether to hire). The consultant reads the question through three to seven framework lenses (offers, monopoly, unit economics, attention, operations, capital) and returns a scored verdict, the risks that would kill it, and the conditions under which to go ahead. Lenses are named for the framework, never voiced as a real person: no "Alex Hormozi says". Sources: Jakeschincariol/founder-skill@fd9385b (MIT; `founder-board`, `founder-offer`, `founder-cfo`, `founder-pricing`, `founder-plan`); nateherkai/roast-room@576c6f3 (MIT; its council and scored verdict, but not its seats that simulate named real people).
 - **Full engagement:** current status, diagnosis, then plans at 90 days, 12 months and 3 years, delivered as a presentation: projected revenue, costs and profit by month for year 1 and by quarter after; KPIs with targets; the growth rate assumed; and what each planned activity is expected to bring in, so the owner can see which bets carry the plan. The weekly scorecard then tracks those KPIs.
 
+**From plan to work (Jase, 2026-10-21).** A plan is only useful if it runs:
+1. The plan breaks into milestones with owners and dates, shown as a timetable and charts; a person keeps it (Floki proposes milestones; a person keeps them, 2026-10-18).
+2. Floki allocates each milestone's work: to a person, as a task on their My tasks list plus an email; to an agent flow or AI teammate, as a handed-over job; where no flow exists yet, Floki builds one (design mode, previewed and approved like any build).
+3. Results and metrics flow back into the plan. The consultant re-reads the scorecard weekly, updates the plan, and tells Floki what changed; Floki re-allocates.
+4. Every flow carries an improvement loop of its own: it reads its results and metrics, proposes a change to itself, and the change runs through the loop rules (a checkable goal, a boundary, an independent judge) and a gate before it goes live.
+
+Autonomy covers execution: doing the work, chasing it and reporting it. Changes to the plan's goals, to spending, to people's work and to what a flow is allowed to do still wait for a person's approval; a loop that rewrites its own rules gets stricter review, not looser.
+
+**Onboarding reads before it asks.** Setting up a business in OS Flow starts by asking what the owner can connect (accounts, finance sheets, drives, CRMs, the website, past documents) and reading them, then asks only for what the connections do not hold. The same answers become the business's brain and the consultant's starting facts.
+
 ### 12.3 Diagnostic sequence
 
 
