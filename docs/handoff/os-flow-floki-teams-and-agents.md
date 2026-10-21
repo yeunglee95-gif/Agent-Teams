@@ -19,6 +19,7 @@ Floki is the AI teammate every business gets built in: its front door, its flow 
 | 2026-10-19 | One door for AI: Floki and the MCP server act through one list of OS Flow actions, so permissions, audit and the gate rule are enforced once | OS Flow MEMORY |
 | 2026-10-20 | Floki builds tools inside OS Flow (small ones from a chat on a block) and apps (larger interactive pieces that connect to outside services such as Higgsfield or kie.ai) | Jase |
 | 2026-10-20 | "Plugin" is renamed **App** (a-064's term replaced); a Website team runs a loop that improves the site from analytics; Floki's chat gets an effort control and voice input | Jase |
+| 2026-10-21 | Each business's brain has a section per department (finance included), fed by people uploading files or by ingest flows; Floki and the Business consultant build strategy from it; a generic finance flow organises the monthly sheets; a privacy layer comes before any of it | Jase |
 | 2026-10-20 | More default teams; a service-business preset that covers what Salesforce covers; a Knowledge architect and a Business consultant built from research, not only from Jase's view | Jase |
 | standing | Floki never decides a gate; he starts, pauses or stops runs only behind a confirm card; his edits are drafts | spec 13 §6.6 |
 | standing | The owner approves every merge, send, spend and publish | spec 16, Agent-Teams |
@@ -390,6 +391,56 @@ nexscope-ai/ecommerce-skills@ee0fb29 (MIT) `ecommerce-growth-strategy` (intake a
 - **Evaluation:** a labelled test set per business, metrics chosen by use, a gain counted only when its confidence interval clears zero, confirmed on held-out questions, and re-run on every retrieval change; a regression beyond the business's threshold blocks the change.
 - **Upkeep flows (run mode):** re-index, a monthly stale check, a quarterly accuracy audit, dedup with a list of what must not be merged (different conclusions, versions over time).
 
+### 13.1 Department sections and the privacy layer (Jase, 2026-10-21)
+
+"Privacy matters to a lot of business." No business file enters a brain until this layer exists.
+
+**Sections.** Every brain is split into sections by department: Finance, Sales and business development, Service and delivery, Marketing, People (HR), Operations, Legal. A business can rename, merge or add sections. Each section has an owner, a member access list and a sensitivity default. Finance, People and Legal are closed by default: only the owner and named roles can see them.
+
+**Two ways in.**
+- **A person uploads.** For example, the finance team uploads the month's sheets.
+- **An ingest flow pulls on a schedule.** Its sources are a drive folder, an email label or a connected account.
+
+Both paths run the same steps before anything is stored:
+1. A malware scan and a secrets scan.
+2. Personal data is detected, and bank, ID and account numbers are masked.
+3. A sensitivity label is assigned.
+4. The file is placed in a section. The owner approves the mapping the first time a new kind of file arrives.
+
+**Isolation between businesses.** Each business is its own tenant, with:
+- its own storage namespace, vector index and encryption key;
+- no shared caches, embeddings or statistics;
+- no training or fine-tuning on its data.
+
+The catalog takes patterns only, never a business's numbers or text. This extends section 13's access rule from retrieval to storage.
+
+**Labels travel.** The labels are public, internal, confidential and restricted. Every chunk carries its label. Anything derived from it carries the highest label of its inputs: summaries, reports, a consultant's brief.
+
+**Who can read what.**
+- **Agents** read a section only through a flow or a design-mode task that grants it.
+- **AI teammates** get section scopes on their token. Restricted is never granted by default.
+- **Model providers:**
+  - calls go only to providers and settings with zero data retention and no training, where offered;
+  - a business can pin a section to one provider, or keep it out of model calls entirely;
+  - for a section kept out, agents see computed figures, never the rows.
+
+**Audit and exit.**
+- Every read of a confidential or restricted item, by a person or an agent, is logged and visible to the owner.
+- Exports and sends need the owner's approval.
+- Deleting a file deletes its chunks, embeddings and derived summaries.
+- Leaving OS Flow deletes the whole tenant, and the owner gets a deletion record.
+
+**Jurisdiction.** Payroll and staff files for mainland China employees are personal information under China's PIPL. Moving them out of the mainland, including to a model provider, has its own rules. This is a counsel check before the first Chinese business uploads payroll, and it applies to Geniotek.
+
+**Generic finance flow (run mode).** Every month:
+1. Collect the sheets, by upload or by an ingest flow.
+2. Normalise them into a standard shape: revenue by client and line, cost by category and by business, cash.
+3. Reconcile against last month.
+4. Flag anomalies to the owner.
+5. Update the Finance section and the business's KPIs.
+
+The Business consultant and Floki read the KPIs, not the raw rows, unless the owner grants the rows. The first month's mapping is approved by the owner. Later months only flag what changed.
+
 ## 14. Phases
 
 | Phase | What | Depends on |
@@ -402,7 +453,8 @@ nexscope-ai/ecommerce-skills@ee0fb29 (MIT) `ecommerce-growth-strategy` (intake a
 | P5 | AI teammates (M5's first item, a-132) on the one action list | spec 01 M5 |
 | P6 | Hosted runs: Managed Agents (R2), then the provider-neutral sandbox runner (section 8) | P4 |
 | P7 | Catalog and presets; onboarding questions; forks that track their source; the service preset proven on Jase's service business first | P4 |
-| P8 | Specialists one at a time: Architect team (spec 15 orders it), Knowledge architect, Business consultant, Team designer, App builder | P2, P6 |
+| P7b | Privacy layer (section 13.1): tenant isolation, sections, labels, ingest scans, audit, deletion; then the finance flow | P4 |
+| P8 | Specialists one at a time: Architect team (spec 15 orders it), Knowledge architect, Business consultant, Team designer, App builder | P2, P6, P7b |
 | P9 | Bring-your-own skills: private tier, then the shared catalog process | P2 |
 
 ## 15. Not taken
@@ -414,6 +466,7 @@ From the reviews behind this spec: ECC's hooks (on by default when installed as 
 - **Hosting:** keep Managed Agents first and add the Cloudflare sandbox runner after it (section 8.4)? Its price and alpha status need checking first.
 - **Interview:** the Business consultant's first run is an interview with Jase (twelve questions, per business), and Jase's numbers stay in his businesses, never in the catalog.
 - **Apps:** who may install an app a person built in one business into another; whether apps can be shared to the app store with the same three tiers as skills (private, shared, verified).
+- **Privacy:** which model providers each section may reach by default, and whether Finance is kept out of model calls (KPIs only) unless the owner opts in.
 - **Brought AI teammates as team members:** may a brought AI hold a member role in a team's run-mode work (assigned tasks), or only design-mode help?
 
 ## 17. Sources
