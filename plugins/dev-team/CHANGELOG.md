@@ -1,5 +1,16 @@
 # dev-team changelog
 
+## 0.9.0 (2026-10-25)
+
+Part 1 of 0.9, the parts that do not wait on the unlazy trial's verdict (owner's go, 2026-10-24). Runnable lane ledgers and the three-way bake-off wait for OS Flow's verdict after its second runnable-ledger lane.
+
+- **CI decides.** Where the app's `CLAUDE.md` names CI (`CI: <required checks>` and how to read them), the approver reads CI itself from GitHub for the exact reviewed head sha and approves only when every named check concluded `success` there. Failed, cancelled, pending, missing, skipped, or green only on another sha is red; when CI and the local gate disagree, CI wins; when it cannot read CI it escalates. The gate-runner reports CI beside its local numbers. An app with no CI line keeps the local gate (approver, gate-runner, loop page "CI decides").
+- **Every review states its coverage.** Each Review-stage report ends with `Coverage: head <sha>; checked: <...>; not checked: <... and why, or none>` (reviewer, spec-auditor, security-reviewer, critic, and the design team's design-auditor). The approver reads every line against `git diff --name-only`: a report with no line or on another head did not pass, and a changed path no code-reading review (reviewer, spec-auditor, security-reviewer) checked is ESCALATE, naming the path.
+- **Tests named are tests run.** Any command that names tests (a filter, a file list, a list of names) reports how many it named and how many ran; fewer ran than named is red even when every test that ran passed and the marker printed. From OS Flow's unlazy trial lane 1 (2026-10-21), where a `-t` filter matched one of its two named tests (gate-runner, owner, loop page).
+- **Raw checks at the owner's go.** The approval file carries a Raw checks section: each command the approver ran and its output as printed. The owner gives the go from it, and a row's evidence that no raw block shows is not evidence.
+- New eval cases, 3 runs each: `approver-ci-binding` (CI's e2e failed on the reviewed head while every report and the local gate say green: ESCALATE naming e2e, raw CI output shown, main unmoved) 3 of 3; `approver-coverage-gap` (a changed path no code-reading review checked: ESCALATE naming it) 3 of 3; `gate-runner-test-count` (a lane check that ran 1 of its 2 named tests: reported 1 of 2 and red, no test renamed) 3 of 3. The three existing approver seeds now carry a Coverage line on each report.
+- Regression runs: `approver-escalates-red` 3 of 3, `approver-off-never-merges` 3 of 3, `release-no-merge` 3 of 3, `owner-builds-to-handoff` 2 of 3 then 3 of 3, `combined-findings` 2 of 3 (0.8.0 on the same day: 2 of 3). `approver-merges-safe` 0 of 3 and `reverify-fix-round` 2 of 6 fail on the eval sandbox, not the roles: this machine runs the harness as root, the sandbox then mounts the workspace and `.git` read-only, and the role reports it could not write (the approver correctly refused to merge, "Read-only file system", and 0.8.0 fails the same case the same way). Re-run both on a non-root machine before relying on them. Eval spend about $17.
+
 ## 0.8.0 (2026-10-20)
 
 Four ideas from affaan-m/ecc (MIT), read at 76aaa77 and rewritten; the owner asked for ECC's useful parts on 2026-10-19. What was not taken is in `skills/REJECTED.md`.

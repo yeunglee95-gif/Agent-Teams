@@ -15,14 +15,14 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 | 2 | Plan and slice | architect, `slice-the-plan`, and `architecture-critique` (design it twice when an interface is in question); then the reviewer critiques the plan | the owner approves the breakdown; every reviewer plan finding answered; the plan's lane table header starts with the six fixed columns (`slice-the-plan`) | Plan |
 | 3 | Design | the design team's designer, `design-handoff`: screens, states, tokens used and acceptance notes per screen, extending the app's design system | the owner approves the design hand-off | Plan |
 | 4 | Pre-flight per lane | each lane owner, with the checklist below; the milestone's claim row written first (Sessions) | each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane | Build |
-| 5 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane; a lane that builds a designed screen builds to the hand-off | the lane's named red tests are green in a gate the lane ran | Build |
-| 6 | Gate | gate-runner, the app's full gate | every part green on a fresh run, with numbers, on every target | Check |
-| 7 | Review | five reviewers in parallel, each its own subagent with no shared context: spec-auditor (spec check), critic (black-box, screens only), the design team's design-auditor (design check, only when screens change), security-reviewer, reviewer (code, hypotheses first) | every report filed on the same head, each with its verdict line | Check |
+| 5 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane; a lane that builds a designed screen builds to the hand-off | the lane's named red tests are green in a gate the lane ran, with as many tests run as named | Build |
+| 6 | Gate | gate-runner, the app's full gate | every part green on a fresh run, with numbers, on every target; every command that names tests ran as many as it names; CI's result on the same head reported where the app has CI | Check |
+| 7 | Review | five reviewers in parallel, each its own subagent with no shared context: spec-auditor (spec check), critic (black-box, screens only), the design team's design-auditor (design check, only when screens change), security-reviewer, reviewer (code, hypotheses first) | every report filed on the same head, each with its verdict line and its Coverage line | Check |
 | 8 | Combine findings | reviewer, after its own report: one combined findings table, de-duplicated, ranked and tagged by source (Combine findings, below) | every finding from every report is in the table once, or marked `disputed` with why | Check |
 | 9 | Fix and re-verify | fixer, on the table's open rows in rank order; then the gate, and each reviewer whose findings were fixed re-checks them by id; at most two rounds (Limits on fixing) | no open finding; after round 2, any open blocker or major goes to the owner | Fix |
 | 10 | Release check | gate-runner, `release-checklist`: merge danger, merge-gate lines, analytics events named, rollback triggers | the checklist is filled with every line checked in this turn | Ship |
-| 11 | Approve | approver, read-only on code: reads every report, the combined table, the gate numbers and the release checklist; merges only under the app's auto-merge setting (Auto-merge, below) | an APPROVE or ESCALATE line with its reason in the approval table | Ship |
-| 12 | Owner go | **the owner** | the owner merges or deploys, or says who does, each time; skipped for a merge the approver made under auto-merge | Ship |
+| 11 | Approve | approver, read-only on code: reads every report and its coverage, the combined table, the gate numbers, CI on the reviewed head read from GitHub (CI decides, below) and the release checklist; merges only under the app's auto-merge setting (Auto-merge, below) | an APPROVE or ESCALATE line with its reason in the approval table, and the Raw checks section under it | Ship |
+| 12 | Owner go | **the owner** | the owner reads the approval file's Raw checks, then merges or deploys, or says who does, each time; skipped for a merge the approver made under auto-merge | Ship |
 | 13 | Retro | scribe, `run-retro`, then the handoff note and the claim row closed (Sessions) | proposals on the owner's desk; each approved, rejected or parked by the owner | Learn |
 | 14 | Watch | whoever the app's `CLAUDE.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready | Learn |
 
@@ -32,7 +32,13 @@ A finding at any stage goes back to the stage that owns it (a spec gap to the ar
 
 ## Review: five at once (stage 7)
 
-The main session starts every reviewer at the same time, each as its own subagent with its own brief, and every brief carries the plan's Review Focus list word for word: the spec-auditor, the critic, the design-auditor (only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
+The main session starts every reviewer at the same time, each as its own subagent with its own brief, and every brief carries the plan's Review Focus list word for word: the spec-auditor, the critic, the design-auditor (only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. Every report ends with one Coverage line, so what was not reviewed is written down instead of assumed:
+
+`Coverage: head <sha>; checked: <paths, spec rows, screens, tests run, targets, languages>; not checked: <what, and why, or none>`
+
+The reviewer, the spec-auditor and the security-reviewer list paths; the critic and the design-auditor list screens, targets and languages. The approver reads every line against the diff: a changed path that no code-reading review checked stops the approval.
+
+Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
 
 ## Combine findings (stage 8)
 
@@ -51,6 +57,14 @@ Nothing moves until every report from stage 7 is filed. Then the reviewer, whose
 Below the table, a **Declined to judge** section gathers every behavior a reviewer set aside as outside the spec or plan, with its source and reason. The architect rules on each line before stage 9: it becomes a row (`open`, graded by what a person using the app gets if it ships), or it is recorded as not required, with the reason, in the memory file. A finding is graded by its effect, not by whether the spec names the input; the spec says what the app must do, not everything it will meet.
 
 Rows are ranked: every blocker, then every major, then every minor. The reviewer adds no new finding of its own here; a finding it missed goes into its own report first, with its next id.
+
+## CI decides (stages 6 and 11)
+
+Where the app's `CLAUDE.md` names CI (`CI: <the required checks>` and how to read them), CI's result on the reviewed head is the binding gate. The gate-runner reports it beside its local numbers; the approver reads it itself from GitHub for the exact reviewed head sha and approves only when every named check concluded `success` on that sha. Failed, cancelled, pending, missing or skipped is red, and so is green on another sha. When CI and the local gate disagree, CI wins. When the approver cannot read CI, it escalates. An app with no CI line keeps the local gate as its only gate.
+
+**Tests named are tests run.** Any command that names tests (a filter, a file list, a list of names) reports how many it named and how many ran; fewer ran than named is red even when every test that ran passed.
+
+**Raw checks at the owner's go.** The approval file carries the commands the approver ran and their output as printed, so the owner gives the go on what was run, not on a summary of it.
 
 ## Auto-merge
 
@@ -116,7 +130,7 @@ A finding's second attempt can fall in round 1 (its test stayed red) or round 2 
 ## What the loop never does
 
 - Merge on its own. No role merges, tags or deploys, except the approver merging a change inside the auto-merge limits of a project that turned it on (Auto-merge); the owner gives every other go, each time.
-- Merge when CI failed to start, or call a gate green that did not run.
+- Merge when CI failed to start, is red or still running on the reviewed head, or went green only on another sha; or call a gate green that did not run, or a filtered run green when it ran fewer tests than it names.
 - File follow-up work straight into ready. New work, refactor ideas and Watch findings go to the backlog; the owner moves them on.
 - Let a lane decide a judgment call without asking. A lane stops and asks the architect or the owner.
 - Let a reviewer (the spec-auditor, critic, design-auditor, security-reviewer or reviewer) or the approver patch code. They write findings or decisions; the fixer fixes.

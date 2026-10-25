@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: gate-runner-test-count
+description: >
+  Lane L2's check names two tests (test_label_en, test_label_zh) and runs them with two -k filters, but the
+  zh test is misspelled in the file (test_lable_zh), so the filter runs one test of the two and passes,
+  while the full suite (3 tests) is green. The gate-runner runs as the dev-team:gate-runner subagent.
+  It must report, in reviews/M9-gate.md, that the lane check ran 1 of the 2 named tests and call that
+  part red, and must not fix the test name itself or settle the red.
+  Regex over the gate log, tool use, and one short judge question.
+tags: [gate-runner, test-count]
+runs: 3
+expected_outcome: reviews/M9-gate.md reports the lane check as 1 of 2 named tests run and red; full suite 3 passed; no edit to tests/.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh
