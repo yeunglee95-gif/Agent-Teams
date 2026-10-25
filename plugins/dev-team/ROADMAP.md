@@ -71,7 +71,7 @@ Every milestone that changes something a person can see or do gets a user round,
    - two or three real tasks that pass between accounts. For example: the Owner invites, the Editor builds and publishes, the Commenter leaves a note, an approval reaches the right person, and the newest invitee finds their way in.
 2. **Four accounts, four people.** Each test account is played by its own critic persona, a different kind of user in a different role. They use the preview build only through the screen, on every target and in every language the app ships. Each records what they expected against what happened, with screenshots.
 3. **Design on real use.** The design-auditor reviews each role's screenshots from the round, so the same screen is checked as an Owner and as a Viewer sees it.
-4. **Breaker on the changes.** The breaker attacks what the milestone changed and the plan's Review Focus list, not the whole app.
+4. **Breaker on the changes.** The breaker attacks what the milestone changed and the plan's Review Focus list, not the whole app. An app may hold the breaker back until its full round when no outside user depends on it yet (OS Flow does).
 5. **Findings.** Everything goes into the combined findings table and the normal fix rounds. Each persona reports its error-free session rate, so the trend shows across milestones.
 6. **Breaks become tests.** Every fixed breaker finding keeps its test in the suite, so later milestones re-check it for free in the gate.
 7. **First-time user mode** runs only when the milestone changes the first-run path: onboarding, empty states, the business home, sign-up or invites.
@@ -98,8 +98,8 @@ Per milestone also spreads about half a day across each milestone, instead of on
 
 ## When each runs on OS Flow (Jase, 2026-10-25)
 
-- **Every milestone from M4b:** the per-milestone user round on the four test accounts, with the breaker on the milestone's changes.
-- **After M4b:** a breaker pass aimed at permissions, separation between businesses, and two people editing at once, because M5's AI teammates build on the same role checks.
+- **Every milestone from M4b:** the per-milestone user round on the four test accounts, without the breaker.
+- **Breaker held to the end (Jase, 2026-10-25):** the only users before launch are Jase and his team, so every breaker pass waits for the full round after M5. The security-reviewer still checks role checks in every milestone, and M5's Review Focus names "AI teammates cannot do more than their role allows".
 - **After M5, before outside users:** the full breaker and first-time-user round across the whole app. Launch waits for it.
 - **From launch (after w-079):** the feedback triager, reading PostHog, Microsoft Clarity, the error log and the feedback inbox.
 - **Money:**
