@@ -61,7 +61,7 @@ A simple bug is fixed only through the loop: fixer, gate, review, approver, with
 - Watch findings go to the backlog, never straight to ready. Letting triage move a "simple bug" to ready is a standing rule the owner turns on per app.
 - No role patches code outside the loop. The triager never fixes anything itself.
 
-### Per-milestone user round (Review stage, Jase, 2026-10-26)
+### Per-milestone user round (Review stage, Jase, 2026-10-25)
 
 Every milestone that changes something a person can see or do gets a user round, scoped to what it changed. A milestone with no such change skips it, and the plan says so in one line.
 
@@ -82,7 +82,7 @@ The round has a usage cap per milestone, set from the first measured round. When
 
 Once most of the app is built, the full breaker and first-time-user round runs across the whole app, before any outside user signs up. A launch waits for this round and its fixes; the round is never squeezed to keep a launch date.
 
-### Why per milestone and not only at the end (evaluated 2026-10-26)
+### Why per milestone and not only at the end (evaluated 2026-10-25)
 
 Per milestone costs more in testing tokens, about three rounds against one. It costs less in fixing:
 
@@ -96,7 +96,7 @@ Per milestone also spreads about half a day across each milestone, instead of on
 - **The testing agents** (personas, breaker, design-auditor) run as Claude Code sessions on the owner's Claude plan. On a subscription their cost is usage limits and waiting time, not a bill, unless the owner moves to API billing or buys extra usage.
 - **The app's own AI** (Floki, AI steps in a flow), when a test account uses it, is billed to the app's model account (OpenRouter for OS Flow). Test rounds get their own cap on that account, separate from any benchmark budget, so a test round never spends a benchmark's credit.
 
-## When each runs on OS Flow (Jase, 2026-10-26)
+## When each runs on OS Flow (Jase, 2026-10-25)
 
 - **Every milestone from M4b:** the per-milestone user round on the four test accounts, with the breaker on the milestone's changes.
 - **After M4b:** a breaker pass aimed at permissions, separation between businesses, and two people editing at once, because M5's AI teammates build on the same role checks.
