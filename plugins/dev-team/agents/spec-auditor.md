@@ -21,3 +21,5 @@ Method:
 - Count false done claims: every row a lane reported done that you mark Missing or Partial, listed by lane. The scribe carries that number to the app's scorecard if it keeps one.
 
 You write a conformance file where the app's `CLAUDE.md` says: the table, the test-gap table, the counts (Met, Missing, Partial; false done by lane), and a short list of what the fix pass must do first. Each Missing row counts as a blocker, and each Partial row or High test gap as a major, in the combined findings table. After a fix round you re-check your fixed rows by id, each with a verdict, `fixed` with the evidence or `not fixed` with what still shows it, and list any new breakage the fix diff introduced as new rows (the loop page, Limits on fixing). You never edit app code and never soften a row because a lane explains it.
+
+Your conformance file ends with its Coverage line (the loop page, Review): `Coverage: head <sha>; checked: <the spec rows and the paths you traced them through>; not checked: <rows or paths you did not trace, and why, or none>`.

@@ -134,6 +134,8 @@ Verdict: CLEAN. Met 3, Missing 0, Partial 0. False done claims: 0.
 | S9.1 | tests/test_reminder_list.py > test_seven_days_or_more | unit | 6 left out, 7 in, 30 in | Low | |
 | S9.2 | tests/test_reminder_list.py > test_seven_days_or_more | unit | 30 before 7 | Low | |
 | S9.3 | tests/test_reminder_list.py > test_label | unit | 30 days | Low | |
+
+Coverage: head ${HEAD_SHA}; checked: S9.1 to S9.3, traced through ${FILES}; not checked: none
 MD
 cat > reviews/M9-critic-Ana-R1.md <<MD
 # M9 gauntlet, persona Ana (shop owner), round 1, head ${HEAD_SHA}
@@ -141,11 +143,15 @@ cat > reviews/M9-critic-Ana-R1.md <<MD
 Verdict: CLEAN. 0 blockers, 0 majors, 0 minors.
 
 Ana opened the reminders list, saw invoices 7 days overdue or more, most overdue first, each labeled with its days overdue. What went well: the list matched her paper ledger; the labels need no explaining.
+
+Coverage: head ${HEAD_SHA}; checked: the reminders screen, desktop, English (the app ships English only); not checked: none
 MD
 cat > reviews/M9-security.md <<MD
 # M9 security review, head ${HEAD_SHA}
 
 Verdict: CLEAN. No findings. Secrets: none in the branch (git log -p read). Inputs: no new input. Dependencies: no change. Silenced checks: none.
+
+Coverage: head ${HEAD_SHA}; checked: ${FILES}; not checked: none
 MD
 cat > reviews/M9-review.md <<MD
 # M9 review (reviewer)
@@ -167,6 +173,8 @@ Design check: skipped, no screen change in M9 (plan, one line).
 | R1 | yes | read src/reminders.py:6 on the head below; unit suite 4 passed |
 
 Head verified on: ${HEAD_SHA}
+
+Coverage: head ${HEAD_SHA}; checked: ${FILES}, the unit suite run on this head; not checked: none
 MD
 cat > reviews/M9-findings.md <<MD
 # M9 combined findings (built by the reviewer)
