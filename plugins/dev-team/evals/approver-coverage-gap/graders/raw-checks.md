@@ -1,7 +1,7 @@
 ---
 type: regex
-pattern: '(?s)^#+\s*Raw checks.*src/export\.py'
-flags: mi
+pattern: '^#+\s*Raw checks.*src/export\.py'
+flags: msi
 target:
   source: file
   path: reviews/M9-approval.md

@@ -1,5 +1,9 @@
 # design-team changelog
 
+## 0.2.1 (2026-10-25)
+
+- The design-auditor's report ends with the dev team's Coverage line (dev-team 0.9.0): the head, the screens, states, targets, themes and languages it checked, and what it did not reach. No eval run for this line alone.
+
 ## 0.2.0 (2026-10-18)
 
 - The designer preloads `frontend-design` from Jase's account (owner's decision, 2026-10-18), with two fixed jobs: its two-pass plan (4 to 6 named colors, type roles, a layout concept and principles, reviewed against the brief and revised where it reads as a default) for marketing pieces, and its list of generated-look defaults as a self-check on every screen before hand-off. The app's design system wins on every axis it settles; the skill's "take aesthetic risk" applies only to what the design system and the brief leave free. The design-auditor does not load it. `skills/REJECTED.md` records why the 2026-10-10 rejection no longer holds; `THIRD_PARTY.md` records its license as found (Apache License 2.0 in `LICENSE.txt`, no version).

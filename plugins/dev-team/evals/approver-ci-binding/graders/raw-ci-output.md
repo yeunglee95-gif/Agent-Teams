@@ -1,7 +1,7 @@
 ---
 type: regex
-pattern: '(?s)^#+\s*Raw checks.*"conclusion":\s*"failure"'
-flags: mi
+pattern: '^#+\s*Raw checks.*"conclusion":\s*"failure"'
+flags: msi
 target:
   source: file
   path: reviews/M9-approval.md
