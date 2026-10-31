@@ -1,6 +1,6 @@
 # Code-smell baseline
 
-Part of the `hidden-failure-check` skill; its `## Source` section covers this file. The smells are from Martin Fowler's _Refactoring_, chapter 3. Used on the standards axis of a review, on top of the rules in the app's `CLAUDE.md`.
+Part of the `hidden-failure-check` skill; its `## Source` section covers this file. The smells are from Martin Fowler's _Refactoring_, chapter 3. Used on the standards axis of a review, on top of the rules in the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet).
 
 Two rules bind it:
 

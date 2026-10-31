@@ -1,5 +1,9 @@
 # design-team changelog
 
+## 0.3.0 (2026-10-31)
+
+- Works with dev-team 0.10.0. The designer, the design-auditor, the `design-handoff` skill and `README.md` read the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet), the file apps are moving their rules to (owner's decision, 2026-10-31). Both roles' never-edit lists protect `AGENTS.md` (or `CLAUDE.md`). No other change. Eval seeds still write a `CLAUDE.md`, so they exercise the fallback; `design-audit-planted` and `design-audit-taste-conflict` not run here (Linux sandbox needed).
+
 ## 0.2.1 (2026-10-25)
 
 - The design-auditor's report ends with the dev team's Coverage line (dev-team 0.9.0): the head, the screens, states, targets, themes and languages it checked, and what it did not reach. No eval run for this line alone.

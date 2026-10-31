@@ -25,7 +25,7 @@ For each lane, write:
 
 - **What it delivers:** the behavior a person will see, in the spec's words, with the spec reference.
 - **Files it owns:** from the ownership map. Lanes in the same wave own disjoint files; a file two lanes need belongs to one lane, and the other reads it through its export or waits.
-- **Red tests it starts from:** each by file and title, asserting on the stable hooks the app's `CLAUDE.md` names. "Done" is these tests green in a gate the owner ran.
+- **Red tests it starts from:** each by file and title, asserting on the stable hooks the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) names. "Done" is these tests green in a gate the owner ran.
 - **Blocked by:** the lanes that must finish first, or "none". Blocking edges are the lane order: lanes with nothing open ahead of them can run in parallel; a chain runs top to bottom.
 - **Contract shapes** it may add, if any, pre-signed in the plan; anything else stops and asks the architect.
 - **Interfaces:** what it consumes from lanes ahead of it and what it produces for lanes after it, by exact name and signature (a function, an export, a store action, a route, a test id). A name one lane produces is spelled the same in every lane that consumes it; check this across the plan before the owner check.
@@ -38,7 +38,7 @@ The plan also holds one lane table, beside any prose, because the owner, the boa
 | N1 | slice | S5.1 add a note | `src/db/notes.ts`, `src/api/notes.ts`, `src/ui/NoteEditor.tsx` | `tests/notes.test.ts` > "adds a note" | none |
 ```
 
-The six columns come first, spelled exactly as above and in this order, even where the app's older plans used another table. A column the app's `CLAUDE.md` asks for (the model a lane runs on, what done means, an estimate) goes after `Blocked by`, never instead of one of the six, between them or under another name. Before the owner check, confirm the header line starts `| Lane | Kind | Delivers | Owns | Red tests | Blocked by |`.
+The six columns come first, spelled exactly as above and in this order, even where the app's older plans used another table. A column the app's `AGENTS.md` asks for (the model a lane runs on, what done means, an estimate) goes after `Blocked by`, never instead of one of the six, between them or under another name. Before the owner check, confirm the header line starts `| Lane | Kind | Delivers | Owns | Red tests | Blocked by |`.
 
 One row per lane, never a row for a group of lanes. Kind is `slice`, `expand`, `migrate` or `contract`. Owns lists file paths. Red tests are `file > test name` entries. Blocked by lists lane ids, or `none`.
 
@@ -72,10 +72,10 @@ Change it until the owner approves it. Then the reviewer critiques the plan (the
 
 ## Where it goes
 
-The lane plan goes where the app's `CLAUDE.md` says milestone plans live. Publish lanes to an issue tracker only if the `CLAUDE.md` names one, and then each item lands where the owner moves it on, never straight into a ready column. Keep exact file lists in the plan, not in the tickets, so there is one home for them.
+The lane plan goes where the app's `AGENTS.md` says milestone plans live. Publish lanes to an issue tracker only if the `AGENTS.md` names one, and then each item lands where the owner moves it on, never straight into a ready column. Keep exact file lists in the plan, not in the tickets, so there is one home for them.
 
 ## Source
 
-Adapted from `skills/engineering/to-tickets/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; tickets became lanes with disjoint file ownership and named red tests; blocking edges became lane order; the quiz step goes to the owner; the reviewer's plan critique added before lanes start; publishing to a tracker only when the app's `CLAUDE.md` names one, never with a ready-for-agent label; the setup-skill pointer and ticket templates removed. License text: `../../licenses/mattpocock-skills-MIT.txt`.
+Adapted from `skills/engineering/to-tickets/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: rewritten in this team's voice; tickets became lanes with disjoint file ownership and named red tests; blocking edges became lane order; the quiz step goes to the owner; the reviewer's plan critique added before lanes start; publishing to a tracker only when the app's `AGENTS.md` names one, never with a ready-for-agent label; the setup-skill pointer and ticket templates removed. License text: `../../licenses/mattpocock-skills-MIT.txt`.
 
 The Interfaces line and the Review Focus section are adapted from `skills/writing-plans/SKILL.md` (the task Interfaces block and the Review Focus section) in obra/superpowers (MIT, Copyright (c) 2025 Jesse Vincent), commit bb92a77741419a4ab5f06e711a283343f1ada0c3. Changed: tasks became lanes; the tests go to the owning lane's red tests; the list goes to the Review stage. License text: `../../licenses/obra-superpowers-MIT.txt`.

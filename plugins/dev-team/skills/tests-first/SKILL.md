@@ -9,7 +9,7 @@ If you did not watch the test fail, you do not know it tests the right thing.
 
 ## The cycle, one behavior at a time
 
-1. **Red.** Write one test for one behavior, with a name that says what should happen. It asserts on the stable hooks the app's `CLAUDE.md` names (test ids, state attributes, visible text), never pixels or fixed sleeps. Use real code; mock only what you cannot run, and a mock carries the full shape of the real data. Before the test body, name the change in the app code that would make it fail; if you cannot name one, the test checks nothing.
+1. **Red.** Write one test for one behavior, with a name that says what should happen. It asserts on the stable hooks the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) names (test ids, state attributes, visible text), never pixels or fixed sleeps. Use real code; mock only what you cannot run, and a mock carries the full shape of the real data. Before the test body, name the change in the app code that would make it fail; if you cannot name one, the test checks nothing.
 2. **Watch it fail.** Run it. It must fail, not error, and fail because the behavior is missing, not because of a typo. If it passes at once, it tests something that already exists: fix the test.
 3. **Green.** Write the least code that makes it pass. Nothing the test does not ask for.
 4. **Watch it pass,** then run the whole unit suite, not just your file. Every other test still passes and the output carries no new errors or warnings. If the test fails, fix the code, never the test. Any red you saw in the suite, even one you did not cause, is named in your report; leaving it out is a false report.

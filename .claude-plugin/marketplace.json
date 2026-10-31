@@ -8,7 +8,7 @@
     {
       "name": "dev-team",
       "source": "./plugins/dev-team",
-      "description": "The shared core dev team: eleven roles, fourteen skills and one fifteen-stage milestone loop that build, gate, review in parallel, approve, audit and record any app, reading the app's own CLAUDE.md for its specifics. Merging stays with the owner unless an app opts in to auto-merge."
+      "description": "The shared core dev team: eleven roles, fourteen skills and one fifteen-stage milestone loop that build, gate, review in parallel, approve, audit and record any app, reading the app's own AGENTS.md (or CLAUDE.md where the app has not switched yet) for its specifics. Merging stays with the owner unless an app opts in to auto-merge."
     },
     {
       "name": "design-team",

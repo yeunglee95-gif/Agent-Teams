@@ -7,7 +7,7 @@ description: Use when writing a design hand-off for the dev team, or when checki
 
 A design hand-off is what the dev team builds from and what the design-auditor checks against. One hand-off per milestone that changes screens. It lives in the folder or link the brief names (in OS Flow's terms, spec/09: a frozen snapshot a person reads as a picture and an AI reads as a Markdown brief). If the brief names no place, stop and ask.
 
-The app's design system (the file its `CLAUDE.md` names; for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) is the source of every token, rule and limit. The hand-off cites it by section and never restates it.
+The app's design system (the file its `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) names; for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) is the source of every token, rule and limit. The hand-off cites it by section and never restates it.
 
 ## What the folder holds
 

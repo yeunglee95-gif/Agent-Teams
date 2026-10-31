@@ -1,6 +1,6 @@
 {
   "name": "design-team",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "The shared design team: a designer who extends the app's design system and hands screens to the dev team, and a design-auditor who checks what was built against the design. Five design skills on Jase's account are referenced, not copied. Each app's own design system always wins.",
   "author": {
     "name": "Jase"

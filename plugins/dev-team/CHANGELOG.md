@@ -1,5 +1,15 @@
 # dev-team changelog
 
+## 0.10.0 (2026-10-31)
+
+Apps are moving their rules file from `CLAUDE.md` to `AGENTS.md` (owner's decision, 2026-10-31). Apps re-pin between milestones, so this version works for both.
+
+- **Every role, skill and the loop page read the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet).** The first mention in each file carries the fallback; later mentions say `AGENTS.md`. No rule changed beyond the file's name.
+- **Protected-file rules name both files.** The approver, the loop page's never-list, `run-retro`, and the design team's designer and design-auditor never edit `AGENTS.md` (or `CLAUDE.md`) without the owner's approval.
+- **`claude-md-upkeep` is now `agents-md-upkeep`** (folder renamed with history, scribe's preload list, `THIRD_PARTY.md` and `run-retro` updated). It audits every `AGENTS.md` and any `CLAUDE.md` left, never creates a `CLAUDE.md` or adds to one, and where an app has a `CLAUDE.md` and no `AGENTS.md` its first proposal is the rename (`git mv`, own commit), not an edit to either file.
+- This repo's own rules moved from `README.md` to a root `AGENTS.md`; the README points to it.
+- Eval seeds still write a `CLAUDE.md` into their test apps, so they now exercise the fallback; left unchanged. No eval run for this version (the evals need a Linux sandbox): run the cases listed in the pull request before any app re-pins.
+
 ## 0.9.0 (2026-10-25)
 
 Part 1 of 0.9, the parts that do not wait on the unlazy trial's verdict (owner's go, 2026-10-24). Runnable lane ledgers and the three-way bake-off wait for OS Flow's verdict after its second runnable-ledger lane.
