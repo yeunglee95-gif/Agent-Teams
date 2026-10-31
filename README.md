@@ -5,6 +5,7 @@ Jase's agent teams, in one private repo. Each team is a Claude Code plugin with 
 ## Layout
 
 ```
+AGENTS.md                          rules for changing this repo
 .claude-plugin/marketplace.json    lists every team
 plugins/
   dev-team/
@@ -30,7 +31,7 @@ plugins/
 
 ## The dev team
 
-Eleven roles and fourteen skills (0.8.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, review, combine findings, fix and re-verify, release check, approve, the owner's go, retro, watch. Review runs five reviewers at once, each in its own context: the spec-auditor, the critic, the design team's design-auditor (only when screens change), the security-reviewer and the reviewer. The reviewer then merges their findings into one combined table, de-duplicated, ranked and tagged by source, which the fixer works through in at most two rounds; anything blocker or major still open after that goes to the owner. The approver reads it all and writes APPROVE or ESCALATE. The owner gives every merge and deploy go, except where an app's `CLAUDE.md` turns on auto-merge (off by default): then the approver may merge a small two-way-door change with every check green and no protected path, and sending, spending, publishing and live data stay the owner's.
+Eleven roles and fourteen skills (0.8.0). Each role preloads only the skills it needs, listed in its agent file. Every role follows one loop, `plugins/dev-team/workflows/milestone-loop.md`, owned by the scribe: intake, grill the plan, plan and slice, design, pre-flight per lane, build lanes, gate, review, combine findings, fix and re-verify, release check, approve, the owner's go, retro, watch. Review runs five reviewers at once, each in its own context: the spec-auditor, the critic, the design team's design-auditor (only when screens change), the security-reviewer and the reviewer. The reviewer then merges their findings into one combined table, de-duplicated, ranked and tagged by source, which the fixer works through in at most two rounds; anything blocker or major still open after that goes to the owner. The approver reads it all and writes APPROVE or ESCALATE. The owner gives every merge and deploy go, except where an app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) turns on auto-merge (off by default): then the approver may merge a small two-way-door change with every check green and no protected path, and sending, spending, publishing and live data stay the owner's.
 
 The loop page's Sessions section sets how sessions map to milestones: one main session per milestone with its model fixed for its life (a model switch drops the prompt cache; an effort change keeps it), reading delegated to a few substantial subagents, a claim row on the roadmap's claim board before any lane starts, a cross-milestone pre-flight against other milestones' claimed paths and open pull requests, a retry cap, and a close with a handoff note so the next milestone starts in a fresh session. The retro (`run-retro`) also reads what each stage cost and names the most expensive one.
 
@@ -63,14 +64,12 @@ Do not make a team's folder until the team has roles in it.
 ## How an app uses a team
 
 - **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams` (and `/plugin install design-team@agent-teams` for an app with screens).
-- **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/`, `THIRD_PARTY.md` and `workflows/` alongside, into `.claude/agent-teams/`, and name `.claude/agent-teams/workflows/milestone-loop.md` in the app's `CLAUDE.md` as the copy of the loop page.
+- **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/`, `THIRD_PARTY.md` and `workflows/` alongside, into `.claude/agent-teams/`, and name `.claude/agent-teams/workflows/milestone-loop.md` in the app's `AGENTS.md` as the copy of the loop page.
 
-Each app keeps its own memory, specs, gate commands and specialists (personas, rubrics, domain reviewers) in its own repo. The roles read the app's `CLAUDE.md` for all of these and stop to ask when it does not say.
+Each app keeps its own memory, specs, gate commands and specialists (personas, rubrics, domain reviewers) in its own repo. The roles read the app's `AGENTS.md` for all of these and stop to ask when it does not say.
 
 A pin changes only between milestones, so a team change cannot break an app's loop mid-milestone.
 
 ## Rules for this repo
 
-- A team moves to its own repo only when someone outside needs access to that team alone (GitHub access is per repo).
-- Business knowledge is linked, never copied. It stays in each business's own repo and Notion.
-- No credentials anywhere in this repo.
+The rules for changing this repo are in `AGENTS.md`.

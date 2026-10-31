@@ -40,7 +40,7 @@ Skipping a step is not a shortcut; it is an unverified claim.
 
 Every one of these means: run the check, then speak.
 
-The app's `CLAUDE.md` names the gate commands and the targets. "Not run" on any target is a red result, not a blank.
+The app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) names the gate commands and the targets. "Not run" on any target is a red result, not a blank.
 
 ## Source
 

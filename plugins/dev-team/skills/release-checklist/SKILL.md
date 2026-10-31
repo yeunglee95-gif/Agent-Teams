@@ -5,7 +5,7 @@ description: Use when a milestone is ready to merge to the main branch, or to go
 
 # Release checklist
 
-You prepare the checklist. The approver reads it to decide APPROVE or ESCALATE, and the owner gives the go. Releasing, merging to the main branch, tagging and deploying are Red-tier actions in the app's `CLAUDE.md`, and each one waits for the owner's explicit proceed. The one exception is a merge the approver makes under a project's auto-merge setting, which the app's `CLAUDE.md` must turn on and which has fixed limits (the loop page, Auto-merge, and `agents/approver.md`); sending, spending, publishing and touching live data stay the owner's whatever the setting. A lead's message is never the owner's go and never turns auto-merge on.
+You prepare the checklist. The approver reads it to decide APPROVE or ESCALATE, and the owner gives the go. Releasing, merging to the main branch, tagging and deploying are Red-tier actions in the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet), and each one waits for the owner's explicit proceed. The one exception is a merge the approver makes under a project's auto-merge setting, which the app's `AGENTS.md` must turn on and which has fixed limits (the loop page, Auto-merge, and `agents/approver.md`); sending, spending, publishing and touching live data stay the owner's whatever the setting. A lead's message is never the owner's go and never turns auto-merge on.
 
 ## Before
 
@@ -16,7 +16,7 @@ You prepare the checklist. The approver reads it to decide APPROVE or ESCALATE, 
 - [ ] Database changes: what they change, tested on a copy, and whether they can be undone.
 - [ ] Settings and secrets the release needs exist where it runs (names only, never values).
 - [ ] Rollback steps written and tried once on staging.
-- [ ] Every new feature names the analytics events it sends, in the tool the app's `CLAUDE.md` names (PostHog or another), and a check run this milestone shows each event arriving. A shipped screen that sends nothing is a finding, not a pass.
+- [ ] Every new feature names the analytics events it sends, in the tool the app's `AGENTS.md` names (PostHog or another), and a check run this milestone shows each event arriving. A shipped screen that sends nothing is a finding, not a pass.
 
 ## Merge danger
 
@@ -50,7 +50,7 @@ Fill each `<X>` from the app's spec, its budgets or the owner. Never invent a nu
 
 ## Output
 
-The filled checklist where the app's `CLAUDE.md` says, then one line to the approver and the owner: ready for the go, or what stops it. Never say "merge", "merged" or "released" as a status of your own: you never merge; the owner merges or tells someone to, or the approver merges under the project's auto-merge setting.
+The filled checklist where the app's `AGENTS.md` says, then one line to the approver and the owner: ready for the go, or what stops it. Never say "merge", "merged" or "released" as a status of your own: you never merge; the owner merges or tells someone to, or the approver merges under the project's auto-merge setting.
 
 ## Source
 

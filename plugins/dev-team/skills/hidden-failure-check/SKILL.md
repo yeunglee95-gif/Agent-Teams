@@ -47,11 +47,11 @@ High gaps block: the stage does not pass while one is open. Each goes to the fix
 Every finding carries:
 
 - **Class:** Gap (a spec row or asked-for behavior missing or incomplete), Bug (the code likely fails or regresses), Verification miss (the code may be right but the evidence does not prove it), Scope drift (the diff changes something nobody asked for, or skips a stated constraint), or Over-engineering (it works but builds more than the spec needs: a new dependency, abstraction, setting or file where existing code or one line would do). Over-engineering is always minor and never blocks on its own. A simplification that would cut validation, security, data-loss protection or accessibility is not a finding.
-- **Axis:** spec (does it do what the spec row says) or standards (does it follow the app's `CLAUDE.md` rules and the code-smell baseline in `smells.md`, next to this file). Report the two axes in separate sections and never rerank findings across them; name the worst finding within each axis, not one winner overall. A smell is always a judgment call and the app's documented rules override it.
+- **Axis:** spec (does it do what the spec row says) or standards (does it follow the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) rules and the code-smell baseline in `smells.md`, next to this file). Report the two axes in separate sections and never rerank findings across them; name the worst finding within each axis, not one winner overall. A smell is always a judgment call and the app's documented rules override it.
 - **Severity:** blocker (silent failure, a fallback that lies, a High gap), major (an untested rule or path a person depends on, a misleading message), minor (missing context, a smell, over-engineering).
 - Path and line, what could be hidden or missed, what the person would experience, and a suggested test title.
 
-Every item you report as a problem is a finding with all of the above, including test gaps and broken `CLAUDE.md` rules. A hypothesis or claim you checked and found true is not a finding: list it as "holds", with the `path:line` or command that showed it, so the next round does not argue it again.
+Every item you report as a problem is a finding with all of the above, including test gaps and broken `AGENTS.md` rules. A hypothesis or claim you checked and found true is not a finding: list it as "holds", with the `path:line` or command that showed it, so the next round does not argue it again.
 
 ## Source
 

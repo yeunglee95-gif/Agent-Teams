@@ -247,7 +247,7 @@ function loopView() {
   const h = D.loopHeader;
   const numKey = h.find(k => /^#|^no|^step$/.test(k)), stageKey = h.find(k => /stage/.test(k)) || h[1];
   const rest = h.filter(k => k !== numKey && k !== stageKey);
-  return `<p class="sub" style="margin-bottom:16px">The loop every project runs, read from <code>workflows/milestone-loop.md</code>. Project details come from each project's own CLAUDE.md.</p>
+  return `<p class="sub" style="margin-bottom:16px">The loop every project runs, read from <code>workflows/milestone-loop.md</code>. Project details come from each project's own AGENTS.md (or CLAUDE.md where the project has not switched yet).</p>
     <ol class="loop">${D.loop.map((r, i) => `<li class="${/owner go|jase/i.test(r[stageKey] + r[rest[0]]) ? "owner" : ""}"><span class="no">${esc(numKey ? r[numKey] : i)}</span><div><p class="st">${md(r[stageKey])}</p><dl class="row">${rest.map(k => r[k] ? `<dt>${esc(k)}</dt><dd>${md(r[k])}</dd>` : "").join("")}</dl></div></li>`).join("")}</ol>`;
 }
 

@@ -2,9 +2,9 @@
 
 The one loop the dev team runs on every project, from a request to shipped work and back, with the design team's Design stage and its part of Review on milestones that change screens. Owned by the scribe; every role reads it. The roles say who does what and the skills say how; this page says in what order, and what moves work from one stage to the next.
 
-Everything project-specific comes from the app's `CLAUDE.md`: the commands, the gate, the paths, the protected files, the owner, what never ships without approval, the tools it uses (an analytics tool such as PostHog, an error log, an issue tracker). Where the `CLAUDE.md` is silent on something a stage needs, the role stops and asks. Nothing here overrides it.
+Everything project-specific comes from the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet): the commands, the gate, the paths, the protected files, the owner, what never ships without approval, the tools it uses (an analytics tool such as PostHog, an error log, an issue tracker). Where the `AGENTS.md` is silent on something a stage needs, the role stops and asks. Nothing here overrides it.
 
-Words used here: **the owner** is the person who gives every merge and deploy go (Jase, unless the app's `CLAUDE.md` names someone else), except a merge the approver makes under a project's auto-merge setting. A **lane owner** is the `owner` role, building one lane.
+Words used here: **the owner** is the person who gives every merge and deploy go (Jase, unless the app's `AGENTS.md` names someone else), except a merge the approver makes under a project's auto-merge setting. A **lane owner** is the `owner` role, building one lane.
 
 ## The stages
 
@@ -24,7 +24,7 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 | 11 | Approve | approver, read-only on code: reads every report and its coverage, the combined table, the gate numbers, CI on the reviewed head read from GitHub (CI decides, below) and the release checklist; merges only under the app's auto-merge setting (Auto-merge, below) | an APPROVE or ESCALATE line with its reason in the approval table, and the Raw checks section under it | Ship |
 | 12 | Owner go | **the owner** | the owner reads the approval file's Raw checks, then merges or deploys, or says who does, each time; skipped for a merge the approver made under auto-merge | Ship |
 | 13 | Retro | scribe, `run-retro`, then the handoff note and the claim row closed (Sessions) | proposals on the owner's desk; each approved, rejected or parked by the owner | Learn |
-| 14 | Watch | whoever the app's `CLAUDE.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready | Learn |
+| 14 | Watch | whoever the app's `AGENTS.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready | Learn |
 
 **Design** (stage 3) and the design-auditor's part of **Review** (stage 7) run only for a milestone that changes screens; for a milestone with no screen change both are skipped, and the plan says so in one line. They are run by the design team (the `design-team` plugin in this repo); where the app has no design team installed, the owner says who covers them or rules them out for the milestone. The Phase column groups the stages for tools that draw the loop; it changes no gate.
 
@@ -42,7 +42,7 @@ Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona
 
 ## Combine findings (stage 8)
 
-Nothing moves until every report from stage 7 is filed. Then the reviewer, whose own report is already written, reads the others and builds one table, because it re-verifies fixes later and already reads the code. It goes in `<milestone>-findings.md` beside the reviews, unless the app's `CLAUDE.md` names another place, and the fixer, the approver and the checks all read it:
+Nothing moves until every report from stage 7 is filed. Then the reviewer, whose own report is already written, reads the others and builds one table, because it re-verifies fixes later and already reads the code. It goes in `<milestone>-findings.md` beside the reviews, unless the app's `AGENTS.md` names another place, and the fixer, the approver and the checks all read it:
 
 `| ID | Severity | Source | Finding | Where | Kind | Status |`
 
@@ -60,7 +60,7 @@ Rows are ranked: every blocker, then every major, then every minor. The reviewer
 
 ## CI decides (stages 6 and 11)
 
-Where the app's `CLAUDE.md` names CI (`CI: <the required checks>` and how to read them), CI's result on the reviewed head is the binding gate. The gate-runner reports it beside its local numbers; the approver reads it itself from GitHub for the exact reviewed head sha and approves only when every named check concluded `success` on that sha. Failed, cancelled, pending, missing or skipped is red, and so is green on another sha. When CI and the local gate disagree, CI wins. When the approver cannot read CI, it escalates. An app with no CI line keeps the local gate as its only gate.
+Where the app's `AGENTS.md` names CI (`CI: <the required checks>` and how to read them), CI's result on the reviewed head is the binding gate. The gate-runner reports it beside its local numbers; the approver reads it itself from GitHub for the exact reviewed head sha and approves only when every named check concluded `success` on that sha. Failed, cancelled, pending, missing or skipped is red, and so is green on another sha. When CI and the local gate disagree, CI wins. When the approver cannot read CI, it escalates. An app with no CI line keeps the local gate as its only gate.
 
 **Tests named are tests run.** Any command that names tests (a filter, a file list, a list of names) reports how many it named and how many ran; fewer ran than named is red even when every test that ran passed.
 
@@ -68,7 +68,7 @@ Where the app's `CLAUDE.md` names CI (`CI: <the required checks>` and how to rea
 
 ## Auto-merge
 
-Off unless the app's `CLAUDE.md` turns it on, per project. It needs two lines there: `Auto-merge: safe changes` (or `Auto-merge: off`) and a line saying whether merging to main deploys (`Merging to main deploys: no`, or `yes`). If either line is missing, auto-merge is off. Optional lines: `Auto-merge size limit: <N> changed lines` (default 400), `Auto-merge may deploy: yes`, and an always-ask list. Only the approver merges under it, and only inside the limits written in its role (`agents/approver.md`, Auto-merge policy). Sending, spending, publishing and touching live data stay the owner's whatever the setting. With auto-merge off, an APPROVE goes to the owner for the go at stage 12.
+Off unless the app's `AGENTS.md` turns it on, per project. It needs two lines there: `Auto-merge: safe changes` (or `Auto-merge: off`) and a line saying whether merging to main deploys (`Merging to main deploys: no`, or `yes`). If either line is missing, auto-merge is off. Optional lines: `Auto-merge size limit: <N> changed lines` (default 400), `Auto-merge may deploy: yes`, and an always-ask list. Only the approver merges under it, and only inside the limits written in its role (`agents/approver.md`, Auto-merge policy). Sending, spending, publishing and touching live data stay the owner's whatever the setting. With auto-merge off, an APPROVE goes to the owner for the go at stage 12.
 
 ## Sessions
 
@@ -76,13 +76,13 @@ How Claude Code sessions map to milestones, so parallel work does not collide an
 
 - **One main session per milestone.** Parallel milestones run as parallel sessions, never as one long chat for several. The main session's model is fixed for its whole life; its effort may change.
 - **The main session delegates reading.** Big files and searches go to a subagent that returns a summary. Prefer a few substantial subagents over many tiny ones, because each new one starts uncached.
-- **Claim board.** Before a milestone session starts any lane, it checks the claim board in the status file the app's `CLAUDE.md` names (the roadmap) and writes its own row: milestone, session or owner, branch or worktree, owned paths, started date. A session never edits another milestone's row. The row is closed at Close.
+- **Claim board.** Before a milestone session starts any lane, it checks the claim board in the status file the app's `AGENTS.md` names (the roadmap) and writes its own row: milestone, session or owner, branch or worktree, owned paths, started date. A session never edits another milestone's row. The row is closed at Close.
 - **Cross-milestone pre-flight and sweep.** Pre-flight question 3 covers other milestones' claimed paths and open pull requests; the sweep at each stage start re-reads the memory file and the claim board (Blocked items).
 - **Shared things.** Contract files change only through the architect. Each milestone writes its decisions into its own dated section of the memory file, so two sessions never edit the same lines.
 - **Messages between sessions** are heads-ups only; the files are the record.
 - **Retry cap.** After one failed repair, escalate: first the same role with more effort, then the owner or a stronger role. A Stop or SubagentStop hook that forces the agent to continue must carry a hard round cap.
 - **Fixer step-up.** The fixer's first attempt runs on `opus` for a `behavior` row and on `sonnet` for a `surface` row (the combined table's Kind). When a `sonnet` repair fails, the main session runs the next attempt on that finding with the fixer on `opus`, by passing the model for that one subagent call. It never switches the main session's model, so the session's prompt cache stays intact. The `opus` attempt gets the failed attempt's cause line and diff. How many attempts and rounds there are, and what goes to the owner, is in Limits on fixing. The next `surface` finding starts on `sonnet` again. A `behavior` row that fails on `opus` gets one more `opus` attempt with the first's cause line and diff.
-- **Close.** The scribe writes a handoff note (decisions, open items, the next milestone's first step) where the app's `CLAUDE.md` says, or else beside the retro, then the retro, and closes the milestone's claim row. The next milestone starts in a fresh session from the `CLAUDE.md`, the memory file and that note.
+- **Close.** The scribe writes a handoff note (decisions, open items, the next milestone's first step) where the app's `AGENTS.md` says, or else beside the retro, then the retro, and closes the milestone's claim row. The next milestone starts in a fresh session from the `AGENTS.md`, the memory file and that note.
 
 ## Pre-flight, before a lane starts (stage 4)
 
@@ -92,7 +92,7 @@ The lane owner answers five questions and writes the answers in the lane's first
 2. **Already in progress?** Another lane, branch or open pull request doing the same thing.
 3. **Overlapping files?** Another lane, another milestone's claimed paths on the claim board, or an open pull request touching the files this lane owns. Two lanes that overlap go one at a time: the earlier one proceeds, the later one is sequenced with `blocked-by:` the earlier one (for another milestone, `blocked-by:` that milestone).
 4. **Unclear?** The spec row or red test is missing, or it contradicts the current code (cite `path:line`). Unclear goes back to the architect; a missing screen, state or token in the design hand-off goes back to the designer. The lane never decides it.
-5. **Too big?** Likely to change more lines than the app's `CLAUDE.md` allows for one lane, or spanning many areas at once. Too big goes back to the architect to split.
+5. **Too big?** Likely to change more lines than the app's `AGENTS.md` allows for one lane, or spanning many areas at once. Too big goes back to the architect to split.
 
 After **proceed**, the lane's first act in its new worktree is a clean-start check: the unit suite runs before the first edit, and a red baseline holds the lane with `blocked-by:` naming the failing tests.
 
@@ -135,7 +135,7 @@ A finding's second attempt can fall in round 1 (its test stayed red) or round 2 
 - Let a lane decide a judgment call without asking. A lane stops and asks the architect or the owner.
 - Let a reviewer (the spec-auditor, critic, design-auditor, security-reviewer or reviewer) or the approver patch code. They write findings or decisions; the fixer fixes.
 - Install an outside skill or tool unpinned. Every outside source is pinned to a commit and recorded in `THIRD_PARTY.md`.
-- Edit a skill, hook, agent file or `CLAUDE.md` without the owner's approval. Retro output is proposals.
+- Edit a skill, hook, agent file or `AGENTS.md` (or `CLAUDE.md`) without the owner's approval. Retro output is proposals.
 
 ## Source
 

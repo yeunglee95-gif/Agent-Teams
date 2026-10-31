@@ -1,6 +1,6 @@
 # Design team
 
-Two roles that design an app's screens and check what was built against them, for any app, reading the app's own `CLAUDE.md` and design system for its specifics. The app's design system (for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) always wins over any skill's taste.
+Two roles that design an app's screens and check what was built against them, for any app, reading the app's own `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) and design system for its specifics. The app's design system (for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) always wins over any skill's taste.
 
 ## The roles
 
@@ -19,7 +19,7 @@ For a milestone that changes screens, the dev team's loop (`plugins/dev-team/wor
 2. The dev team builds to the hand-off. A gap in the design goes back to the designer; a lane never invents it.
 3. **Design check**, in the dev team's Review stage: the design-auditor writes its report in its own context, at the same time as the dev team's spec-auditor, critic, security-reviewer and reviewer. The reviewer folds its findings into the one combined findings table (tagged `design-auditor D<N>`). The fixer fixes; the design-auditor re-checks its findings by id after each fix round, at most two rounds. A blocker or major still open after round 2 goes to the owner.
 
-Both are skipped for a milestone with no screen change. The owner (Jase, unless the app's `CLAUDE.md` names someone else) gives every merge, deploy, send and publish go; the one exception is a merge the dev team's approver makes under an app's opt-in auto-merge setting, which never covers sending or publishing.
+Both are skipped for a milestone with no screen change. The owner (Jase, unless the app's `AGENTS.md` names someone else) gives every merge, deploy, send and publish go; the one exception is a merge the dev team's approver makes under an app's opt-in auto-merge setting, which never covers sending or publishing.
 
 The designer also serves marketing: a landing page, an email template or an ad gets a direction note and mocks from the app's design system first. Nothing goes out without the owner's go.
 

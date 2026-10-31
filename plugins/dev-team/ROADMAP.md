@@ -56,7 +56,7 @@ Then it routes them:
 - **Simple bugs** become a ready-to-fix item, with steps that reproduce the bug and a proposed red test.
 - **Everything else** goes to the owner's desk, ranked.
 
-A simple bug is fixed only through the loop: fixer, gate, review, approver, with auto-merge only where the app opted in. Two rules on the loop page change only by the owner's decision, recorded in the app's `CLAUDE.md`:
+A simple bug is fixed only through the loop: fixer, gate, review, approver, with auto-merge only where the app opted in. Two rules on the loop page change only by the owner's decision, recorded in the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet):
 
 - Watch findings go to the backlog, never straight to ready. Letting triage move a "simple bug" to ready is a standing rule the owner turns on per app.
 - No role patches code outside the loop. The triager never fixes anything itself.

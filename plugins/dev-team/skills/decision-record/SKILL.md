@@ -9,7 +9,7 @@ Write one when a choice would cost a day or more to reverse. Small choices go in
 
 ## Where it goes
 
-Where the app's `CLAUDE.md` says. If it says nothing, ask; never pick a folder yourself. The memory file gets a one-line entry that links to the record.
+Where the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) says. If it says nothing, ask; never pick a folder yourself. The memory file gets a one-line entry that links to the record.
 
 ## Format
 

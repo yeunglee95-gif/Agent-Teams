@@ -9,7 +9,7 @@ A plan built on a guessed decision is rebuilt later at a higher price. Before yo
 
 ## Facts are yours, decisions are the owner's
 
-- **A fact** is anything the code, the specs, the memory file, the app's `CLAUDE.md` or an outside service can answer: what the code does now, which files a change touches, what a library supports. Look it up yourself, or send a sub-agent to look it up. Never ask the owner for something you could read.
+- **A fact** is anything the code, the specs, the memory file, the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) or an outside service can answer: what the code does now, which files a change touches, what a library supports. Look it up yourself, or send a sub-agent to look it up. Never ask the owner for something you could read.
 - **A decision** is a choice between real options: what the feature should do, what to drop, what a term means, what to trade for speed or cost. Only the owner makes it. Put it to them and wait.
 - When the owner's answer contradicts the code ("you said partial cancellation is possible, but the code cancels whole orders"), say so at once and ask which is right.
 
@@ -31,7 +31,7 @@ After each round, record the answers in the memory file as decisions (date, what
 
 ## Terms
 
-When a term is vague or used two ways ("account": the customer or the login?), propose one precise word and ask. When a term settles, write it at once into the one glossary file the app's `CLAUDE.md` names: the term, a one- or two-sentence definition of what it is, and the words to avoid. Only terms specific to this app; no implementation details. If the `CLAUDE.md` names no glossary file, ask the owner where it goes; never start a second one.
+When a term is vague or used two ways ("account": the customer or the login?), propose one precise word and ask. When a term settles, write it at once into the one glossary file the app's `AGENTS.md` names: the term, a one- or two-sentence definition of what it is, and the words to avoid. Only terms specific to this app; no implementation details. If the `AGENTS.md` names no glossary file, ask the owner where it goes; never start a second one.
 
 ## Decision records
 
@@ -49,4 +49,4 @@ Done when the frontier is empty: every branch visited, nothing silently assumed.
 
 ## Source
 
-Adapted from `skills/productivity/grilling/SKILL.md` and `skills/engineering/domain-modeling/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: merged into one skill and rewritten in this team's voice; the user is the owner; at most four questions a round; answers logged in the memory file; the glossary goes to the one file the app's `CLAUDE.md` names instead of a `GLOSSARY.md` the skill creates; domain-modeling's ADR format not taken, only its three-part test, with records written through the `decision-record` skill; nothing written into a plan until the owner confirms. License text: `../../licenses/mattpocock-skills-MIT.txt`.
+Adapted from `skills/productivity/grilling/SKILL.md` and `skills/engineering/domain-modeling/SKILL.md` in mattpocock/skills (MIT, Copyright (c) 2026 Matt Pocock), commit 49dd158d1076134a641b33efb035946536778336. Changed: merged into one skill and rewritten in this team's voice; the user is the owner; at most four questions a round; answers logged in the memory file; the glossary goes to the one file the app's `AGENTS.md` names instead of a `GLOSSARY.md` the skill creates; domain-modeling's ADR format not taken, only its three-part test, with records written through the `decision-record` skill; nothing written into a plan until the owner confirms. License text: `../../licenses/mattpocock-skills-MIT.txt`.
