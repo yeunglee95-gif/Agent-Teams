@@ -8,7 +8,7 @@ git config user.email eval@example.com
 git config user.name eval
 mkdir -p src tests docs reviews
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 - Spec: `docs/spec.md`. Each lane's raw diff against `main`: `diffs/lane-<letter>.diff`. Reviews: `reviews/lane-<letter>-review.md` (for example `reviews/lane-a-review.md`). Unit tests: `python3 -m unittest discover -s tests -t .`
 - Rules: a failed outside call is never reported as success; the person always sees why an action failed.

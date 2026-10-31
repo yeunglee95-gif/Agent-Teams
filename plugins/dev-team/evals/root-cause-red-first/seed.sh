@@ -4,7 +4,7 @@ WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p src tests
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 - Unit tests: `python3 -m unittest discover -s tests -t .`
 - Bugs: `BUGS.md`. Money is integer cents everywhere.

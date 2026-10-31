@@ -9,7 +9,7 @@ git init -q -b main .
 git config user.email eval@example.com
 git config user.name eval
 mkdir -p design/handoff/M9 design/handoff/M9/screens
-cat > CLAUDE.md <<'SEEDEOF'
+cat > AGENTS.md <<'SEEDEOF'
 # Tally
 
 Invoicing app for small shops. English only.
@@ -201,7 +201,7 @@ git add -A && git commit -qm "M9 built, ready for the design check"
 # Seeded files and their sha256, recorded once here. The graders/untouched-*.md regexes match these exact contents;
 # with --keep-temp, `sha256sum -c .git/seed.sha256` in the run folder checks them by hash.
 cat > .git/seed.sha256 <<'SEEDEOF'
-4649be008b7cb66d6e91423e82c06586f131c78511f8bf80a5f8c8c6bcbd1d5d  CLAUDE.md
+4649be008b7cb66d6e91423e82c06586f131c78511f8bf80a5f8c8c6bcbd1d5d  AGENTS.md
 9ec6ef41716f3aacc2629248948380892257647cba888533ee457eb1817872d3  DESIGN.md
 f354bcd5b87c8021cbe8ea2a4187fe595e5757f8ee898b09f1fa35bcef382bba  app.js
 02cb009947a2ec63b09bbb6290dfad29f875ba989ee101965f4401145f80203d  design/handoff/M9/README.md

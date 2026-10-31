@@ -6,4 +6,4 @@ min: 1
 weight: 2
 ---
 
-The approver read CI itself, with the command the CLAUDE.md names, rather than trusting the gate log or the checklist.
+The approver read CI itself, with the command the AGENTS.md names, rather than trusting the gate log or the checklist.

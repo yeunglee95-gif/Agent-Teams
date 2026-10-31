@@ -5,7 +5,7 @@ description: >
   than any other stage, and a routing miss log in which the reviewer already failed on
   sonnet. The scribe runs run-retro. The retro must name the most expensive stage, propose
   no model change without eval evidence, not propose the logged failure again, and leave
-  CLAUDE.md, the app's skill and its agent file untouched. The stage, the retro file and the
+  AGENTS.md, the app's skill and its agent file untouched. The stage, the retro file and the
   untouched files are checked by regex; one short judge question checks the proposals.
 tags: [run-retro, scribe, cost]
 runs: 3

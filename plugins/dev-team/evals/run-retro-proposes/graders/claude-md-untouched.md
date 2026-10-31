@@ -4,8 +4,8 @@ pattern: '^# Tally\n\nInvoicing app for small shops\. English and Spanish\.\n\n-
 match: contains
 target:
   source: file
-  path: CLAUDE.md
+  path: AGENTS.md
 weight: 1
 ---
 
-CLAUDE.md is unchanged: the retro proposes, the owner approves.
+AGENTS.md is unchanged: the retro proposes, the owner approves.

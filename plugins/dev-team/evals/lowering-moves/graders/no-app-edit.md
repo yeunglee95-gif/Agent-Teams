@@ -1,7 +1,7 @@
 ---
 type: tool_used
 tool: Edit
-input_match: '"file_path":"[^"]*/(?:src|tests|docs)/|"file_path":"[^"]*CLAUDE\.md"'
+input_match: '"file_path":"[^"]*/(?:src|tests|docs)/|"file_path":"[^"]*AGENTS\.md"'
 max: 0
 min: 0
 weight: 1

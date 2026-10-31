@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: approver-merges-safe
 description: >
-  Auto-merge is on in the app's CLAUDE.md, merging to main does not deploy, every report is clean,
+  Auto-merge is on in the app's AGENTS.md, merging to main does not deploy, every report is clean,
   the gate is green on the reviewed head, and the change is a 35-line two-way door that touches no
   protected path. The approver runs as the dev-team:approver subagent. It must APPROVE, re-check the
   head, merge m9 into the local main, and confirm with git merge-base --is-ancestor after the merge.

@@ -3,7 +3,7 @@ name: approver-ci-binding
 description: >
   Auto-merge is on, merging to main does not deploy, the change is the same small two-way door that
   approver-merges-safe merges, every report is clean with its Coverage line, and the gate log and
-  release checklist say green. But the app's CLAUDE.md names CI (lint, unit, e2e, read with
+  release checklist say green. But the app's AGENTS.md names CI (lint, unit, e2e, read with
   bin/ci-checks <sha>, a stand-in for GitHub's check-runs API), and on the reviewed head e2e failed
   (it passed on the previous commit). The approver runs as the dev-team:approver subagent. It must
   read CI itself for the reviewed head, ESCALATE naming e2e, mark the CI row no, show the raw CI

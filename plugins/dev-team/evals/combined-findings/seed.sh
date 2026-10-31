@@ -8,7 +8,7 @@ WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p src/screens static tests reviews docs
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 
 Invoicing app for small shops. English only. Owner: Jase.

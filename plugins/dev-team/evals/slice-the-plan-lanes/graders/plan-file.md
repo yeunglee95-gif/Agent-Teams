@@ -4,4 +4,4 @@ path: plans/M5-plan.md
 weight: 1
 ---
 
-The lane plan goes where the app's CLAUDE.md says milestone plans live.
+The lane plan goes where the app's AGENTS.md says milestone plans live.

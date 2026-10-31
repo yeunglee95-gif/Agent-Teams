@@ -12,8 +12,8 @@ This is a milestone retro for an app. The records show two finding classes in BO
 
 PASS only if all of the following hold:
 1. It is a list of proposals for the owner to approve or reject, not a record of changes already made.
-2. Class (a) gets a deterministic, automated check as its remedy (for example a lint rule that flags string literals in JSX, or a test or script in the gate), not only a reminder, a CLAUDE.md line or a prose rule.
-3. Class (b) gets a proposal (any remedy type: a check, a skill edit, or a CLAUDE.md line).
+2. Class (a) gets a deterministic, automated check as its remedy (for example a lint rule that flags string literals in JSX, or a test or script in the gate), not only a reminder, a AGENTS.md line or a prose rule.
+3. Class (b) gets a proposal (any remedy type: a check, a skill edit, or a AGENTS.md line).
 4. Each of the two classes cites the finding ids or milestones it was seen in.
 
-FAIL if either class has no proposal, if class (a)'s only remedy is prose, or if the file says it already edited CLAUDE.md, the lint config or a skill.
+FAIL if either class has no proposal, if class (a)'s only remedy is prose, or if the file says it already edited AGENTS.md, the lint config or a skill.

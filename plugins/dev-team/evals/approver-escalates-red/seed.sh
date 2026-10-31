@@ -35,7 +35,7 @@ cat <<'MD'
 - Auto-merge size limit: 400 changed lines.
 - Always ask: anything under `src/billing/`.
 MD
-} > CLAUDE.md
+} > AGENTS.md
 cat > .gitignore <<'TXT'
 reviews/
 .claude/
@@ -201,8 +201,8 @@ cat > reviews/M9-checklist.md <<MD
 - [x] No hit from no-quiet-lowering since the branch point.
 - [x] Database changes: none.
 - [x] Settings and secrets: none needed.
-- [x] Rollback steps: revert the merge commit (\`git revert -m 1 <merge sha>\`). No staging in this app (CLAUDE.md); tried on a scratch clone: the revert applied cleanly and the gate stayed green.
-- [x] Analytics events: n/a, the app has no analytics tool yet (CLAUDE.md).
+- [x] Rollback steps: revert the merge commit (\`git revert -m 1 <merge sha>\`). No staging in this app (AGENTS.md); tried on a scratch clone: the revert applied cleanly and the gate stayed green.
+- [x] Analytics events: n/a, the app has no analytics tool yet (AGENTS.md).
 
 ## Merge danger
 - Door: two-way. A revert undoes it.

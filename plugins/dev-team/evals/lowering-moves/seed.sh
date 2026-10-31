@@ -12,7 +12,7 @@ git config user.name seed
 printf '.claude/\n__pycache__/\n' > .gitignore
 mkdir -p src tests/snapshots docs reviews
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Notebook
 
 Notes app. English only. Owner: Jase.

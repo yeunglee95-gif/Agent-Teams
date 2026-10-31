@@ -4,7 +4,7 @@ WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p src tests docs audits
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 - Spec: `docs/spec.md`; milestone M7 claims section S7. Audits: `audits/<milestone>-conformance.md`.
 - Unit tests: `python3 -m unittest discover -s tests -t .`

@@ -8,4 +8,4 @@ target:
 weight: 1
 ---
 
-The approval file is where the CLAUDE.md says, with the decision table in its fixed shape.
+The approval file is where the AGENTS.md says, with the decision table in its fixed shape.

@@ -13,7 +13,7 @@ git config user.name seed
 printf '.claude/\n__pycache__/\n' > .gitignore
 mkdir -p src tests docs reviews
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Corner Shop
 
 Checkout for a small shop. English only. Owner: Jase.

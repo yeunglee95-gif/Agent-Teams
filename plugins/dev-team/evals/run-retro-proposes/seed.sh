@@ -4,7 +4,7 @@ set -euo pipefail
 WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p reviews fixes gate critic retros src .claude/skills/copy-rules
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 
 Invoicing app for small shops. English and Spanish.

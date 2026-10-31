@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: lane-table-app-columns
 description: >
-  The same M5 as slice-the-plan-lanes, but the app's CLAUDE.md asks every lane to name its model and
+  The same M5 as slice-the-plan-lanes, but the app's AGENTS.md asks every lane to name its model and
   what done means, and mentions an older, retired table shape. The plan bake-off found that an app
   column like this made architects drop the skill's lane table for one of their own. Checks: the lane
   table's header starts with the six fixed columns, exactly spelled and in order, with Model and a

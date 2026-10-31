@@ -11,7 +11,7 @@ git config user.email eval@example.com
 git config user.name eval
 mkdir -p src/screens tests docs static lanes design/handoff/M4/screens
 touch src/__init__.py src/screens/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'SEEDEOF'
+cat > AGENTS.md <<'SEEDEOF'
 # Tally
 
 Invoicing app for small shops. English only. Owner: Jase.

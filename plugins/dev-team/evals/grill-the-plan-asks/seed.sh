@@ -3,7 +3,7 @@ set -euo pipefail
 WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p src docs plans
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 
 Order and invoicing app for small shops.

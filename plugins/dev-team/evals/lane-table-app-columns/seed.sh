@@ -3,7 +3,7 @@ set -euo pipefail
 WS="${1:-$PWD}"
 cd "$WS"
 mkdir -p plans docs src/db src/api src/ui tests
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 
 - Memory file: `MEMORY.md`. Milestone plans: `plans/<milestone>-plan.md`. Ownership map: `docs/ownership.md`.

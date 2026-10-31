@@ -1,10 +1,10 @@
 ---
 type: tool_used
 tool: Write
-input_match: '"file_path":"[^"]*/(?:src|tests|docs)/|"file_path":"[^"]*(?:CLAUDE\.md|M5-fix-round-1\.md)"'
+input_match: '"file_path":"[^"]*/(?:src|tests|docs)/|"file_path":"[^"]*(?:AGENTS\.md|M5-fix-round-1\.md)"'
 max: 0
 min: 0
 weight: 1
 ---
 
-The reviewer never writes over code, tests, the spec, CLAUDE.md or the fixer's report.
+The reviewer never writes over code, tests, the spec, AGENTS.md or the fixer's report.

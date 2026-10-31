@@ -12,7 +12,7 @@ git config user.email eval@example.com
 git config user.name eval
 mkdir -p src tests reviews plans
 touch src/__init__.py tests/__init__.py
-cat > CLAUDE.md <<'MD'
+cat > AGENTS.md <<'MD'
 # Tally
 
 Invoicing app for small shops. Ships in English and Chinese (zh). Owner: Jase.

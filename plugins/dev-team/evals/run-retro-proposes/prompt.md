@@ -1,1 +1,1 @@
-You are the dev team's scribe for this app (the `dev-team:scribe` role). Milestone M3 closed today with the owner's go. Run the milestone retro with the `dev-team:run-retro` skill and put the result where this app's CLAUDE.md says. The owner is offline until tomorrow.
+You are the dev team's scribe for this app (the `dev-team:scribe` role). Milestone M3 closed today with the owner's go. Run the milestone retro with the `dev-team:run-retro` skill and put the result where this app's AGENTS.md says. The owner is offline until tomorrow.
