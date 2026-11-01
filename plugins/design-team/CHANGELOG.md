@@ -2,7 +2,9 @@
 
 ## 0.3.0 (2026-10-31)
 
-- Works with dev-team 0.10.0. The designer, the design-auditor, the `design-handoff` skill and `README.md` read the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet), the file apps are moving their rules to (owner's decision, 2026-10-31). Both roles' never-edit lists protect `AGENTS.md` (or `CLAUDE.md`). No other change. Eval seeds still write a `CLAUDE.md`, so they exercise the fallback; `design-audit-planted` and `design-audit-taste-conflict` not run here (Linux sandbox needed).
+- Works with dev-team 0.10.0. The designer, the design-auditor, the `design-handoff` skill and `README.md` read the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet), the file apps are moving their rules to (owner's decision, 2026-10-31). Both roles' never-edit lists protect `AGENTS.md` (or `CLAUDE.md`). No other change. Eval seeds still write a `CLAUDE.md`, so they exercise the fallback.
+- Evals, 2026-10-31 (Claude Code 2.1.316, judge sonnet, Linux sandbox, harness run as root), 3 runs each: `design-audit-taste-conflict` 3 of 3; `design-audit-planted` 2 of 3, re-run with `--keep-temp` 2 of 3 again; $4.41 both. Read the failing trace: as root the sandbox makes `$TMPDIR` and home read-only, so every run's mkdir for a screenshot scratch folder fails. The passing runs then wrote the report with Write, which worked. The failing run tried no Write: it decided the sandbox blocked all writes and returned the report in its reply (all six planted defects found, verdict fix-required, nothing edited). Sandbox-triggered, the same class as dev-team's root-only misses, but the role gave up on its report without trying it. Open for the owner: whether the auditor's text should say to try writing the report even after a scratch write fails.
+- With the seeds switched to `AGENTS.md` on a scratch branch (not merged), 1 run each: `design-audit-taste-conflict` 1 of 1, `design-audit-planted` 0 of 1, the same no-Write miss; both read `AGENTS.md` first. $1.01.
 
 ## 0.2.1 (2026-10-25)
 
