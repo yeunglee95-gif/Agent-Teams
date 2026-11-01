@@ -1,6 +1,6 @@
 # Agent Teams
 
-Jase's agent teams, in one private repo. Each team is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them: the dev team and the design team. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it.
+Jase's agent teams, in one private repo. Each team is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them: the dev team and the design team. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it. Decisions from 2026-11-01 on are in this repo's `MEMORY.md`.
 
 ## Layout
 
