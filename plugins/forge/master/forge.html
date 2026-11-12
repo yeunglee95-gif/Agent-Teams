@@ -1,0 +1,960 @@
+<!doctype html>
+<!-- forge renderer 1.4.2 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Tokens: Capsule (Claude-OS/DESIGN.md). Day is the light block, Night the dark one. */
+  :root {
+    --ground: #ffffff; --panel: #ffffff; --panel-2: #f4f4f5;
+    --ink: #18181b; --ink-2: #52525b; --ink-3: #6b6b74;
+    --line: #e4e4e7; --line-2: #d4d4d8;
+    --capsule: #18181b; --capsule-ink: #ffffff; --capsule-ink-2: rgb(255 255 255 / .62); --capsule-ring: 0 2px 2px rgb(0 0 0 / .05);
+    --hold: #fc5f2b; --hold-ink: #c2410c; --hold-wash: #fff1ec;
+    --run: #2e62c9; --run-wash: #e8effd;
+    --pass: #157a4b; --pass-wash: #e3f5ec;
+    --later: #e4e4e7; --park: #84848d;
+    --on-state: #ffffff; --on-coral: #18181b;
+    --k-trigger: #0f8a6c; --k-condition: #7651c4; --k-action: #2a74b0; --k-resolution: #52606d;
+    --wafer-ring: inset 0 0 0 1px var(--line), 0 2px 2px rgb(0 0 0 / .05);
+    --sans: 'Inter Tight', 'Segoe UI', system-ui, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    --r-small: 10px; --r-row: 12px; --r-card: 15px;
+    --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #111113; --panel: #1a1a1d; --panel-2: #232327;
+      --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+      --line: #2a2a2f; --line-2: #3a3a40;
+      --capsule: #000000; --capsule-ring: inset 0 0 0 1px #2a2a2f;
+      --hold: #ff7a4d; --hold-ink: #ff9d7a; --hold-wash: #2e1a12;
+      --run: #6f9bf0; --run-wash: #182238;
+      --pass: #47c08a; --pass-wash: #13261d;
+      --later: #2e2e33; --park: #73737c;
+      --on-state: #111113; --on-coral: #111113;
+      --k-trigger: #3cbf9b; --k-condition: #a487ee; --k-action: #5ea3dc; --k-resolution: #9aa7b6;
+      --wafer-ring: inset 0 0 0 1px var(--line);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #111113; --panel: #1a1a1d; --panel-2: #232327;
+    --ink: #f4f4f5; --ink-2: #c4c4cc; --ink-3: #9a9aa3;
+    --line: #2a2a2f; --line-2: #3a3a40;
+    --capsule: #000000; --capsule-ring: inset 0 0 0 1px #2a2a2f;
+    --hold: #ff7a4d; --hold-ink: #ff9d7a; --hold-wash: #2e1a12;
+    --run: #6f9bf0; --run-wash: #182238;
+    --pass: #47c08a; --pass-wash: #13261d;
+    --later: #2e2e33; --park: #73737c;
+    --on-state: #111113; --on-coral: #111113;
+    --k-trigger: #3cbf9b; --k-condition: #a487ee; --k-action: #5ea3dc; --k-resolution: #9aa7b6;
+    --wafer-ring: inset 0 0 0 1px var(--line);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 14.5px/1.45 var(--sans);
+    letter-spacing: -0.005em;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--hold); color: var(--on-coral); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 22px; padding-block: 14px 56px; display: grid; gap: 26px; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  a { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--line-2); }
+  a:hover { text-decoration-color: currentColor; }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; overflow-wrap: anywhere; }
+  .stamp span, table.state .sub, .bar .lab, .ask .meta { overflow-wrap: anywhere; min-width: 0; }
+  :focus-visible { outline: 2px solid var(--hold-ink); outline-offset: 2px; }
+  .hidden { display: none !important; }
+  .sym { flex: none; display: block; }
+  .chev { flex: none; color: var(--ink-3); transition: transform 200ms var(--ease); }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+
+  /* Sections: rows and hairlines, no boxes */
+  .panel { display: grid; gap: 12px; min-width: 0; align-content: start; }
+  .panel > header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; }
+  .panel h2 { font-size: 22px; font-weight: 400; letter-spacing: -0.015em; line-height: 1.2; }
+  .panel .count { font-size: 13px; color: var(--ink-3); letter-spacing: 0; }
+  .panel .count.hot { color: var(--hold-ink); font-weight: 600; }
+  .panel .sub { color: var(--ink-3); font-size: 13.5px; max-width: 75ch; }
+
+  /* Capsule bar: solid, sticky, the one dark object on the page */
+  /* The bar never wraps: its wrapper is a size container, and items drop as it narrows (nav links below 720px, the long button wording below 560px). The name and the primary button always stay. */
+  .capbar { position: sticky; top: 10px; z-index: 5; container-type: inline-size; min-width: 0; }
+  .capsule { flex-wrap: nowrap; background: var(--capsule); color: var(--capsule-ink); border-radius: var(--r-card); padding: 8px 8px 8px 16px; display: flex; align-items: center; gap: 16px; min-height: 52px; box-shadow: var(--capsule-ring); min-width: 0; }
+  .capsule .mark { font-weight: 700; letter-spacing: -0.02em; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .capsule .mark i { font-style: normal; color: var(--hold); }
+  .capsule nav { display: flex; gap: 14px; font-size: 13.5px; flex-wrap: nowrap; white-space: nowrap; min-width: 0; overflow: hidden; }
+  .capsule nav a { color: var(--capsule-ink-2); text-decoration: none; transition: color 200ms var(--ease); }
+  .capsule nav a:hover { color: var(--capsule-ink); }
+  .capsule .end { margin-left: auto; display: flex; gap: 8px; align-items: center; flex: none; }
+  .cbtn { font: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 9999px; border: 0; background: var(--hold); color: var(--on-coral); cursor: pointer; white-space: nowrap; text-decoration: none; transition: transform 160ms var(--ease); }
+  .cbtn:active { transform: scale(0.97); }
+  .cbtn.quiet { background: transparent; color: var(--capsule-ink); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .28); font-weight: 600; }
+  .cbtn .arr { width: 18px; height: 18px; border-radius: 50%; background: rgb(24 24 27 / .14); display: grid; place-items: center; transition: transform 200ms var(--ease); }
+  .cbtn.quiet .arr { background: rgb(255 255 255 / .12); }
+  @media (hover: hover) and (pointer: fine) { .cbtn:hover .arr { transform: translateX(2px); } }
+
+  /* Page head */
+  .top { display: grid; gap: 8px; padding-top: 8px; }
+  .top h1 { font-size: 44px; font-weight: 400; letter-spacing: -0.025em; line-height: 1; overflow-wrap: anywhere; }
+  .top h1 .dot { color: var(--hold); }
+  .top .lede { color: var(--ink-2); max-width: 70ch; font-size: 15px; }
+  .stamp { display: flex; gap: 4px 14px; flex-wrap: wrap; color: var(--ink-3); font-size: 13px; align-items: baseline; }
+  .stale { color: var(--ink); font-weight: 600; }
+  .stamp .sv { color: var(--ink-2); }
+  details.about > summary { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; color: var(--ink-2); border-radius: var(--r-small); }
+  details.about > summary .chev { transform: rotate(-90deg); }
+  details[open].about > summary .chev { transform: rotate(0deg); }
+  .about-body { display: grid; gap: 8px; padding: 8px 0 0 22px; }
+  .banner { background: var(--panel-2); color: var(--ink); border-radius: var(--r-small); padding: 9px 12px; font-size: 13.5px; }
+  .banner.fail { background: var(--hold-wash); }
+  .banner.fail b { color: var(--hold-ink); }
+
+  .rounds { display: flex; gap: 6px; margin-top: 2px; flex-wrap: wrap; }
+
+  /* Pills and chips */
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; line-height: 1.3; padding: 2px 9px 2px 6px; border-radius: 9999px; max-width: 100%; text-align: left; background: var(--panel-2); color: var(--ink-2); vertical-align: 1px; }
+  .pill.nomark { padding-left: 9px; }
+  .lbl { display: block; font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
+  .pill + .lbl { display: inline; margin-left: 6px; }
+  .p-needs-you { background: var(--hold-wash); color: var(--hold-ink); }
+  .p-running { background: var(--run-wash); color: var(--run); }
+  .p-done { background: var(--pass-wash); color: var(--pass); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 500; padding: 1px 9px; border-radius: 9999px; background: var(--panel-2); color: var(--ink-2); }
+  .tag.urgent { background: var(--ink); color: var(--ground); font-weight: 600; }
+  .tag.overdue { background: var(--hold-wash); color: var(--hold-ink); font-weight: 600; }
+  .who { display: inline-block; font-size: 12px; font-weight: 400; line-height: 1.4; padding: 2px 9px; border-radius: 9999px; background: var(--panel-2); color: var(--ink-2); white-space: nowrap; vertical-align: 1px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .who b { color: var(--ink); font-weight: 600; }
+  table.state .who { margin-left: 6px; }
+
+  /* Two columns: Needs you beside the status panel */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px 32px; align-items: start; }
+
+  /* Needs you */
+  .asks { display: grid; }
+  .ask { padding: 14px 0; border-top: 1px solid var(--line); display: grid; gap: 8px; min-width: 0; scroll-margin-top: 76px; }
+  .asks > .ask:first-child { border-top: 0; padding-top: 4px; }
+  .ask .r1 { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+  .ask .r1 .sym { margin-top: 3px; }
+  .ask h3 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.35; min-width: 0; flex: 1; }
+  .ask h3 .tag { margin-left: 6px; vertical-align: 1px; }
+  .ask .k { flex: none; font-size: 12px; color: var(--ink-3); padding-top: 2px; white-space: nowrap; }
+  .ask .body { padding-left: 24px; display: grid; gap: 8px; min-width: 0; }
+  .ask .why { color: var(--ink-2); font-size: 14px; }
+  .ask .opts { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .ask .opts li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; font-size: 13.5px; padding: 7px 11px; border-radius: var(--r-small); background: var(--panel-2); }
+  .ask .opts li.rec { box-shadow: inset 0 0 0 1px var(--pass); }
+  .ask .opts b { font-weight: 600; }
+  .ask .opts .c { grid-column: 2; color: var(--ink-2); }
+  .ask .opts .rec-mark { font-size: 12px; font-weight: 600; color: var(--pass); grid-column: 1; display: inline-flex; gap: 5px; align-items: center; }
+  .ask .reco { font-size: 14px; }
+  .ask .reco ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 13.5px; }
+  .ask .meta { display: flex; gap: 4px 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); }
+  .ask .meta b { color: var(--ink-2); font-weight: 600; }
+  .ask .names { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ask .def { font-size: 13.5px; padding: 8px 11px; border-radius: var(--r-small); background: var(--panel-2); color: var(--ink); }
+  .ask .def b { font-weight: 600; }
+  .ask .def.fired { background: var(--hold-wash); }
+  .ask .def.fired b { color: var(--hold-ink); }
+  details.guide { border-radius: var(--r-small); background: var(--panel-2); padding: 9px 11px; }
+  details.guide > summary, details.more-asks > summary, details.closed-asks > summary { display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 14px; }
+  details.guide > summary .chev, details.more-asks > summary .chev, details.closed-asks > summary .chev { transform: rotate(-90deg); }
+  details[open].guide > summary .chev, details[open].more-asks > summary .chev, details[open].closed-asks > summary .chev { transform: rotate(0deg); }
+  details.guide summary small { font-weight: 400; color: var(--ink-3); font-size: 13px; }
+  details.guide .gmeta { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); margin: 8px 0 4px; }
+  details.guide .gmeta b { color: var(--ink-2); font-weight: 600; }
+  details.guide ol { margin: 6px 0 0; padding-left: 22px; display: grid; gap: 6px; font-size: 14px; }
+  details.guide ol li { padding-left: 2px; overflow-wrap: anywhere; }
+  details.guide ol a { white-space: nowrap; font-weight: 600; }
+  details.guide .safe { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; }
+  details.more-asks, details.closed-asks { border-top: 1px solid var(--line); padding-top: 12px; }
+  details.closed-asks > summary { color: var(--ink-3); font-weight: 500; font-size: 13.5px; }
+  details.more-asks > .asks { margin-top: 6px; }
+  .closed-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; }
+  .closed-list li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+  .closed-list b { color: var(--ink); font-weight: 600; }
+  .aid { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink-3); margin-right: 8px; white-space: nowrap; }
+  .closed-list time { font-size: 12.5px; color: var(--ink-3); }
+  .empty { color: var(--ink-3); font-size: 14px; padding: 6px 0; }
+
+  /* Status panel: "Where the build is". A bounded set of rows, so it stays one size whatever the board holds. */
+  .status { gap: 14px; }
+  .st-top { display: grid; grid-template-columns: minmax(118px, 168px) minmax(0, 1fr); gap: 14px 18px; align-items: start; }
+  .st-top.solo { grid-template-columns: minmax(0, 1fr); }
+  .st-main { display: grid; gap: 14px; min-width: 0; align-content: start; }
+  .st-now { display: grid; gap: 4px; min-width: 0; }
+  .st-now .nm { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.35; overflow-wrap: anywhere; }
+  .st-now .nm .code { display: inline-block; font-size: 12.5px; font-weight: 600; padding: 1px 8px; margin-right: 6px; border-radius: 9999px; background: var(--run-wash); color: var(--run); vertical-align: 1px; }
+  .st-now .nt { color: var(--ink-2); font-size: 13.5px; overflow-wrap: anywhere; }
+  .pct { display: grid; gap: 6px; }
+  .pct .v { font-size: 30px; font-weight: 400; letter-spacing: -0.025em; line-height: 1; }
+  .pct .v small { font-size: 14px; font-weight: 500; color: var(--ink-3); letter-spacing: -0.005em; margin-left: 6px; }
+  .pct .s { color: var(--ink-3); font-size: 13px; }
+  .days { font-size: 13px; color: var(--ink-3); }
+  .days b { color: var(--ink); font-weight: 600; }
+  .track { height: 6px; background: var(--panel-2); border-radius: 9999px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+  .track .fill { height: 100%; background: var(--pass); border-radius: 9999px; }
+  .wafer-card { border-radius: var(--r-card); padding: 10px; background: var(--panel); box-shadow: var(--wafer-ring); display: grid; gap: 8px; min-width: 0; }
+  .wafer { width: 100%; height: auto; display: block; }
+  .wafer .disc { fill: var(--panel-2); stroke: var(--line-2); stroke-width: 1.2; }
+  .wafer .die { stroke: var(--panel); stroke-width: calc(1.5 * var(--s, 1)); }
+  .wafer .edge { fill: none; stroke: var(--line); stroke-width: 1; }
+  .wafer .b-done { fill: var(--pass); } .wafer .b-run { fill: var(--run); }
+  /* Coral on the grey disc is 2.81:1 by day, so a needs-you die carries a Coral Ink edge (4.8:1) as well as its ink centre. */
+  .wafer .b-hold { fill: var(--hold); stroke: var(--hold-ink); stroke-width: calc(1 * var(--s, 1)); }
+  .wafer .b-queue { fill: var(--panel); stroke: var(--ink-3); stroke-width: calc(1.2 * var(--s, 1)); } .wafer .b-later { fill: var(--later); stroke: var(--ink-3); stroke-width: calc(1 * var(--s, 1)); } .wafer .b-park { fill: var(--park); }
+  .wafer .mark-hold { fill: var(--on-coral); } .wafer .mark-run { fill: var(--on-state); } .wafer .mark-park { stroke: var(--ink); stroke-width: calc(1.4 * var(--s, 1)); stroke-linecap: round; }
+  .wafer a { outline: none; }
+  .wafer a:focus-visible .die, .wafer a:hover .die { stroke: var(--ink); stroke-width: 2; }
+  /* The page's one motion moment: the dies fill in once, as a probe station steps across a wafer. */
+  @media (prefers-reduced-motion: no-preference) {
+    .wafer .probe { animation: probe 260ms var(--ease) both; animation-delay: calc(var(--i) * var(--stag, 6ms)); transform-box: fill-box; transform-origin: center; }
+    @keyframes probe { from { opacity: 0.12; transform: scale(0.9); } }
+  }
+  .wlegend { list-style: none; margin: 0; padding: 0 2px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; font-size: 12px; color: var(--ink-2); }
+  .wlegend li { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; }
+  .wlegend b { margin-left: auto; color: var(--ink); font-weight: 600; }
+  .wlegend li.hot { color: var(--hold-ink); font-weight: 600; }
+  .wlegend li.hot b { color: var(--hold-ink); }
+  .facts { display: grid; grid-template-columns: 104px minmax(0, 1fr); column-gap: 12px; margin: 0; font-size: 14px; border-top: 1px solid var(--line); }
+  .facts > dt, .facts > dd { padding: 8px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+  .facts > dt { font-size: 12.5px; font-weight: 600; color: var(--ink-3); padding-top: 10px; line-height: 1.3; }
+  .facts > dd { margin: 0; overflow-wrap: anywhere; }
+  .facts .h { color: var(--ink-3); font-size: 13px; }
+  .facts .late { color: var(--hold-ink); font-weight: 600; font-size: 13px; }
+  .facts .hotn { color: var(--hold-ink); font-weight: 600; }
+  .facts .tv { font-weight: 600; }
+  .facts .tv small { font-weight: 500; color: var(--ink-3); font-size: 13px; }
+  .facts .tn { display: block; color: var(--ink-3); font-size: 13px; }
+  .facts a { color: inherit; }
+  details.moves { margin-top: 2px; }
+  details.moves > summary { display: inline-flex; gap: 4px; align-items: center; font-size: 13px; color: var(--ink-3); border-radius: var(--r-small); }
+  details.moves > summary .chev { transform: rotate(-90deg); width: 14px; height: 14px; }
+  details[open].moves > summary .chev { transform: rotate(0deg); }
+  details.moves ol { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+  .tok { display: grid; gap: 8px; }
+  .tok h3 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.35; }
+  .tok h3 span { font-weight: 400; color: var(--ink-3); font-size: 13px; letter-spacing: 0; }
+  .tok .figs { display: flex; gap: 4px 18px; flex-wrap: wrap; align-items: baseline; font-size: 13px; color: var(--ink-3); }
+  .tok .figs b { font-size: 22px; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); margin-right: 5px; }
+  .split { display: flex; gap: 2px; height: 8px; border-radius: 9999px; overflow: hidden; }
+  .split span { display: block; height: 100%; min-width: 3px; }
+  .mlegend { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+  .mlegend li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .mlegend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
+  .mlegend b { color: var(--ink); font-weight: 600; }
+  .tips { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .tips li { font-size: 13px; color: var(--ink); background: var(--panel-2); border-radius: var(--r-small); padding: 8px 11px; }
+  .tok .note { font-size: 12.5px; color: var(--ink-3); }
+
+  /* Team room: a grid of cards, one per desk. Cards in a row share a height; a card's details open in place. */
+  .desks { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .desk { display: flex; flex-direction: column; gap: 8px; padding: 13px 14px 12px; border-radius: var(--r-card); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); min-width: 0; }
+  .desk .d-head { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 8px; align-items: start; }
+  .desk .d-head .sym { margin-top: 3px; }
+  .desk .d-role { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.35; min-width: 0; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .desk .d-who { min-height: 22px; display: flex; gap: 6px; align-items: center; min-width: 0; overflow: hidden; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+  .desk .d-who .pn { overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
+  .desk .d-who .who { flex: 0 1 auto; min-width: 0; }
+  .who.unset { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink-3); }
+  .desk .d-now { font-size: 13.5px; color: var(--ink-2); line-height: 1.4; min-height: 2.8em; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+  .desk .d-now.dim { color: var(--ink-3); }
+  .desk .d-run { display: flex; gap: 7px; align-items: center; font-size: 13px; color: var(--ink-2); min-width: 0; white-space: nowrap; }
+  .desk .d-run b { color: var(--run); font-weight: 600; flex: none; }
+  .desk .d-run span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .desk .d-run.none { color: var(--ink-3); }
+  .desk details { margin-top: auto; border-top: 1px solid var(--line); padding-top: 8px; }
+  .desk details > summary { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; color: var(--ink-2); border-radius: var(--r-small); }
+  .desk details > summary .chev { transform: rotate(-90deg); width: 14px; height: 14px; }
+  .desk details[open] > summary .chev { transform: rotate(0deg); }
+  .desk .d-body { display: grid; gap: 10px; padding-top: 10px; font-size: 13.5px; color: var(--ink-2); }
+  .desk.you { background: var(--hold-wash); box-shadow: none; }
+  .desk.you .d-now { color: var(--ink); }
+  .desk.you details { border-top-color: var(--line-2); }
+  .desk.idle { background: var(--panel-2); box-shadow: none; }
+  .desk.idle .d-role { color: var(--ink-2); font-weight: 500; }
+  .desk.idle .d-now { color: var(--ink-3); }
+  .r-kv { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: 13px; }
+  .r-kv dt { color: var(--ink-3); }
+  .r-kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  .jobs li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .jobs li:first-child { border-top: 0; padding-top: 0; }
+  .jobs .t { font-weight: 600; font-size: 13.5px; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+  .jobs .n { grid-column: 1 / -1; color: var(--ink-2); font-size: 13px; min-width: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+  .jobs .pill { justify-self: end; white-space: nowrap; }
+  .jobs .t .who { margin-left: 6px; }
+  .ladder { margin-top: 2px; font-size: 12.5px; color: var(--ink-3); }
+  .ladder b { color: var(--ink-2); font-weight: 600; }
+
+  /* Lined up after */
+  .queue { list-style: none; margin: 0; padding: 0; display: grid; }
+  .queue li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 3px 10px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
+  .queue li:first-child { border-top: 0; padding-top: 4px; }
+  .queue li > .sym { margin-top: 3px; }
+  .queue .q { font-weight: 600; font-size: 14.5px; min-width: 0; }
+  .queue .q .who, .queue .q .pill { margin-left: 6px; }
+  .queue .qd { grid-column: 2; color: var(--ink-2); font-size: 13.5px; min-width: 0; }
+  .queue .more { grid-column: 2; font-size: 13px; color: var(--ink-3); }
+
+  /* Milestones */
+  .rail { list-style: none; margin: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(96px, 1fr); position: relative; overflow-x: auto; padding: 0 0 4px; min-width: 0; max-width: 100%; }
+  .rail::before { content: ""; position: absolute; left: 4%; right: 4%; top: 13px; height: 2px; background: var(--line); }
+  .ms { position: relative; display: grid; justify-items: center; text-align: center; gap: 6px; padding-inline: 4px; min-width: 0; }
+  .ms .node { min-width: 28px; height: 28px; padding-inline: 7px; border-radius: 9999px; white-space: nowrap; letter-spacing: -0.01em; justify-self: center; display: grid; place-items: center; font-size: 11.5px; font-weight: 600; background: var(--panel); box-shadow: inset 0 0 0 2px var(--line-2); color: var(--ink-2); z-index: 1; }
+  .ms.done .node { background: var(--pass); box-shadow: none; color: var(--on-state); }
+  .ms.running .node { background: var(--run); box-shadow: none; color: var(--on-state); }
+  .ms.needs-you .node { background: var(--hold); box-shadow: none; color: var(--on-coral); }
+  .ms.later .node { background: var(--later); box-shadow: inset 0 0 0 1px var(--ink-3); }
+  .ms.parked .node { background: var(--panel); box-shadow: none; outline: 2px dashed var(--park); outline-offset: -2px; }
+  .ms .t { font-size: 13px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+  .ms .s { font-size: 12px; color: var(--ink-3); line-height: 1.35; overflow-wrap: anywhere; }
+  .ms-detail { display: grid; }
+  .row { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 4px 14px; padding: 11px 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .row:first-child { border-top: 0; }
+  .row .code { font-size: 13px; font-weight: 600; color: var(--ink-3); }
+  .row .name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .row .exit { grid-column: 2 / 3; color: var(--ink-2); font-size: 13.5px; }
+
+  /* State table */
+  .filters { display: flex; gap: 8px 14px; flex-wrap: wrap; align-items: center; font-size: 13px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font: inherit; font-size: 12.5px; display: inline-flex; gap: 6px; align-items: center; padding: 4px 11px; border-radius: 9999px; border: 0; background: var(--panel-2); color: var(--ink-2); cursor: pointer; transition: transform 160ms var(--ease); }
+  .chip:active { transform: scale(0.97); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
+  .chip .n { font-weight: 600; }
+  .filters select { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 9999px; border: 0; box-shadow: inset 0 0 0 1px var(--line-2); background: var(--panel); color: var(--ink); }
+  .filters .count { color: var(--ink-3); margin-left: auto; font-size: 12.5px; }
+  table.state { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.state th { text-align: left; font-size: 12.5px; font-weight: 600; color: var(--ink-3); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  table.state td { padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  table.state tr.band td { padding: 18px 8px 6px; border-top: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-3); }
+  table.state td.t { width: 38%; } table.state td.s { width: 20%; }
+  table.state .title { font-weight: 600; }
+  table.state .sub { display: block; font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+  table.state .pill + .lbl { display: block; margin-left: 0; }
+  table.state .checks { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  table.state .chk { display: inline-flex; gap: 5px; align-items: center; font-size: 12px; padding: 1px 8px 1px 5px; border-radius: 9999px; background: var(--panel-2); color: var(--ink-2); }
+  table.state td.n { color: var(--ink-2); font-size: 13.5px; }
+  table.state .bandtag { display: inline-block; font-size: 12px; color: var(--ink-3); background: var(--panel-2); border-radius: 9999px; padding: 0 8px; margin-left: 6px; vertical-align: 1px; }
+  table.state .ref { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); margin-top: 4px; overflow-wrap: anywhere; }
+
+  /* Progress bars */
+  .bars { display: grid; gap: 8px; }
+  .bar { display: grid; grid-template-columns: 74px minmax(0, 1fr) 60px; gap: 10px; align-items: center; font-size: 13px; }
+  .bar .lab { color: var(--ink-3); font-size: 12.5px; }
+  .bar .track { height: 8px; background: var(--panel-2); border-radius: 9999px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--ink-3); border-radius: 9999px; }
+  .bar.last .fill { background: var(--pass); }
+  .bar .n { text-align: right; color: var(--ink-2); font-size: 12.5px; }
+
+  /* Goal */
+  .vision { font-size: 15px; color: var(--ink); max-width: 70ch; line-height: 1.55; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; }
+  .checks li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 14px; padding: 11px 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .checks li > * { min-width: 0; }
+  .checks .c { font-size: 14.5px; font-weight: 600; }
+  .checks .cd { grid-column: 1 / 2; color: var(--ink-3); font-size: 13px; }
+
+  /* Decisions */
+  .log { list-style: none; margin: 0; padding: 0; display: grid; }
+  .log li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--ink-2); }
+  .log li:first-child { border-top: 0; }
+  .log time { font-size: 12.5px; color: var(--ink-3); padding-top: 1px; }
+  .log b { color: var(--ink); font-weight: 600; }
+  .log .by { display: inline-block; font-size: 11.5px; font-weight: 600; color: var(--ink-3); background: var(--panel-2); border-radius: 9999px; padding: 0 7px; margin-left: 6px; vertical-align: 1px; }
+  .showall { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); background: none; border: 0; padding: 8px 0 0; cursor: pointer; text-align: left; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+
+  /* Words we use: a plain table; on a narrow screen each term stacks into one block, its columns labelled */
+  table.gloss { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.gloss th { text-align: left; font-size: 12.5px; font-weight: 600; color: var(--ink-3); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  table.gloss td { padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); font-size: 13.5px; min-width: 0; overflow-wrap: anywhere; }
+  table.gloss tbody tr:first-child td, table.gloss tbody tr:first-child th { border-top: 0; }
+  table.gloss th.term { text-align: left; padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; color: var(--ink); font-weight: 600; font-size: 14px; width: 17%; }
+  table.gloss td.means { color: var(--ink); font-size: 14px; width: 43%; }
+  table.gloss td.ex, table.gloss td.not { width: 20%; }
+
+  /* Copy note under the Answer button. Inside the artifact viewer a new tab opens sandboxed and claude.ai cannot load there, so the button also copies the chat link. */
+  .copynote { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 9; width: max-content; max-width: calc(100vw - 32px); background: var(--capsule); color: var(--capsule-ink); border-radius: var(--r-card); padding: 10px 14px; font-size: 13.5px; box-shadow: 0 6px 18px rgb(0 0 0 / .14); }
+  .copynote b { font-weight: 600; }
+  .copynote code { display: block; margin-top: 4px; color: var(--capsule-ink-2); user-select: all; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: no-preference) { .copynote { animation: rise 220ms var(--ease) both; } @keyframes rise { from { opacity: 0; transform: translate(-50%, 8px); } } }
+  .foot { color: var(--ink-3); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+  @container (max-width: 720px) { .capsule nav { display: none; } }
+  /* When the bar drops its nav, the same links show in the status line under the board name. */
+  .stamp .links-m { display: none; }
+  @media (max-width: 764px) { .stamp .links-m { display: inline-flex; gap: 14px; } .stamp .links-m a { color: var(--ink-2); text-underline-offset: 3px; } }
+  @container (max-width: 560px) { .capsule { gap: 10px; padding: 6px 6px 6px 14px; } .capsule .long { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; }
+  }
+  @media (max-width: 860px) {
+    .rail { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: 1fr; }
+    .rail::before { left: 13px; right: auto; top: 14px; bottom: 14px; width: 2px; height: auto; }
+    .ms { grid-template-columns: var(--node-col, 28px) minmax(0, 1fr); justify-items: start; text-align: left; gap: 0 12px; padding: 6px 0; }
+    .ms .node { grid-row: span 2; justify-self: start; }
+    table.state, table.state tbody, table.state tr, table.state td { display: block; width: auto !important; }
+    table.state thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    table.state tr { border-top: 1px solid var(--line); padding: 8px 0; }
+    table.state td { border-top: 0; padding: 3px 0; }
+    table.state tr.band { padding: 14px 0 2px; }
+    table.gloss, table.gloss tbody, table.gloss tr, table.gloss td, table.gloss th.term { display: block; width: auto !important; }
+    table.gloss thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    table.gloss tr { border-top: 1px solid var(--line); padding: 10px 0; display: grid; gap: 3px; }
+    table.gloss tbody tr:first-child { border-top: 0; padding-top: 4px; }
+    table.gloss td, table.gloss th.term { border-top: 0; padding: 0; }
+    table.gloss td:empty { display: none; }
+    table.gloss td[data-label]::before { content: attr(data-label) ": "; color: var(--ink-3); font-weight: 600; }
+  }
+  @media (max-width: 760px) {
+    .cols { grid-template-columns: minmax(0, 1fr); }
+    .top h1 { font-size: 34px; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding-inline: 16px; gap: 22px; }
+    .top h1 { font-size: 30px; }
+    .st-top { grid-template-columns: minmax(0, 132px) minmax(0, 1fr); gap: 12px 14px; }
+    .facts { grid-template-columns: 92px minmax(0, 1fr); }
+    .row { grid-template-columns: 46px minmax(0, 1fr); }
+    .row .pill { grid-column: 2; justify-self: start; }
+    .row .exit { grid-column: 2; }
+    .ask .r1 { flex-wrap: wrap; }
+    .ask .k { flex-basis: 100%; padding-left: 24px; padding-top: 0; }
+    .ask .body { padding-left: 0; }
+    .filters .count { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <noscript><p>This page needs JavaScript to read forge.json.</p></noscript>
+</div>
+
+<script type="application/json" id="forge-data"></script>
+<script>
+(function () {
+  'use strict';
+  var RENDERER = '1.4.2';
+  var STATES = ['needs-you', 'running', 'queued', 'later', 'parked', 'done'];
+  var STATE_LABEL = { 'needs-you': 'Needs you', running: 'Running', queued: 'Queued', later: 'Later', parked: 'Parked', done: 'Done' };
+  var KIND_LABEL = { decision: 'Your decision', action: 'Your action', look: 'Quick look' };
+  var PRIO = { now: 0, soon: 1, later: 2 };
+  var RUNG = { 'human-led': 'Human-led: a person does it, the AI may draft', 'human-assisted': 'Human-assisted: the AI does it, a person checks the result', autonomous: 'Autonomous: the AI does it and flags loudly when something is wrong' };
+  var CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var ARR = '<span class="arr"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5.5 2.5L8 5 5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function inline(s) {
+    // The little markup a forge cell uses: `code` and **bold**. Everything else is escaped.
+    var out = esc(s);
+    out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+    return out;
+  }
+  // State marks (Capsule's shape twins), so no state depends on color alone:
+  // needs you = square with an ink centre, running = bar, done = tick, queued = empty outline, later = dash, parked = cross.
+  function mark(state, size) {
+    var z = size || 14, st = { 'needs-you': 'hold', running: 'run', done: 'done', queued: 'queue', later: 'later', parked: 'park' }[state] || 'queue';
+    var c = { hold: 'var(--hold)', run: 'var(--run)', done: 'var(--pass)', queue: 'var(--ink-3)', later: 'var(--line-2)', park: 'var(--park)' }[st];
+    var inner = {
+      hold: '<rect x="1" y="1" width="12" height="12" rx="2.5" fill="' + c + '"/><rect x="5" y="5" width="4" height="4" rx="1" fill="var(--on-coral)"/>',
+      run: '<rect x="1" y="1" width="12" height="12" rx="2.5" fill="' + c + '"/><rect x="3.5" y="6" width="7" height="2" rx="1" fill="var(--on-state)"/>',
+      done: '<rect x="1" y="1" width="12" height="12" rx="2.5" fill="' + c + '"/><path d="M4 7.2l2 2 4-4.4" fill="none" stroke="var(--on-state)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+      queue: '<rect x="1.6" y="1.6" width="10.8" height="10.8" rx="2.2" fill="none" stroke="' + c + '" stroke-width="1.3"/>',
+      later: '<rect x="1.5" y="1.5" width="11" height="11" rx="2.2" fill="' + c + '" stroke="var(--ink-3)" stroke-width="1"/><rect x="4" y="6.3" width="6" height="1.4" rx=".7" fill="var(--ink-3)"/>',
+      park: '<rect x="1" y="1" width="12" height="12" rx="2.5" fill="' + c + '"/><path d="M4.5 4.5l5 5M9.5 4.5l-5 5" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/>'
+    }[st];
+    return '<svg class="sym" width="' + z + '" height="' + z + '" viewBox="0 0 14 14" aria-hidden="true">' + inner + '</svg>';
+  }
+  function stateText(state, label) {
+    // The state word always shows; a free label sits beside it unless it already starts with the word.
+    var base = STATE_LABEL[state] || state;
+    if (!label) return base;
+    return label.toLowerCase().indexOf(base.toLowerCase()) === 0 ? label : base + ': ' + label;
+  }
+  var LABEL_MAX = 40;
+  function pill(state, label) {
+    // A short label rides in the pill; a long one (a status story) goes beside it as text, so the pill stays a pill.
+    if (label && label.length > LABEL_MAX) return '<span class="pill p-' + esc(state) + '">' + mark(state, 12) + esc(STATE_LABEL[state] || state) + '</span><span class="lbl">' + inline(label) + '</span>';
+    return '<span class="pill p-' + esc(state) + '">' + mark(state, 12) + esc(stateText(state, label)) + '</span>';
+  }
+  function safeHref(u) { return /^https:\/\//.test(String(u)) ? esc(u) : null; }
+  function fmtTime(iso) {
+    var d = new Date(iso); if (isNaN(d)) return esc(iso);
+    var m = /([+-]\d\d:\d\d|Z)$/.exec(iso); var off = m ? m[1] : '';
+    // Show the timestamp as written (wall time at its offset), not in the viewer's zone.
+    var wall = iso.replace('T', ' ').replace(/(:\d\d)(\.\d+)?([+-]\d\d:\d\d|Z)?$/, '');
+    return esc(wall.slice(0, 16) + (off === '+08:00' ? ' HKT' : off ? ' ' + off : ''));
+  }
+  function whoChip(w) {
+    // Who is doing it: the model as named when the work was assigned, plus the role.
+    var x = w && w.who; if (!x || !x.model) return '';
+    return '<span class="who" title="Model and role doing this"><b>' + esc(x.model) + '</b>' + (x.role ? ' ' + esc(x.role) : '') + '</span>';
+  }
+  function hostOf(u) { try { return new URL(u).host.replace(/^www\./, ''); } catch (e) { return 'link'; } }
+  function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+  function byOrder(a, b) { return (a.order == null ? 1e9 : a.order) - (b.order == null ? 1e9 : b.order); }
+  function el(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; }
+  function norm(s) { return String(s == null ? '' : s).trim().toLowerCase(); }
+
+  function load(cb) {
+    var inlineData = document.getElementById('forge-data');
+    var text = inlineData && inlineData.textContent.trim();
+    if (text) { try { return cb(null, JSON.parse(text)); } catch (e) { return cb(e); } }
+    if (location.protocol === 'file:') return cb(new Error('Open forge/board.html (the built page), or serve this folder. A file:// page cannot read forge.json next to it.'));
+    fetch('./forge.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('forge.json: HTTP ' + r.status); return r.json(); }).then(function (d) { cb(null, d); }).catch(cb);
+  }
+
+  function render(d) {
+    var app = document.getElementById('app');
+    app.innerHTML = '';
+    var major = String(d.forge || '').split('.')[0];
+    if (major !== '1') { app.appendChild(el('<div class="banner fail"><b>Wrong contract.</b> This renderer (' + RENDERER + ') reads contract 1.x; the file says ' + esc(d.forge) + '.</div>')); return; }
+    var p = d.project || {};
+    var title = /forge$/i.test(p.name || '') ? p.name : (p.name || 'Project') + ' Forge';
+    document.title = title;
+    var now = new Date();
+
+    // Asks are sorted first: the capsule's primary button depends on whether any are open.
+    var asks = (d.asks || []).slice();
+    var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    function daysLeft(a) { if (!a.default || !a.default.fires_on) return null; var fp = a.default.fires_on.split('-'); return Math.round((new Date(+fp[0], +fp[1] - 1, +fp[2]) - today0) / 864e5); }
+    function overdue(a) { var l = daysLeft(a); return l != null && l < 0; }
+    var open = asks.filter(function (a) { return !a.closed; }).sort(function (a, b) {
+      // Overdue defaults first: they should already have fired, so they are the most urgent thing on the board.
+      if (overdue(a) !== overdue(b)) return overdue(a) ? -1 : 1;
+      var pa = PRIO[a.priority], pb = PRIO[b.priority]; if (pa !== pb) return pa - pb;
+      var fa = a.default ? a.default.fires_on : '9999', fb = b.default ? b.default.fires_on : '9999'; if (fa !== fb) return fa < fb ? -1 : 1;
+      var oa = a.opened || '', ob = b.opened || ''; return oa < ob ? -1 : oa > ob ? 1 : 0;
+    });
+    var closed = asks.filter(function (a) { return a.closed; }).sort(function (a, b) { return a.closed.on < b.closed.on ? 1 : a.closed.on > b.closed.on ? -1 : 0; });
+
+    // Capsule bar: project name, links, and the one action that answers Jase's asks.
+    var links = Object.keys(p.links || {}).filter(function (k) { return k !== 'artifact' && k !== 'chat' && safeHref(p.links[k]); }).map(function (k) { return '<a href="' + safeHref(p.links[k]) + '" target="_blank" rel="noopener">' + esc(k) + '</a>'; }).join('');
+    var chat = p.links && p.links.chat && safeHref(p.links.chat);
+    var answerIn = chat ? '<a class="cbtn' + (open.length ? '' : ' quiet') + '" href="' + chat + '" target="_blank" rel="noopener"><span>Answer in <span class="long">' + esc(title) + ' </span>chat</span>' + ARR + '</a>' : '';
+    app.appendChild(el('<div class="capbar"><header class="capsule"><span class="mark" title="' + esc(p.name || title) + '">' + esc(p.name || title) + '<i>.</i></span>' + (links ? '<nav aria-label="Project links">' + links + '</nav>' : '') + '<span class="end">' + answerIn + '</span></header></div>'));
+
+    // Page head
+    var updated = new Date(d.updated); var mins = isNaN(updated) ? null : Math.max(0, Math.round((now - updated) / 60000));
+    var ago = mins == null ? 'unreadable timestamp' : mins < 60 ? mins + ' min ago' : mins < 2880 ? Math.round(mins / 60) + ' h ago' : Math.round(mins / 1440) + ' days ago';
+    // The board moves only for asks, decisions and milestones (Jase, 2026-11-12), so its age alone says nothing.
+    // It is behind when an open ask's default date has passed: that ask should have fired or been re-dated.
+    var pastDue = open.filter(overdue);
+    var stale = mins == null || pastDue.length > 0;
+    var stamps = (p.stamps || []).map(function (s) { return '<span>' + esc(s.label) + ': <span class="sv">' + esc(s.value) + '</span></span>'; }).join('');
+    app.appendChild(el(
+      '<section class="top">' +
+        '<h1>' + esc(title) + '<span class="dot">.</span></h1>' +
+        '<p class="stamp"><span>Updated ' + fmtTime(d.updated) + (ago ? ', ' + (stale ? '<span class="stale">' + ago + ', behind</span>' : ago) : '') + '</span>' + (links ? '<span class="links-m">' + links + '</span>' : '') + '</p>' +
+        (stale ? '<div class="banner">' + (mins == null ? 'This page\'s update time cannot be read, so it may be behind.' : 'This page is behind: ' + pastDue.map(function (a) { return esc(a.id); }).join(', ') + (pastDue.length === 1 ? ' is' : ' are') + ' past ' + (pastDue.length === 1 ? 'its' : 'their') + ' default date.') + ' If a session is running, ask it to republish.</div>' : '') +
+        '<details class="about"><summary>' + CHEV + '<span>About this board</span></summary><div class="about-body">' + (p.eyebrow ? '<p class="stamp">' + esc(p.eyebrow) + '</p>' : '') + '<p class="lede">' + inline(p.lede) + '</p>' + (stamps ? '<div class="stamp">' + stamps + '</div>' : '') + '</div></details>' +
+      '</section>'));
+
+    // Needs you
+    function askArticle(a) {
+      var opts = (a.options || []).length ? '<ul class="opts">' + a.options.map(function (o) { return '<li class="' + (o.recommended ? 'rec' : '') + '">' + (o.recommended ? '<span class="rec-mark">' + mark('done', 12) + 'Recommended</span>' : '') + '<b style="grid-column:' + (o.recommended ? '2' : '1 / -1') + '">' + esc(o.label) + '</b>' + (o.consequence ? '<span class="c">' + inline(o.consequence) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '';
+      var reco = a.recommendation || (a.reasoning || []).length ? '<div class="reco">' + (a.recommendation ? '<b>Recommendation:</b> ' + inline(a.recommendation) : '') + ((a.reasoning || []).length ? '<ul>' + a.reasoning.map(function (r) { return '<li>' + inline(r) + '</li>'; }).join('') + '</ul>' : '') + '</div>' : '';
+      var names = (a.names || []).length ? '<div class="names">' + a.names.map(function (n) { return '<span class="tag">' + esc(n) + '</span>'; }).join('') + '</div>' : '';
+      var def = '';
+      if (a.default) {
+        var left = daysLeft(a);
+        def = left < 0
+          ? '<div class="def fired"><b>Overdue since ' + esc(a.default.fires_on) + ' (' + (-left) + ' day' + (left === -1 ? '' : 's') + '):</b> the default, ' + inline(a.default.action) + ', should have fired. The build chat fires it or sets a new date at its next update; say now if you object.</div>'
+          : '<div class="def"><b>' + (left === 0 ? 'Default fires today' : 'Default fires ' + esc(a.default.fires_on) + ' (' + left + ' day' + (left === 1 ? '' : 's') + ')') + ':</b> ' + inline(a.default.action) + ' unless you say otherwise.</div>';
+      }
+      var g = a.guide, guide = '';
+      if (g && (g.steps || []).length) {
+        var gsum = g.steps.length + ' step' + (g.steps.length === 1 ? '' : 's') + (g.time ? ', ' + esc(g.time) : '');
+        guide = '<details class="guide"><summary>' + CHEV + '<span>Show the step-by-step guide <small>(' + gsum + ')</small></span></summary>' +
+          '<div class="gmeta">' + (g.where ? '<span><b>Where:</b> ' + esc(g.where) + '</span>' : '') + (g.time ? '<span><b>Time:</b> ' + esc(g.time) + '</span>' : '') + (g.checked ? '<span><b>Steps checked:</b> ' + esc(g.checked) + '</span>' : '') + '</div>' +
+          '<ol>' + g.steps.map(function (st) { var h = st.url && safeHref(st.url); return '<li>' + inline(st.text) + (h ? ' <a href="' + h + '" target="_blank" rel="noopener">' + esc(st.link || hostOf(st.url)) + ' ↗</a>' : '') + '</li>'; }).join('') + '</ol>' +
+          '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p></details>';
+      }
+      var opened = a.opened ? '<span><b>Opened:</b> ' + esc(a.opened) + ' (' + daysBetween(new Date(a.opened), now) + ' d)</span>' : '';
+      return '<article class="ask" id="' + esc(a.id) + '"><div class="r1">' + mark('needs-you', 14) + '<h3><span class="aid">' + esc(a.id) + '</span>' + esc(a.title) + (overdue(a) ? '<span class="tag overdue">Overdue</span>' : '') + '</h3><span class="k">' + esc(KIND_LABEL[a.kind] || a.kind) + (a.priority ? ', answer ' + esc(a.priority) : '') + '</span></div>' +
+        '<div class="body"><p class="why">' + inline(a.why) + '</p>' + opts + reco + names + def + guide +
+        '<p class="meta"><span><b>Holds up:</b> ' + inline(a.holds_up || 'nothing') + '</span>' + opened + (a.ref ? '<span><b>Detail:</b> <span class="mono">' + esc(a.ref) + '</span></span>' : '') + '</p></div></article>';
+    }
+    var TOP = 3, top = open.slice(0, TOP), rest = open.slice(TOP);
+    var nOver = open.filter(overdue).length;
+    var askHtml = top.map(askArticle).join('');
+    var restHtml = rest.length ? '<details class="more-asks"><summary>' + CHEV + '<span>Show ' + rest.length + ' more, in the same order</span></summary><div class="asks">' + rest.map(askArticle).join('') + '</div></details>' : '';
+    var closedHtml = closed.length ? '<details class="closed-asks"><summary>' + CHEV + '<span>Show ' + closed.length + ' recently closed</span></summary><ul class="closed-list">' + closed.map(function (a) { return '<li><time>' + esc(a.closed.on) + '</time><span><span class="aid">' + esc(a.id) + '</span><b>' + esc(a.title) + '</b>, closed by ' + (a.closed.by === 'default' ? 'its default' : 'you') + (a.closed.outcome ? ': ' + inline(a.closed.outcome) : '') + '</span></li>'; }).join('') + '</ul></details>' : '';
+    var subTxt = open.length ? open.length + ' open' + (nOver ? ', ' + nOver + ' overdue' : '') + '. ' + (open.length > TOP ? 'The top three first, the rest fold below them. ' : '') + 'Overdue first, then by priority and firing date. An item with a default fires on its date unless you say otherwise.' : 'Nothing needs you.';
+    var needsHtml = '<section class="panel" aria-labelledby="needs"><header><h2 id="needs">Needs you</h2><span class="count' + (open.length ? ' hot' : '') + '">' + open.length + ' open</span></header><p class="sub">' + subTxt + '</p>' + (open.length ? '<div class="asks">' + askHtml + '</div>' + restHtml : '<p class="empty">Nothing needs you. New asks land here, first on the page, when the build needs a decision or an action from you.</p>') + closedHtml + '</section>';
+
+    // Row: Needs you beside the status panel. On a phone Needs you comes first and the panel follows.
+    var work = (d.work || []).slice();
+    function spot(a, b) { if (!!a.spotlight !== !!b.spotlight) return a.spotlight ? -1 : 1; return byOrder(a, b); }
+    var running = work.filter(function (w) { return w.state === 'running'; }).sort(spot);
+    app.appendChild(el('<div class="cols">' + needsHtml + statusPanel(d, work, open, today0, now) + '</div>'));
+
+    // Team room, full width: a grid of desk cards (who.role matched to the desk's role)
+    app.appendChild(el(crewSection(d.team || [], running)));
+
+    // Milestones
+    var ms = d.milestones || [];
+    // Long milestone codes (TEAM, U1-U14) turn the circle into a pill; on a phone every row's marker column takes the longest one's width so names line up.
+    var nodeCol = Math.max(28, ms.reduce(function (n, m) { return Math.max(n, String(m.code || '').replace(/^M(?=\d)/, '').length); }, 0) * 7.5 + 16);
+    var rail = ms.map(function (m) { return '<li class="ms ' + esc(m.state) + '"><span class="node">' + esc(m.code.replace(/^M(?=\d)/, '')) + '</span><span class="t">' + esc(m.name) + '</span><span class="s">' + esc(m.label && m.label.length > LABEL_MAX ? (STATE_LABEL[m.state] || m.state) : stateText(m.state, m.label)) + '</span></li>'; }).join('');
+    var detail = ms.map(function (m) { return '<div class="row"><span class="code">' + esc(m.code) + '</span><span class="name">' + esc(m.name) + '</span>' + pill(m.state, m.label) + '<span class="exit">' + inline(m.exit) + (m.note ? ' ' + inline(m.note) : '') + (m.closed_on && (m.label || '').indexOf(m.closed_on.slice(5)) < 0 ? ' <span>Closed ' + esc(m.closed_on) + '</span>' : '') + '</span></div>'; }).join('');
+    var msNow = ms.filter(function (m) { return m.state === 'running'; }).map(function (m) { return m.code; }).join(', ');
+    app.appendChild(el('<section class="panel" aria-labelledby="ms"><header><h2 id="ms">Milestones</h2>' + (msNow ? '<span class="count">' + esc(msNow) + ' running</span>' : '') + '</header><p class="sub">Each one closes on a test you could watch happen.</p><ol class="rail" style="--node-col:' + Math.ceil(nodeCol) + 'px">' + rail + '</ol><div class="ms-detail">' + detail + '</div></section>'));
+
+    // Lined up after, derived from work
+    var queuedAll = work.filter(function (w) { return w.state === 'queued' || w.state === 'needs-you'; }).sort(function (a, b) { if (!!a.spotlight !== !!b.spotlight) return a.spotlight ? -1 : 1; if ((a.state === 'needs-you') !== (b.state === 'needs-you')) return a.state === 'needs-you' ? -1 : 1; return byOrder(a, b); });
+    var queued = queuedAll.slice(0, 6);
+    function qli(w) { return '<li>' + mark(w.state, 14) + '<span class="q"><span class="aid">' + esc(w.id) + '</span>' + esc(w.title) + whoChip(w) + (w.state === 'needs-you' ? pill('needs-you', w.label || 'Your call') : '') + '</span>' + (w.next ? '<span class="qd">' + inline(w.next) + '</span>' : '') + '</li>'; }
+    app.appendChild(el('<section class="panel" aria-labelledby="next"><header><h2 id="next">Lined up after</h2><span class="count">' + queuedAll.length + ' lined up</span></header>' + (queued.length ? '<ol class="queue">' + queued.map(qli).join('') + (queuedAll.length > 6 ? '<li><span></span><span class="more">+ ' + (queuedAll.length - 6) + ' more in the state table</span></li>' : '') + '</ol>' : '<p class="empty">Nothing queued.</p>') + '</section>'));
+
+    // State table
+    renderTable(app, work, asks);
+
+    // Goal
+    if (d.goal && d.goal.vision) {
+      var checks = (d.goal.checks || []).map(function (c) { return '<li><span class="c">' + esc(c.title) + '</span>' + pill(c.state, c.label) + (c.note ? '<span class="cd">' + inline(c.note) + '</span>' : '') + '</li>'; }).join('');
+      app.appendChild(el('<section class="panel" aria-labelledby="goal"><header><h2 id="goal">The end goal</h2></header><p class="sub">What done looks like, and what you\'ll see.</p><p class="vision">' + inline(d.goal.vision) + '</p>' + (checks ? '<ul class="checks">' + checks + '</ul>' : '') + '</section>'));
+    }
+
+    // Progress
+    if ((d.progress || []).length) {
+      var bars = d.progress.map(function (b, i, arr) { var pct = b.max ? Math.round(100 * b.value / b.max) : 0; return '<div class="bar ' + (i === arr.length - 1 ? 'last' : '') + '"><span class="lab">' + esc(b.label) + '</span><div class="track"><div class="fill" style="width:' + pct + '%"></div></div><span class="n">' + esc(b.value) + ' / ' + esc(b.max) + '</span></div>'; }).join('');
+      app.appendChild(el('<section class="panel" aria-labelledby="prog"><header><h2 id="prog">Progress</h2></header>' + (d.progress[d.progress.length - 1].note ? '<p class="sub">' + inline(d.progress[d.progress.length - 1].note) + '</p>' : '') + '<div class="bars">' + bars + '</div></section>'));
+    }
+
+    // Decisions
+    var dec = (d.decisions || []).slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+    function decLi(x) { return '<li><time>' + esc(x.date) + '</time><span><b>' + esc(x.title) + '</b><span class="by">' + (x.by === 'jase' ? 'Jase' : 'agent') + '</span>' + (x.detail ? ' ' + inline(x.detail) : '') + '</span></li>'; }
+    var first = dec.slice(0, 20), older = dec.slice(20);
+    var sec = el('<section class="panel" aria-labelledby="dec"><header><h2 id="dec">Recent decisions</h2><span class="count">' + dec.length + '</span></header><p class="sub">Yours, plus the ones the build made that you should know about. MEMORY.md is the log; this mirrors it.</p><ul class="log">' + first.map(decLi).join('') + '</ul>' + (older.length ? '<button class="showall" type="button">Show ' + older.length + ' older</button><ul class="log hidden">' + older.map(decLi).join('') + '</ul>' : '') + '</section>');
+    app.appendChild(sec);
+    function reveal(id) { var t = id && document.getElementById(id); if (!t) return; var dt = t.closest('details'); if (dt) dt.open = true; t.scrollIntoView({ block: 'start' }); }
+    app.addEventListener('click', function (e) { if (e.metaKey || e.ctrlKey || e.shiftKey) return; var a = e.target.closest('a[href^="#a-"]'); if (!a) return; e.preventDefault(); reveal(a.getAttribute('href').slice(1)); history.replaceState(null, '', a.getAttribute('href')); });
+    if (/^#a-/.test(location.hash)) reveal(location.hash.slice(1));
+    // The Answer button opens the build chat and also copies its link: inside the artifact viewer the new tab is sandboxed and claude.ai may not load there.
+    app.addEventListener('click', function (e) {
+      var a = e.target.closest('a.cbtn'); if (!a) return;
+      var url = a.href, note = document.querySelector('.copynote');
+      if (note) note.remove();
+      note = document.createElement('div'); note.className = 'copynote'; note.setAttribute('role', 'status');
+      function show(copied) {
+        note.innerHTML = copied ? '<b>Chat link copied.</b> If the new tab does not load, paste the link into your browser\'s address bar.' : '<b>If the new tab does not load,</b> copy this link into your browser\'s address bar:<code>' + esc(url) + '</code>';
+        document.body.appendChild(note); clearTimeout(show.t); show.t = setTimeout(function () { note.remove(); }, copied ? 6000 : 15000);
+      }
+      try { navigator.clipboard.writeText(url).then(function () { show(true); }, function () { show(false); }); } catch (err) { show(false); }
+    });
+    var btn = app.querySelector('.showall'); if (btn) btn.addEventListener('click', function () { btn.nextElementSibling.classList.remove('hidden'); btn.remove(); });
+
+    // Words we use (contract 1.3): the project's terms, as written. Other files link here instead of restating them.
+    var gloss = (d.glossary || []).filter(function (g) { return g && g.term; });
+    if (gloss.length) {
+      var gRows = gloss.map(function (g) {
+        return '<tr><th scope="row" class="term">' + esc(g.term) + '</th><td class="means">' + inline(g.means) + '</td>' +
+          '<td class="ex" data-label="Example">' + (g.example ? inline(g.example) : '') + '</td>' +
+          '<td class="not" data-label="Not to be confused with">' + (g.not ? inline(g.not) : '') + '</td></tr>';
+      }).join('');
+      app.appendChild(el('<section class="panel" aria-labelledby="words"><header><h2 id="words">Words we use</h2><span class="count">' + gloss.length + (gloss.length === 1 ? ' term' : ' terms') + '</span></header><p class="sub">What each word means in this project. This is its one home: other files link here rather than restating it.</p>' +
+        '<table class="gloss"><thead><tr><th scope="col">Term</th><th scope="col">Means</th><th scope="col">Example</th><th scope="col">Not to be confused with</th></tr></thead><tbody>' + gRows + '</tbody></table></section>'));
+    }
+
+    app.appendChild(el('<p class="foot">Full detail lives in the repo: <span class="mono">MEMORY.md</span> for decisions, <span class="mono">ROADMAP.md</span> for milestones, <span class="mono">forge/forge.json</span> for this page. Written by ' + esc(d.updated_by) + '. Renderer ' + RENDERER + ', contract ' + esc(d.forge) + '.</p>'));
+  }
+
+  // ---------- Status panel (1.4): "Where the build is" ----------
+  // Every row hides when its data is missing. The rules for percent complete, next up and the token tips are in the build spec 5.3b.
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var WDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  function pd(s) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); if (!m) return null; var t = new Date(+m[1], +m[2] - 1, +m[3]); return t.getMonth() === +m[2] - 1 ? t : null; }
+  function dayDiff(t, today0) { return Math.round((t - today0) / 864e5); }
+  function fmtDay(s, today0) { var t = pd(s); if (!t) return ''; return WDAY[t.getDay()] + ' ' + t.getDate() + ' ' + MON[t.getMonth()] + (t.getFullYear() !== today0.getFullYear() ? ' ' + t.getFullYear() : ''); }
+  function relDay(n) { return n === 0 ? 'today' : n === 1 ? 'tomorrow' : n > 1 ? 'in ' + n + ' days' : (-n) + ' day' + (n === -1 ? '' : 's') + ' late'; }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function human(n) {
+    function t(x) { return x < 10 ? String(Math.round(x * 10) / 10) : String(Math.round(x)); }
+    return n >= 1e9 ? t(n / 1e9) + 'B' : n >= 1e6 ? t(n / 1e6) + 'M' : n >= 1e3 ? t(n / 1e3) + 'k' : String(n);
+  }
+  // Model colors come from Capsule's block-kind hues, never coral (coral means needs-you). Known families keep their hue on every board.
+  var MODEL_HUE = [[/fable/i, '--k-condition'], [/opus/i, '--k-action'], [/sonnet/i, '--k-trigger'], [/haiku/i, '--k-resolution']];
+  var SPARE_HUE = ['--k-condition', '--k-action', '--k-trigger', '--k-resolution', '--ink-3'];
+
+  // The wafer: copied from the Capsule reference build (Claude OS Style Trials). One die per work row, binned by state;
+  // a 13 x 13 disc with a notch, grown by two dies a side whenever the work outgrows it.
+  var BIN = { 'needs-you': 'hold', running: 'run', queued: 'queue', later: 'later', parked: 'park', done: 'done' };
+  function waferGrid(n) {
+    var R = 120, C = 130, P = 260 / n, dies = [], edges = [];
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+      var x = C - n / 2 * P + c * P, y = C - n / 2 * P + r * P, far = 0;
+      [[0, 0], [P, 0], [0, P], [P, P]].forEach(function (o) { var dx = x + o[0] - C, dy = y + o[1] - C; if (Math.sqrt(dx * dx + dy * dy) > R - P / 5) far++; });
+      if (far === 0) dies.push([x, y]); else if (far < 4) edges.push([x, y]);
+    }
+    return { P: P, dies: dies, edges: edges };
+  }
+  function waferSvg(work, openAsk) {
+    var order = ['needs-you', 'running', 'queued', 'later', 'parked', 'done'];
+    var pool = []; order.forEach(function (st) { work.forEach(function (w) { if (w.state === st) pool.push(w); }); });
+    var n = 13, g = waferGrid(n);
+    while (g.dies.length < pool.length && n < 61) { n += 2; g = waferGrid(n); }
+    var R = 120, C = 130, P = g.P, s = P / 20, seed = 37, dies = g.dies;
+    // Deterministic scatter: spread the work over the wafer the way bins spread on a real map.
+    var ord = dies.map(function (d, i) { return [i, (i * seed + 11) % dies.length]; }).sort(function (a, b) { return a[1] - b[1] || a[0] - b[0]; }).map(function (p) { return p[0]; });
+    var bin = {}; ord.forEach(function (di, k) { bin[di] = pool[k] || null; });
+    var stag = Math.min(6, 780 / dies.length).toFixed(2) + 'ms';
+    var notch = 'M' + (C - 7) + ' ' + (C + R) + ' A' + R + ' ' + R + ' 0 1 1 ' + (C + 7) + ' ' + (C + R) + ' L' + C + ' ' + (C + R - 7) + ' Z';
+    var counts = {}; pool.forEach(function (w) { counts[w.state] = (counts[w.state] || 0) + 1; });
+    var said = order.filter(function (st) { return counts[st]; }).map(function (st) { return counts[st] + ' ' + STATE_LABEL[st].toLowerCase(); }).join(', ');
+    var out = '<svg class="wafer" viewBox="0 0 260 260" role="img" aria-label="Wafer map: ' + plural(pool.length, 'piece') + ' of work (' + esc(said) + ')" style="--s:' + s.toFixed(3) + ';--stag:' + stag + '">' +
+      '<defs><clipPath id="wc-forge"><path d="' + notch + '"/></clipPath></defs><path class="disc" d="' + notch + '"/><g clip-path="url(#wc-forge)">';
+    function r1(v) { return Math.round(v * 100) / 100; }
+    g.edges.forEach(function (e) { out += '<rect class="edge" x="' + r1(e[0] + s) + '" y="' + r1(e[1] + s) + '" width="' + r1(P - 2 * s) + '" height="' + r1(P - 2 * s) + '" rx="' + r1(3 * s) + '"/>'; });
+    out += '</g>';
+    dies.forEach(function (d, i) {
+      var w = bin[i], x = r1(d[0] + s), y = r1(d[1] + s), z = r1(P - 2 * s);
+      if (!w) { out += '<rect class="edge" x="' + x + '" y="' + y + '" width="' + z + '" height="' + z + '" rx="' + r1(3 * s) + '"/>'; return; }
+      var b = BIN[w.state] || 'queue', mk = '';
+      if (b === 'hold') mk = '<rect class="mark-hold" x="' + r1(x + 6 * s) + '" y="' + r1(y + 6 * s) + '" width="' + r1(6 * s) + '" height="' + r1(6 * s) + '" rx="' + r1(1.5 * s) + '"/>';
+      if (b === 'run') mk = '<rect class="mark-run" x="' + r1(x + 4 * s) + '" y="' + r1(y + 8 * s) + '" width="' + r1(10 * s) + '" height="' + r1(2 * s) + '" rx="' + r1(s) + '"/>';
+      if (b === 'park') mk = '<path class="mark-park" d="M' + r1(x + 5 * s) + ' ' + r1(y + 5 * s) + 'l' + r1(8 * s) + ' ' + r1(8 * s) + 'M' + r1(x + 13 * s) + ' ' + r1(y + 5 * s) + 'l' + r1(-8 * s) + ' ' + r1(8 * s) + '"/>';
+      var tip = STATE_LABEL[w.state] + ': ' + w.title;
+      var gg = '<g class="probe" style="--i:' + i + '"><rect class="die b-' + b + '" x="' + x + '" y="' + y + '" width="' + z + '" height="' + z + '" rx="' + r1(3 * s) + '"/>' + mk + '</g>';
+      // A die that needs Jase links to its ask, through the same reveal the state table uses.
+      if (b === 'hold' && w.ask && openAsk[w.ask]) out += '<a href="#' + esc(w.ask) + '" aria-label="' + esc(tip) + '"><title>' + esc(tip) + '</title>' + gg + '</a>';
+      else out += '<g><title>' + esc(tip) + '</title>' + gg + '</g>';
+    });
+    out += '</svg>';
+    var legend = order.filter(function (st) { return counts[st]; }).map(function (st) { return '<li' + (st === 'needs-you' ? ' class="hot"' : '') + '>' + mark(st, 12) + esc(STATE_LABEL[st]) + '<b>' + counts[st] + '</b></li>'; }).join('');
+    return '<div class="wafer-card">' + out + '<ul class="wlegend" aria-label="Work by state">' + legend + '</ul></div>';
+  }
+
+  function statusPanel(d, work, openAsks, today0, now) {
+    var p = d.project || {}, h = d.headline || {}, nowM = h.now || {}, ms = (d.milestones || []).filter(function (m) { return m && m.code; });
+    var fd = function (x) { return fmtDay(x, today0); };
+    // Now: the current milestone, at the top of the panel.
+    var rounds = (nowM.rounds || []).map(function (st) { return mark(STATE_LABEL[st] ? st : 'queued', 14); }).join('');
+    var nowHtml = nowM.code || nowM.name ? '<div class="st-now"><p class="nm">' + (nowM.code ? '<span class="code">' + esc(nowM.code) + '</span>' : '') + esc(nowM.name || '') + '</p>' + (nowM.note ? '<p class="nt">' + inline(nowM.note) + '</p>' : '') + (rounds ? '<div class="rounds" aria-label="Review rounds">' + rounds + '</div>' : '') + '</div>' : '';
+    // Percent complete, by milestones: done ones count whole, a running one by its progress.
+    var pctHtml = '';
+    if (ms.length) {
+      var done = ms.filter(function (m) { return m.state === 'done'; }).length, part = 0;
+      ms.forEach(function (m) { if (m.state === 'running' && typeof m.progress === 'number' && isFinite(m.progress)) part += Math.max(0, Math.min(100, m.progress)) / 100; });
+      var pct = Math.round(100 * (done + part) / ms.length);
+      pctHtml = '<div class="pct"><p class="v">' + pct + '%<small>complete</small></p><div class="track" role="img" aria-label="' + pct + '% complete"><div class="fill" style="width:' + pct + '%"></div></div><p class="s">' + done + ' of ' + plural(ms.length, 'milestone') + ' done</p></div>';
+    }
+    var st = pd(p.started), daysHtml = '';
+    if (st && dayDiff(st, today0) <= 0) { var dn = -dayDiff(st, today0); daysHtml = '<p class="days"><b>' + (dn ? plural(dn, 'day') + ' building' : 'Started today') + '</b>' + (dn ? ', since ' + esc(fd(p.started)) : '') + '</p>'; }
+    var openAsk = {}; (d.asks || []).forEach(function (a) { if (a && !a.closed) openAsk[a.id] = 1; });
+    var wafer = work.length ? waferSvg(work, openAsk) : '';
+    var main = nowHtml + pctHtml + daysHtml;
+    var top = wafer || main ? '<div class="st-top' + (wafer && main ? '' : ' solo') + '">' + wafer + (main ? '<div class="st-main">' + main + '</div>' : '') + '</div>' : '';
+
+    var facts = [];
+    function fact(label, html) { facts.push('<dt>' + esc(label) + '</dt><dd>' + html + '</dd>'); }
+    var next = ms.filter(function (m) { return m.state !== 'done' && pd(m.target); }).sort(function (a, b) { return a.target < b.target ? -1 : a.target > b.target ? 1 : 0; })[0];
+    if (next) { var nd = dayDiff(pd(next.target), today0); fact('Next up', '<b>' + esc(fd(next.target)) + ':</b> ' + inline(next.ships || next.name) + ' <span class="' + (nd < 0 ? 'late' : 'h') + '">' + relDay(nd) + '</span>'); }
+    var fin = p.finish && pd(p.finish.target) ? p.finish : null;
+    if (fin) {
+      var prev = (fin.previous || []).filter(function (x) { return x && pd(x.target); }), fdn = dayDiff(pd(fin.target), today0);
+      var moved = prev.length ? '<span class="tn">Moved ' + (prev.length === 1 ? 'once' : prev.length === 2 ? 'twice' : prev.length + ' times') + ', first set for ' + esc(fd(prev[0].target)) + '</span>' : '';
+      var moves = prev.length ? '<details class="moves"><summary>' + CHEV + '<span>Show each move</span></summary><ol>' + prev.map(function (x, i) { var to = i + 1 < prev.length ? prev[i + 1].target : fin.target; return '<li>' + esc(fd(x.target)) + ' to ' + esc(fd(to)) + (pd(x.changed_on) ? ', on ' + esc(fd(x.changed_on)) : '') + (x.why ? ': ' + inline(x.why) : '') + '</li>'; }).join('') + '</ol></details>' : '';
+      fact('Target finish', '<b>' + esc(fd(fin.target)) + '</b> <span class="' + (fdn < 0 ? 'late' : 'h') + '">' + relDay(fdn) + '</span>' + moved + moves);
+    }
+    var ls = p.last_shipped && p.last_shipped.what ? { what: inline(p.last_shipped.what), on: p.last_shipped.on } : null;
+    if (!ls) {
+      var lastM = ms.filter(function (m) { return m.state === 'done' && pd(m.closed_on); }).map(function (m, i) { return { m: m, i: i }; }).sort(function (a, b) { return a.m.closed_on < b.m.closed_on ? 1 : a.m.closed_on > b.m.closed_on ? -1 : b.i - a.i; }).map(function (x) { return x.m; })[0];
+      if (lastM) ls = { what: esc(lastM.code) + ' ' + inline(lastM.ships || lastM.name), on: lastM.closed_on };
+    }
+    if (ls) fact('Last shipped', ls.what + (pd(ls.on) ? ' <span class="h">' + esc(fd(ls.on)) + '</span>' : ''));
+    var oldest = openAsks.map(function (a) { return pd(a.opened); }).filter(Boolean).sort(function (a, b) { return a - b; })[0];
+    fact('Waiting on you', openAsks.length ? '<a href="#needs"><span class="hotn">' + openAsks.length + ' open</span></a>' + (oldest ? ' <span class="h">oldest ' + plural(-dayDiff(oldest, today0), 'day') + '</span>' : '') : '<span class="h">Nothing</span>');
+    // The project's own figures close the panel, after the tokens.
+    var tiles = [];
+    (h.tiles || []).slice(0, 3).forEach(function (t) { if (!t || !t.label) return; tiles.push('<dt>' + esc(t.label) + '</dt><dd><span class="tv">' + esc(t.value) + (t.unit ? ' <small>' + esc(t.unit) + '</small>' : '') + '</span>' + (t.note ? '<span class="tn">' + inline(t.note) + '</span>' : '') + '</dd>'); });
+
+    return '<section class="panel status" aria-labelledby="where"><header><h2 id="where">Where the build is</h2></header>' + top +
+      (facts.length ? '<dl class="facts">' + facts.join('') + '</dl>' : '') + tokens(d, today0) + (tiles.length ? '<dl class="facts" aria-label="Project figures">' + tiles.join('') + '</dl>' : '') + '</section>';
+  }
+
+  // Agent tokens logged: daily aggregates from usage[]. At most two tips, from fixed rules (build spec 5.3b); none when no rule fires.
+  function tokens(d, today0) {
+    var rows = (d.usage || []).filter(function (u) { return u && pd(u.on) && dayDiff(pd(u.on), today0) <= 0 && typeof u.tokens === 'number' && isFinite(u.tokens) && u.tokens >= 0 && u.model; });
+    if (!rows.length) return '';
+    function age(u) { return -dayDiff(pd(u.on), today0); }
+    function sum(list) { return list.reduce(function (n, u) { return n + u.tokens; }, 0); }
+    var wk = rows.filter(function (u) { return age(u) <= 6; }), prev = rows.filter(function (u) { return age(u) >= 7 && age(u) <= 13; });
+    var tw = sum(wk), tp = sum(prev), all = sum(rows);
+    var by = {}, names = []; wk.forEach(function (u) { var k = String(u.model).trim(); if (!(k in by)) { by[k] = 0; names.push(k); } by[k] += u.tokens; });
+    names.sort(function (a, b) { return by[b] - by[a]; });
+    var used = {}, hue = {};
+    names.forEach(function (m) { MODEL_HUE.some(function (x) { if (x[0].test(m) && !used[x[1]]) { hue[m] = x[1]; used[x[1]] = 1; return true; } return false; }); });
+    names.forEach(function (m) { if (!hue[m]) { hue[m] = SPARE_HUE.filter(function (c) { return !used[c]; })[0] || '--ink-3'; used[hue[m]] = 1; } });
+    var share = function (m) { return tw ? Math.round(100 * by[m] / tw) : 0; };
+    var split = tw ? '<div class="split" role="img" aria-label="Last 7 days by model: ' + esc(names.map(function (m) { return m + ' ' + share(m) + '%'; }).join(', ')) + '">' + names.map(function (m) { return '<span style="flex:' + by[m] + ' 1 0;background:var(' + hue[m] + ')"></span>'; }).join('') + '</div>' +
+      '<ul class="mlegend">' + names.map(function (m) { return '<li><i style="background:var(' + hue[m] + ')"></i>' + esc(m) + ' <b>' + share(m) + '%</b></li>'; }).join('') + '</ul>' : '';
+    var tips = [];
+    var fable = names.filter(function (m) { return /fable/i.test(m); }).reduce(function (n, m) { return n + by[m]; }, 0);
+    if (tw && fable / tw > 0.4) tips.push('Fable used ' + Math.round(100 * fable / tw) + '% of this week\'s tokens. Route in-between checks to Opus (gk-gauntlet); keep Fable for milestone reviews.');
+    var runs = wk.filter(function (u) { return typeof u.runs === 'number' && u.runs > 0; });
+    var nRuns = runs.reduce(function (n, u) { return n + u.runs; }, 0);
+    if (nRuns && sum(runs) / nRuns > 250000) tips.push('Agent runs average ' + human(Math.round(sum(runs) / nRuns)) + ' tokens. Brief each one with the exact files to read so it reads less.');
+    if (tp && tw > 1.5 * tp) tips.push('Token use is up ' + Math.round(100 * (tw / tp - 1)) + '% on last week.');
+    tips = tips.slice(0, 2);
+    return '<div class="tok"><h3>Agent tokens logged <span>(partial: the build chat\'s own use is not counted)</span></h3>' +
+      '<p class="figs"><span><b>' + human(tw) + '</b>last 7 days</span><span><b>' + human(all) + '</b>all time</span></p>' + split +
+      (tips.length ? '<ul class="tips">' + tips.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
+      (d.usage_note ? '<p class="note">' + inline(d.usage_note) + '</p>' : '') + '</div>';
+  }
+
+  // Team room: a grid of desk cards. Jase's own desk (person starting "Jase") is left out (Needs you is his desk); `you: true` marks a desk that waits on him.
+  // A running work row sits on the desk whose role, or whose who.role, equals the row's who.role (trimmed, any case); the rest go on an Unassigned card.
+  // Order: desks that wait on Jase (coral wash), then the other active desks, then idle desks dimmed in place (never folded), then Unassigned. No team array: one card per who.role.
+  function crewSection(team, running) {
+    function jobs(rows) {
+      return '<ul class="jobs">' + rows.map(function (w) { return '<li><span class="t"><span class="aid">' + esc(w.id) + '</span>' + esc(w.title) + whoChip(w) + '</span>' + pill(w.state, w.label && w.label.length <= 24 ? w.label : '') + (w.next ? '<span class="n" title="' + esc(w.next) + '">' + inline(w.next) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
+    }
+    function chip(who) {
+      var m = who && who.model;
+      return m ? '<span class="who" title="' + esc(m + (who.role ? ' ' + who.role : '')) + '"><b>' + esc(m) + '</b>' + (who.role ? ' ' + esc(who.role) : '') + '</span>' : '<span class="who unset">Model not set</span>';
+    }
+    function runLine(rows) {
+      return rows.length ? '<p class="d-run">' + mark('running', 12) + '<b>' + rows.length + ' running</b><span>' + esc(rows[0].title) + '</span></p>' : '<p class="d-run none">Nothing running</p>';
+    }
+    function card(o) {
+      // o: { state, role, person, whoHtml, now, dim, rows, body, hot, idle, summary }
+      return '<article class="desk' + (o.hot ? ' you' : '') + (o.idle ? ' idle' : '') + '"><div class="d-head" title="' + esc(STATE_LABEL[o.state] || o.state) + '">' + mark(o.state, 14) + '<h3 class="d-role" title="' + esc(o.role) + '">' + esc(o.role) + '</h3></div>' +
+        '<p class="d-who">' + (o.person ? '<span class="pn">' + esc(o.person) + '</span>' : '') + o.whoHtml + '</p>' +
+        '<p class="d-now' + (o.dim ? ' dim' : '') + '">' + o.now + '</p>' + runLine(o.rows) +
+        '<details><summary>' + CHEV + '<span>' + o.summary + '</span></summary><div class="d-body">' + (o.rows.length ? jobs(o.rows) : '') + o.body + '</div></details></article>';
+    }
+    function rowChips(rows) {
+      var seen = {}, out = [];
+      rows.forEach(function (w) { var k = w.who && w.who.model; if (k && !seen[k]) { seen[k] = 1; out.push(w); } });
+      return out.slice(0, 2).map(whoChip).join('') + (out.length > 2 ? '<span>+' + (out.length - 2) + '</span>' : '');
+    }
+    function unassignedCard(rows, name) {
+      return card({ state: 'running', role: name, person: '', whoHtml: rowChips(rows), now: name === 'Unassigned' ? 'Running work that no desk\'s role matches.' : 'Running work with this role.', dim: true, rows: rows, body: '', summary: 'Show work' });
+    }
+    var cards = '', count = running.length + ' running';
+    if (!team.length) {
+      var roles = [], byRole = {}, loose = [];
+      running.forEach(function (w) { var r = w.who && w.who.role; if (!r) { loose.push(w); return; } var k = norm(r); if (!byRole[k]) { byRole[k] = []; roles.push(r); } byRole[k].push(w); });
+      cards = roles.map(function (r) { return unassignedCard(byRole[norm(r)], r); }).join('') + (loose.length ? unassignedCard(loose, 'Unassigned') : '');
+    } else {
+      var desks = team.filter(function (t) { return t && !/^jase\b/i.test(t.person || ''); }).map(function (t) { return { t: t, keys: [norm(t.role), norm(t.who && t.who.role)].filter(Boolean), rows: [] }; });
+      var unassigned = [];
+      running.forEach(function (w) {
+        var k = norm(w.who && w.who.role), hit = null;
+        if (k) desks.some(function (x) { if (x.keys.indexOf(k) >= 0) { hit = x; return true; } return false; });
+        if (hit) hit.rows.push(w); else unassigned.push(w);
+      });
+      var IDLE = { done: 1, later: 1, parked: 1 };
+      var RANK = { 'needs-you': 0, running: 1, queued: 2 };
+      function hot(t) { return t.state === 'needs-you' || !!t.you; }
+      var active = desks.filter(function (x) { return x.rows.length || hot(x.t) || !IDLE[x.t.state]; });
+      var idle = desks.filter(function (x) { return !x.rows.length && !hot(x.t) && IDLE[x.t.state]; });
+      function rk(t) { return hot(t) ? -1 : (RANK[t.state] == null ? 3 : RANK[t.state]); }
+      active = active.map(function (x, i) { x.i = i; return x; }).sort(function (a, b) { return (rk(a.t) - rk(b.t)) || a.i - b.i; });
+      function desk(x, isIdle) {
+        var t = x.t;
+        var kv = '<dl class="r-kv"><dt>State</dt><dd>' + esc(stateText(t.state, t.label)) + '</dd>' + (t.autonomy ? '<dt>Autonomy</dt><dd>' + esc(RUNG[t.autonomy] || t.autonomy) + '</dd>' : '') + (t.output ? '<dt>Output</dt><dd><code>' + esc(t.output) + '</code></dd>' : '') + ((t.shelf || []).length ? '<dt>Shelf</dt><dd>' + t.shelf.map(esc).join(', ') + '</dd>' : '') + '</dl>';
+        return card({ state: t.state, role: t.role, person: t.person && t.person !== 'AI' ? t.person : '', whoHtml: t.person && t.person !== 'AI' && !(t.who && t.who.model) ? '' : chip(t.who), now: t.now ? inline(t.now) : inline(t.brief || ''), dim: !t.now, rows: x.rows, hot: hot(t), idle: isIdle,
+          body: (t.now && t.brief ? '<p>' + inline(t.brief) + '</p>' : '') + kv, summary: 'Show work and desk' });
+      }
+      // Every desk stays on the board: idle ones dimmed in place (Jase, 2026-10-04: a folded team read as missing).
+      cards = active.map(function (x) { return desk(x, false); }).join('') + idle.map(function (x) { return desk(x, true); }).join('') + (unassigned.length ? unassignedCard(unassigned, 'Unassigned') : '');
+      count = plural(desks.length, 'desk') + ', ' + running.length + ' running' + (idle.length ? ', ' + idle.length + ' idle' : '');
+    }
+    var ladder = team.length ? '<p class="ladder"><b>Autonomy:</b> human-led, a person does it and the AI may draft; human-assisted, the AI does it and a person checks; autonomous, the AI does it and flags loudly when something is wrong.</p>' : '';
+    return '<section class="panel" aria-labelledby="now"><header><h2 id="now">Team room</h2><span class="count">' + count + '</span></header>' +
+      (cards ? '<div class="desks">' + cards + '</div>' : '<p class="empty">Nothing is running. The build moves only while a session runs; ask in the build chat to start one.</p>') + ladder + '</section>';
+  }
+
+  function renderTable(app, work, asks) {
+    var askById = {}; (asks || []).forEach(function (a) { askById[a.id] = a; });
+    var areas = []; work.forEach(function (w) { if (w.area && areas.indexOf(w.area) < 0) areas.push(w.area); });
+    work.forEach(function (w) { if (!w.band) w.band = 'unbanded'; });
+    var bands = []; work.forEach(function (w) { if (bands.indexOf(w.band) < 0) bands.push(w.band); });
+    var counts = {}; STATES.forEach(function (s) { counts[s] = 0; }); work.forEach(function (w) { counts[w.state]++; });
+    var openCount = work.length - counts.done;
+    var state = { status: 'open', area: 'all', urgent: false, sort: 'priority' };
+
+    var sec = el('<section class="panel" aria-labelledby="st"><header><h2 id="st">State table</h2><span class="count">' + work.length + ' items</span></header><p class="sub">Every piece of work, grouped by band. The Team room and Lined up after are drawn from these rows.</p>' +
+      '<div class="filters"><div class="chips" data-f="status" role="group" aria-label="Status">' +
+        '<button class="chip" type="button" data-v="open">Open<span class="n">' + openCount + '</span></button>' +
+        STATES.map(function (s) { return '<button class="chip" type="button" data-v="' + s + '">' + mark(s, 12) + esc(STATE_LABEL[s]) + '<span class="n">' + counts[s] + '</span></button>'; }).join('') +
+        '<button class="chip" type="button" data-v="all">All<span class="n">' + work.length + '</span></button></div>' +
+      (areas.length ? '<div class="chips" data-f="area" role="group" aria-label="Area"><button class="chip" type="button" data-v="all">Any area</button>' + areas.map(function (a) { return '<button class="chip" type="button" data-v="' + esc(a) + '">' + esc(a) + '</button>'; }).join('') + '</div>' : '') +
+      '<div class="chips" data-f="urgent" role="group" aria-label="Urgent only"><button class="chip" type="button" data-v="urgent">Urgent<span class="n">' + work.filter(function (w) { return w.urgent; }).length + '</span></button></div>' +
+      '<label>Sort <select><option value="priority">by priority</option><option value="band">by band</option><option value="written">as written</option></select></label>' +
+      '<span class="count" aria-live="polite"></span></div>' +
+      '<table class="state" role="table"><thead><tr><th>Work</th><th>State</th><th>Next</th></tr></thead><tbody></tbody></table></section>');
+    app.appendChild(sec);
+    var root = app.lastElementChild;
+    var tbody = root.querySelector('tbody'), count = root.querySelector('.filters .count');
+
+    function prioKey(w) { return (w.urgent ? 0 : 1) * 100 + STATES.indexOf(w.state) * 10; }
+    function rowHtml(w, showBand) {
+      var a = w.ask && askById[w.ask] && !askById[w.ask].closed ? askById[w.ask] : null;
+      var checks = (w.checks || []).length ? '<div class="checks">' + w.checks.map(function (c) { return '<span class="chk ' + esc(c.state) + '">' + mark(c.state, 10) + esc(c.name) + (c.label ? ': ' + esc(c.label) : '') + '</span>'; }).join('') + '</div>' : '';
+      return '<tr role="row" data-id="' + esc(w.id) + '"><td role="cell" class="t"><span class="title"><span class="aid">' + esc(w.id) + '</span>' + esc(w.title) + '</span>' + whoChip(w) + (w.urgent ? ' <span class="tag urgent">Urgent</span>' : '') + (showBand ? '<span class="bandtag">' + esc(w.band) + '</span>' : '') + (w.sub ? '<span class="sub">' + esc(w.sub) + '</span>' : '') + '</td>' +
+        '<td role="cell" class="s">' + pill(w.state, w.label) + (w.closed_on ? '<span class="lbl">' + esc(w.closed_on) + '</span>' : '') + checks + '</td>' +
+        '<td role="cell" class="n">' + inline(w.next || '') + (a ? ' <a href="#' + esc(a.id) + '">' + esc(a.id) + ' ' + esc(a.title) + '</a>' : '') + (w.ref ? '<span class="ref">' + esc(w.ref) + '</span>' : '') + '</td></tr>';
+    }
+    function draw() {
+      var rows = work.filter(function (w) {
+        if (state.status === 'open' && w.state === 'done') return false;
+        if (state.status !== 'open' && state.status !== 'all' && w.state !== state.status) return false;
+        if (state.area !== 'all' && w.area !== state.area) return false;
+        if (state.urgent && !w.urgent) return false;
+        return true;
+      });
+      var html = '';
+      if (state.sort === 'band') {
+        bands.forEach(function (b) {
+          var inBand = rows.filter(function (w) { return w.band === b; }).sort(byOrder);
+          if (!inBand.length) return;
+          html += '<tr class="band" role="row"><td role="cell" colspan="3">' + esc(b) + ' (' + inBand.length + ')' + '</td></tr>' + inBand.map(function (w) { return rowHtml(w, false); }).join('');
+        });
+      } else {
+        var sorted = rows.slice().sort(state.sort === 'priority' ? function (a, b) { var k = prioKey(a) - prioKey(b); return k || byOrder(a, b); } : byOrder);
+        html = sorted.map(function (w) { return rowHtml(w, true); }).join('');
+      }
+      tbody.innerHTML = html || '<tr><td colspan="3" class="empty">No rows match.</td></tr>';
+      count.textContent = rows.length + ' of ' + work.length + ' shown';
+      root.querySelectorAll('.chips[data-f="status"] .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.v === state.status)); });
+      root.querySelectorAll('.chips[data-f="area"] .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.v === state.area)); });
+      root.querySelectorAll('.chips[data-f="urgent"] .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(state.urgent)); });
+    }
+    root.querySelector('.filters').addEventListener('click', function (e) {
+      var c = e.target.closest('.chip'); if (!c) return;
+      var f = c.parentNode.dataset.f;
+      if (f === 'status') state.status = c.dataset.v; else if (f === 'area') state.area = c.dataset.v; else if (f === 'urgent') state.urgent = !state.urgent;
+      draw();
+    });
+    root.querySelector('select').addEventListener('change', function (e) { state.sort = e.target.value; draw(); });
+    draw();
+  }
+
+  load(function (err, data) {
+    if (err) { document.getElementById('app').innerHTML = '<div class="banner fail"><b>Could not load the forge:</b> ' + esc(err.message) + '</div>'; return; }
+    try { render(data); } catch (e) { document.getElementById('app').innerHTML = '<div class="banner fail"><b>The forge could not be drawn:</b> ' + esc(e.message) + '</div>'; throw e; }
+  });
+})();
+</script>
+</body>
+</html>

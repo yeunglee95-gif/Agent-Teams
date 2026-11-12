@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yeunglee95-gif/Claude-OS/00_Resources/forge/forge.schema.json",
+  "title": "Forge contract 1.4",
+  "description": "One build board per project. Written by the project's cloud session, rendered by forge.html and later by the Forge page in OS Flow. Every text field may carry a Chinese twin with the suffix _zh.",
+  "type": "object",
+  "required": ["forge", "project", "updated", "updated_by", "headline", "asks", "milestones", "work", "decisions"],
+  "additionalProperties": false,
+  "properties": {
+    "forge": { "type": "string", "pattern": "^1\\.[0-9]+$", "description": "Contract version, e.g. \"1.4\". The renderer refuses a major it does not know. A file using a 1.3 or 1.4 field must say that version or later (build spec 5.3a, 5.3b)." },
+    "project": {
+      "type": "object",
+      "required": ["id", "name", "business", "repo", "lede"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string" }, "name_zh": { "type": "string" },
+        "business": { "type": "string", "description": "OPINE, Geniotek, Grids Lab, OS Flow, Meeting Agent, Claude OS" },
+        "repo": { "type": "string", "description": "owner/name" },
+        "branch": { "type": "string" },
+        "eyebrow": { "type": "string", "description": "Small line above the title, e.g. 'Build board · orchestrator's view'" }, "eyebrow_zh": { "type": "string" },
+        "lede": { "type": "string", "description": "One paragraph under the title: what this page is and when it moves." }, "lede_zh": { "type": "string" },
+        "started": { "type": "string", "format": "date", "description": "1.4: the day the build began; set once. The status panel counts days building from it." },
+        "finish": {
+          "type": "object", "required": ["target"], "additionalProperties": false,
+          "description": "1.4: the target finish. When it slips, the old target moves into previous with why (build spec 5.3b).",
+          "properties": {
+            "target": { "type": "string", "format": "date" },
+            "previous": { "type": "array", "description": "Earlier targets, oldest first.", "items": { "type": "object", "required": ["target", "changed_on", "why"], "additionalProperties": false,
+              "properties": { "target": { "type": "string", "format": "date" }, "changed_on": { "type": "string", "format": "date" }, "why": { "type": "string" }, "why_zh": { "type": "string" } } } }
+          }
+        },
+        "last_shipped": {
+          "type": "object", "required": ["what", "on"], "additionalProperties": false,
+          "description": "1.4: what last reached a user. When absent the panel shows the most recently closed milestone.",
+          "properties": { "what": { "type": "string" }, "what_zh": { "type": "string" }, "on": { "type": "string", "format": "date" } }
+        },
+        "stamps": { "type": "array", "items": { "type": "object", "required": ["label", "value"], "properties": { "label": { "type": "string" }, "value": { "type": "string" } } }, "description": "Small mono facts beside the timestamp, e.g. Branch, Rulings." },
+        "links": {
+          "type": "object", "additionalProperties": { "type": "string", "format": "uri" },
+          "description": "artifact (the published page), chat (the build chat where Jase answers asks; the board shows it as Answer in), live (the deployed app), repo, and any other named link."
+        }
+      }
+    },
+    "updated": { "type": "string", "format": "date-time", "description": "ISO 8601 with offset. The stale banner reads it." },
+    "updated_by": { "type": "string", "description": "The session or role that wrote this version." },
+    "headline": {
+      "type": "object",
+      "required": ["now"],
+      "additionalProperties": false,
+      "properties": {
+        "now": {
+          "type": "object", "required": ["code", "name", "note"], "additionalProperties": false,
+          "properties": {
+            "code": { "type": "string", "description": "Milestone code, e.g. M3a" },
+            "name": { "type": "string" }, "name_zh": { "type": "string" },
+            "note": { "type": "string" }, "note_zh": { "type": "string" },
+            "rounds": { "type": "array", "items": { "type": "string", "enum": ["done", "running", "needs-you", "queued", "later", "parked"] }, "description": "Small bar per review round, coloured by state." }
+          }
+        },
+        "tiles": {
+          "type": "array", "maxItems": 3,
+          "items": { "type": "object", "required": ["label", "value"], "additionalProperties": false,
+            "properties": { "label": { "type": "string" }, "label_zh": { "type": "string" }, "value": { "type": "string" }, "unit": { "type": "string" }, "note": { "type": "string" }, "note_zh": { "type": "string" } } }
+        }
+      }
+    },
+    "asks": {
+      "type": "array",
+      "description": "Everything needing Jase. The one list. Nothing waits on him that is not here.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "kind", "priority", "why", "opened"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^a-[0-9]{3,}$" },
+          "title": { "type": "string" }, "title_zh": { "type": "string" },
+          "kind": { "type": "string", "enum": ["decision", "action", "look"], "description": "decision: pick an option. action: do something only Jase can. look: check content and correct it." },
+          "priority": { "type": "string", "enum": ["now", "soon", "later"] },
+          "why": { "type": "string" }, "why_zh": { "type": "string" },
+          "holds_up": { "type": "string", "description": "What waits on this. 'Nothing' is a valid answer." }, "holds_up_zh": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "object", "required": ["label"], "additionalProperties": false,
+            "properties": { "label": { "type": "string" }, "label_zh": { "type": "string" }, "recommended": { "type": "boolean" }, "consequence": { "type": "string" }, "consequence_zh": { "type": "string" } } } },
+          "recommendation": { "type": "string" }, "recommendation_zh": { "type": "string" },
+          "reasoning": { "type": "array", "items": { "type": "string" } },
+          "names": { "type": "array", "items": { "type": "string" }, "description": "Tags, e.g. the three names to check." },
+          "default": {
+            "type": "object", "required": ["action", "fires_on"], "additionalProperties": false,
+            "description": "Fires on the date unless Jase vetoes. Never on: a public URL, an outbound message, money, a client, partner or factory commitment.",
+            "properties": { "action": { "type": "string" }, "action_zh": { "type": "string" }, "fires_on": { "type": "string", "format": "date" } }
+          },
+          "opened": { "type": "string", "format": "date" },
+          "closed": {
+            "type": "object", "required": ["on", "by"], "additionalProperties": false,
+            "properties": { "on": { "type": "string", "format": "date" }, "by": { "type": "string", "enum": ["jase", "default"] }, "outcome": { "type": "string" }, "outcome_zh": { "type": "string" } }
+          },
+          "ref": { "type": "string", "description": "File or page that holds the detail." },
+          "guide": {
+            "type": "object", "required": ["steps", "checked"], "additionalProperties": false,
+            "description": "Step-by-step guide behind the ask's More button, for a hands-on task only Jase can do (a password, a secret, a payment, a dashboard setting). Says where to paste a secret, never the secret.",
+            "properties": {
+              "where": { "type": "string", "description": "The place it happens, e.g. 'Supabase dashboard'." }, "where_zh": { "type": "string" },
+              "time": { "type": "string", "description": "Rough time, e.g. 'about 5 min'." }, "time_zh": { "type": "string" },
+              "checked": { "type": "string", "format": "date", "description": "When the steps and links were last checked against the real page." },
+              "steps": { "type": "array", "items": { "type": "object", "required": ["text"], "additionalProperties": false,
+                "properties": { "text": { "type": "string" }, "text_zh": { "type": "string" }, "url": { "type": "string", "format": "uri", "description": "https link straight to the page for this step." }, "link": { "type": "string", "description": "Link text; defaults to the page's host." }, "link_zh": { "type": "string" } } } }
+            }
+          }
+        }
+      }
+    },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["code", "name", "state", "exit"], "additionalProperties": false,
+        "properties": {
+          "code": { "type": "string" },
+          "name": { "type": "string" }, "name_zh": { "type": "string" },
+          "state": { "$ref": "#/$defs/state" },
+          "label": { "type": "string", "description": "Free text beside the state, e.g. 'Live, m3a-rc1'." }, "label_zh": { "type": "string" },
+          "exit": { "type": "string", "description": "The test you could watch happen." }, "exit_zh": { "type": "string" },
+          "closed_on": { "type": "string", "format": "date" },
+          "note": { "type": "string" }, "note_zh": { "type": "string" },
+          "target": { "type": "string", "format": "date", "description": "1.4: the day this milestone is meant to close." },
+          "ships": { "type": "string", "description": "1.4: one short line saying what becomes available, e.g. 'Forge page in OS Flow'." }, "ships_zh": { "type": "string" },
+          "progress": { "type": "number", "minimum": 0, "maximum": 100, "description": "1.4: percent done, 0 to 100; read only on a running milestone." }
+        }
+      }
+    },
+    "work": {
+      "type": "array",
+      "description": "The state table. Running now and Queued are derived from it.",
+      "items": {
+        "type": "object", "required": ["id", "title", "state", "band"], "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^w-[0-9]{3,}$" },
+          "title": { "type": "string" }, "title_zh": { "type": "string" },
+          "sub": { "type": "string", "description": "Mono subline: commit, migration, date." },
+          "state": { "$ref": "#/$defs/state" },
+          "label": { "type": "string" }, "label_zh": { "type": "string" },
+          "area": { "type": "string", "description": "Filter chip: app, content, tooling, process, research, or the project's own." },
+          "band": { "type": "string", "description": "Group heading: live defects, shipped, in flight, pipeline, content, engine, deferred, or the project's own." },
+          "urgent": { "type": "boolean" },
+          "spotlight": { "type": "boolean", "description": "Force into Running now / Queued regardless of order." },
+          "next": { "type": "string", "description": "What happens next, or why it is parked." }, "next_zh": { "type": "string" },
+          "ask": { "type": "string", "pattern": "^a-[0-9]{3,}$", "description": "The ask a needs-you row waits on." },
+          "checks": { "type": "array", "items": { "type": "object", "required": ["name", "state"], "additionalProperties": false,
+            "properties": { "name": { "type": "string" }, "state": { "$ref": "#/$defs/state" }, "label": { "type": "string" } } },
+            "description": "Sub-statuses, e.g. accuracy / teaching / downstream." },
+          "order": { "type": "integer" },
+          "closed_on": { "type": "string", "format": "date" },
+          "ref": { "type": "string" },
+          "who": { "$ref": "#/$defs/who" }
+        }
+      }
+    },
+    "team": {
+      "type": "array",
+      "description": "The Team room: one desk per role. Omit when the project has no roles.",
+      "items": {
+        "type": "object", "required": ["role", "autonomy", "brief", "state"], "additionalProperties": false,
+        "properties": {
+          "role": { "type": "string" }, "role_zh": { "type": "string" },
+          "person": { "type": "string", "description": "A name, or 'AI' for an agent." },
+          "autonomy": { "type": "string", "enum": ["human-led", "human-assisted", "autonomous"] },
+          "brief": { "type": "string" }, "brief_zh": { "type": "string" },
+          "now": { "type": "string" }, "now_zh": { "type": "string" },
+          "state": { "$ref": "#/$defs/state" },
+          "label": { "type": "string" },
+          "output": { "type": "string", "description": "Path of the last output." },
+          "shelf": { "type": "array", "items": { "type": "string" }, "description": "Documents the role reads." },
+          "you": { "type": "boolean", "description": "Highlights the desk that waits on Jase." },
+          "who": { "$ref": "#/$defs/who" }
+        }
+      }
+    },
+    "goal": {
+      "type": "object", "required": ["vision"], "additionalProperties": false,
+      "properties": {
+        "vision": { "type": "string" }, "vision_zh": { "type": "string" },
+        "checks": { "type": "array", "items": { "type": "object", "required": ["title", "state"], "additionalProperties": false,
+          "properties": { "title": { "type": "string" }, "title_zh": { "type": "string" }, "state": { "$ref": "#/$defs/state" }, "label": { "type": "string" }, "note": { "type": "string" }, "note_zh": { "type": "string" } } } }
+      }
+    },
+    "progress": {
+      "type": "array",
+      "items": { "type": "object", "required": ["label", "value", "max"], "additionalProperties": false,
+        "properties": { "label": { "type": "string" }, "value": { "type": "number" }, "max": { "type": "number" }, "note": { "type": "string" } } },
+      "description": "Small bars, e.g. spec rows met per check."
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["date", "title", "by", "memory_ref"], "additionalProperties": false,
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "title": { "type": "string" }, "title_zh": { "type": "string" },
+          "detail": { "type": "string" }, "detail_zh": { "type": "string" },
+          "by": { "type": "string", "enum": ["jase", "agent"] },
+          "memory_ref": { "type": "string", "minLength": 12, "description": "An exact substring of the MEMORY.md entry. The gate greps for it. MEMORY.md is the log; the forge mirrors it." }
+        }
+      }
+    },
+    "glossary": {
+      "type": "array",
+      "description": "Words we use (1.3): the project's terms, one home for each. A term goes in the turn it is defined; the project's other files link here instead of restating it. Rules in the build spec 5.3a: one entry per term (ignoring case, full-width forms and inner spacing), no empty field, no em dash in English text, contract 1.3 or later.",
+      "items": {
+        "type": "object", "required": ["term", "means"], "additionalProperties": false,
+        "properties": {
+          "term": { "type": "string" }, "term_zh": { "type": "string" },
+          "means": { "type": "string", "description": "What the word means here, in a sentence or two." }, "means_zh": { "type": "string" },
+          "example": { "type": "string", "description": "A real instance, e.g. a block or a product name." }, "example_zh": { "type": "string" },
+          "not": { "type": "string", "description": "What it is not to be confused with." }, "not_zh": { "type": "string" }
+        }
+      }
+    },
+    "usage": {
+      "type": "array",
+      "description": "1.4: agent tokens logged, one daily aggregate per day, model and role (unique together). Partial: the build chat's own use is not counted. Rules in the build spec 5.3b.",
+      "items": {
+        "type": "object", "required": ["on", "model", "tokens"], "additionalProperties": false,
+        "properties": {
+          "on": { "type": "string", "format": "date" },
+          "model": { "type": "string", "description": "As named when the work ran, e.g. 'Opus 5.5'." },
+          "tokens": { "type": "integer", "minimum": 0, "description": "Sum of subagent_tokens from that day's task notifications." },
+          "runs": { "type": "integer", "minimum": 0, "description": "Agent runs counted in tokens." },
+          "role": { "type": "string", "description": "e.g. builder, critic, gauntlet" }
+        }
+      }
+    },
+    "usage_note": { "type": "string", "description": "1.4: one line shown under the token figures, e.g. what the log leaves out." }, "usage_note_zh": { "type": "string" },
+    "extensions": { "type": "object", "description": "Per-project free object. The renderer ignores it." }
+  },
+  "$defs": {
+    "state": { "type": "string", "enum": ["done", "running", "needs-you", "queued", "later", "parked"] },
+    "who": {
+      "type": "object", "required": ["model"], "additionalProperties": false,
+      "description": "Who is doing it: the model as named when the work was assigned (e.g. 'Opus 5.5', 'Fable 5.1', 'Sonnet 5.5'), or a person's name, plus the role. Written at the time, never translated later.",
+      "properties": { "model": { "type": "string" }, "role": { "type": "string", "description": "e.g. builder, critic, planner" }, "role_zh": { "type": "string" } }
+    }
+  }
+}

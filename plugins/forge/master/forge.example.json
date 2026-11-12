@@ -1,0 +1,856 @@
+{
+  "forge": "1.4",
+  "project": {
+    "id": "example-app",
+    "name": "Example App",
+    "business": "Claude OS",
+    "repo": "yeunglee95-gif/example-app",
+    "branch": "main",
+    "eyebrow": "Build board · orchestrator's view",
+    "lede": "Where the build is, what it is doing now, what it needs from you, and where it ends. It changes when the session republishes it, which happens every time something here moves.",
+    "started": "2026-08-25",
+    "finish": {
+      "target": "2026-11-14",
+      "previous": [
+        {
+          "target": "2026-10-31",
+          "changed_on": "2026-09-18",
+          "why": "M1 gained a review round after the first critic pass found unsaved edits on a slow phone."
+        },
+        {
+          "target": "2026-11-07",
+          "changed_on": "2026-10-01",
+          "why": "The block and wire redesign moved into M2 instead of after launch."
+        }
+      ]
+    },
+    "last_shipped": {
+      "what": "Read-only flow viewer on the live site",
+      "on": "2026-09-29"
+    },
+    "stamps": [
+      {
+        "label": "Branch",
+        "value": "main"
+      },
+      {
+        "label": "Rulings",
+        "value": "R1–R4"
+      }
+    ],
+    "links": {
+      "artifact": "https://claude.ai/artifact/EXAMPLE",
+      "chat": "https://claude.ai/code/session_EXAMPLE",
+      "live": "https://example.pages.dev",
+      "repo": "https://github.com/yeunglee95-gif/example-app"
+    }
+  },
+  "updated": "2026-10-05T09:40:00+08:00",
+  "updated_by": "cloud session example-app",
+  "headline": {
+    "now": {
+      "code": "M1",
+      "name": "Core editor",
+      "note": "Two review rounds left. The gate is green on the branch.",
+      "rounds": [
+        "done",
+        "running"
+      ]
+    },
+    "tiles": [
+      {
+        "label": "Spec met",
+        "value": "42",
+        "unit": "/ 50",
+        "note": "Rows checked in the running app, never from a worker's word."
+      },
+      {
+        "label": "Last green gate",
+        "value": "10-01",
+        "note": "Lint, types, 300 unit tests, 40 browser tests."
+      },
+      {
+        "label": "Live site",
+        "value": "m0 live",
+        "note": "Behind the email login."
+      }
+    ]
+  },
+  "asks": [
+    {
+      "id": "a-001",
+      "title": "Approve pushing M1 to main",
+      "kind": "decision",
+      "priority": "now",
+      "why": "Every check passes. Pushing to main re-runs the gate and deploys M1.",
+      "holds_up": "M1 going live",
+      "options": [
+        {
+          "label": "Proceed",
+          "recommended": true,
+          "consequence": "Deploys today; the team sees the new editor tomorrow."
+        },
+        {
+          "label": "Wait for round 3",
+          "consequence": "One more review round, two more days."
+        }
+      ],
+      "recommendation": "Proceed.",
+      "reasoning": [
+        "Two rounds came back clean.",
+        "The live site still runs M0 from three weeks ago."
+      ],
+      "opened": "2026-10-01"
+    },
+    {
+      "id": "a-002",
+      "title": "Check three names in the onboarding copy",
+      "kind": "look",
+      "priority": "soon",
+      "why": "Three labels were written from your PRD. They say what the product delivers, so they are yours to correct.",
+      "holds_up": "Nothing. It's about getting your content right.",
+      "names": [
+        "Measured stage months",
+        "Client-visible project view",
+        "Decision logged"
+      ],
+      "opened": "2026-09-30",
+      "default": {
+        "action": "Keeps the three names as written",
+        "fires_on": "2026-10-07"
+      }
+    },
+    {
+      "id": "a-003",
+      "title": "Add the admin password as a GitHub secret",
+      "kind": "action",
+      "priority": "later",
+      "why": "The lesson import signs in as the admin. The password has to be typed by you, so it never passes through a chat.",
+      "holds_up": "Importing the unit 3 lessons",
+      "guide": {
+        "where": "GitHub, the repo's settings",
+        "time": "about 3 min",
+        "checked": "2026-10-03",
+        "steps": [
+          {
+            "text": "Open the repo's new-secret page.",
+            "url": "https://github.com/yeunglee95-gif/example-app/settings/secrets/actions/new",
+            "link": "New secret"
+          },
+          {
+            "text": "In **Name**, type `ADMIN_PASSWORD` exactly."
+          },
+          {
+            "text": "In **Secret**, type the password. Do not paste it anywhere else."
+          },
+          {
+            "text": "Click **Add secret**."
+          },
+          {
+            "text": "Reply \"done\" in the build chat; it reruns the import.",
+            "url": "https://claude.ai/code/session_EXAMPLE",
+            "link": "Build chat"
+          }
+        ]
+      },
+      "opened": "2026-10-01"
+    },
+    {
+      "id": "a-000",
+      "title": "Approve the design spec",
+      "kind": "decision",
+      "priority": "now",
+      "why": "The spec fixes the token set and the two layouts.",
+      "holds_up": "M0",
+      "opened": "2026-09-05",
+      "closed": {
+        "on": "2026-09-06",
+        "by": "jase",
+        "outcome": "Approved as written."
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "code": "M0",
+      "name": "Foundation",
+      "state": "done",
+      "label": "Done 09-05",
+      "exit": "The app starts and every check passes.",
+      "closed_on": "2026-09-05",
+      "target": "2026-09-05",
+      "ships": "The app shell behind the email login"
+    },
+    {
+      "code": "M1",
+      "name": "Core editor",
+      "state": "running",
+      "label": "Last mile",
+      "exit": "The brief works end to end in both languages.",
+      "target": "2026-10-12",
+      "ships": "The flow editor on the live site",
+      "progress": 70
+    },
+    {
+      "code": "M2",
+      "name": "Verified",
+      "state": "queued",
+      "label": "Next",
+      "exit": "Zero open errors after two clean review rounds.",
+      "target": "2026-10-24",
+      "ships": "Blocks and wires redesigned, two clean reviews"
+    },
+    {
+      "code": "M3",
+      "name": "Team",
+      "state": "later",
+      "label": "Later",
+      "exit": "Two people edit one flow and see each other's changes.",
+      "target": "2026-11-04",
+      "ships": "Two people editing one flow"
+    },
+    {
+      "code": "M4",
+      "name": "Ship",
+      "state": "later",
+      "label": "Last",
+      "exit": "Final acceptance review, live site matches the build.",
+      "target": "2026-11-14",
+      "ships": "Final acceptance and handover"
+    }
+  ],
+  "work": [
+    {
+      "id": "w-001",
+      "title": "Deployed: m0 is live",
+      "sub": "tag m0",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "next": "Nothing; the first automatic deploy was the M0 merge.",
+      "closed_on": "2026-09-05",
+      "order": 1
+    },
+    {
+      "id": "w-002",
+      "title": "No silent presses on a locked flow",
+      "sub": "R3",
+      "state": "running",
+      "band": "in flight",
+      "area": "app",
+      "next": "Every refused control says why; the check watches what actually happened.",
+      "order": 2,
+      "who": {
+        "model": "Opus 5.5",
+        "role": "builder"
+      }
+    },
+    {
+      "id": "w-003",
+      "title": "Review round 3",
+      "state": "running",
+      "band": "in flight",
+      "area": "process",
+      "next": "Two reviewers. Zero majors on both layouts closes M1.",
+      "order": 3,
+      "who": {
+        "model": "Fable 5.1",
+        "role": "critic"
+      }
+    },
+    {
+      "id": "w-004",
+      "title": "Close M1",
+      "state": "needs-you",
+      "label": "Your go-ahead",
+      "band": "in flight",
+      "area": "process",
+      "ask": "a-001",
+      "next": "Full check on both screen sizes, then merge and deploy, then tag m1.",
+      "order": 4
+    },
+    {
+      "id": "w-005",
+      "title": "Fix whatever round 3 finds",
+      "state": "queued",
+      "band": "in flight",
+      "area": "app",
+      "next": "Then review again until a round comes back with zero majors.",
+      "order": 5,
+      "who": {
+        "model": "Opus 5.5",
+        "role": "builder"
+      }
+    },
+    {
+      "id": "w-006",
+      "title": "M2: the block and wire redesign",
+      "state": "queued",
+      "band": "pipeline",
+      "area": "app",
+      "next": "Connection points on all four sides, wires that route around blocks.",
+      "order": 6
+    },
+    {
+      "id": "w-007",
+      "title": "Unit 3 lessons",
+      "state": "running",
+      "band": "content",
+      "area": "content",
+      "checks": [
+        {
+          "name": "accuracy",
+          "state": "done"
+        },
+        {
+          "name": "teaching",
+          "state": "running"
+        },
+        {
+          "name": "downstream",
+          "state": "queued"
+        }
+      ],
+      "next": "Teaching pass running; downstream import after.",
+      "order": 7,
+      "who": {
+        "model": "Sonnet 5.5",
+        "role": "screens"
+      }
+    },
+    {
+      "id": "w-008",
+      "title": "Login flake on slow phones",
+      "sub": "found 09-28",
+      "state": "needs-you",
+      "urgent": true,
+      "band": "live defects",
+      "area": "app",
+      "ask": "a-002",
+      "next": "Reproduced once on a 2-core runner; needs the copy decision before the fix lands.",
+      "order": 0
+    },
+    {
+      "id": "w-009",
+      "title": "PNG export",
+      "state": "parked",
+      "label": "After M2",
+      "band": "deferred",
+      "area": "app",
+      "next": "Parked until the redesign settles the card size.",
+      "order": 9
+    },
+    {
+      "id": "w-010",
+      "title": "Market research branch",
+      "state": "later",
+      "band": "deferred",
+      "area": "research",
+      "next": "Opens after the go/no-go.",
+      "order": 10
+    },
+    {
+      "id": "w-011",
+      "title": "Email login",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-03",
+      "order": 11
+    },
+    {
+      "id": "w-012",
+      "title": "Project list",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-04",
+      "order": 12
+    },
+    {
+      "id": "w-013",
+      "title": "Dark theme",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-04",
+      "order": 13
+    },
+    {
+      "id": "w-014",
+      "title": "CI gate on every push",
+      "state": "done",
+      "band": "shipped",
+      "area": "tooling",
+      "closed_on": "2026-08-29",
+      "order": 14
+    },
+    {
+      "id": "w-015",
+      "title": "Read-only flow viewer",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-29",
+      "order": 15
+    },
+    {
+      "id": "w-016",
+      "title": "Canvas pan and zoom",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-12",
+      "order": 16
+    },
+    {
+      "id": "w-017",
+      "title": "Block palette",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-16",
+      "order": 17
+    },
+    {
+      "id": "w-018",
+      "title": "Undo and redo",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-19",
+      "order": 18
+    },
+    {
+      "id": "w-019",
+      "title": "Autosave every edit",
+      "state": "done",
+      "band": "shipped",
+      "area": "app",
+      "closed_on": "2026-09-24",
+      "order": 19
+    },
+    {
+      "id": "w-020",
+      "title": "Chinese strings for the editor",
+      "state": "done",
+      "band": "content",
+      "area": "content",
+      "closed_on": "2026-09-26",
+      "order": 20
+    },
+    {
+      "id": "w-021",
+      "title": "Unit 1 lessons",
+      "state": "done",
+      "band": "content",
+      "area": "content",
+      "closed_on": "2026-09-10",
+      "order": 21
+    },
+    {
+      "id": "w-022",
+      "title": "Unit 2 lessons",
+      "state": "done",
+      "band": "content",
+      "area": "content",
+      "closed_on": "2026-09-22",
+      "order": 22
+    },
+    {
+      "id": "w-023",
+      "title": "Keyboard shortcuts sheet",
+      "state": "queued",
+      "band": "pipeline",
+      "area": "app",
+      "order": 23,
+      "next": "Starts after M1 closes."
+    },
+    {
+      "id": "w-024",
+      "title": "Wire labels",
+      "state": "queued",
+      "band": "pipeline",
+      "area": "app",
+      "order": 24,
+      "next": "Starts after M1 closes."
+    },
+    {
+      "id": "w-025",
+      "title": "Comment threads on blocks",
+      "state": "later",
+      "band": "deferred",
+      "area": "app",
+      "order": 25,
+      "next": "Opens after launch."
+    },
+    {
+      "id": "w-026",
+      "title": "Usage analytics",
+      "state": "later",
+      "band": "deferred",
+      "area": "tooling",
+      "order": 26,
+      "next": "Opens after launch."
+    }
+  ],
+  "team": [
+    {
+      "role": "Tech lead",
+      "person": "AI",
+      "autonomy": "human-assisted",
+      "brief": "Picks the milestone, plans the lanes, owns sign-off, keeps this page and the decision log.",
+      "now": "Holding M1 until you approve the push to main.",
+      "state": "needs-you",
+      "label": "Waiting on you",
+      "output": "forge/forge.json",
+      "shelf": [
+        "MEMORY.md",
+        "ROADMAP.md"
+      ],
+      "you": true,
+      "who": {
+        "model": "Fable 5.1",
+        "role": "planner"
+      }
+    },
+    {
+      "role": "Gate runner",
+      "person": "AI",
+      "autonomy": "autonomous",
+      "brief": "Runs every check on one commit and fixes only what it can prove. Cannot merge or deploy.",
+      "now": "Green at abc1234: 300 unit, 40 browser, 0 failures.",
+      "state": "done",
+      "label": "Done",
+      "output": "qa/gate/STATUS.md",
+      "who": {
+        "model": "Opus 5.5",
+        "role": "gauntlet"
+      }
+    },
+    {
+      "role": "Critic: Ken",
+      "person": "AI",
+      "autonomy": "autonomous",
+      "brief": "A project manager using the built app for the first time, at desktop and phone size.",
+      "now": "Round 3 running on both layouts.",
+      "state": "running",
+      "label": "Round 3",
+      "output": "qa/round-3/ken/",
+      "who": {
+        "model": "Fable 5.1",
+        "role": "critic"
+      }
+    },
+    {
+      "role": "Security reviewer",
+      "person": "AI",
+      "autonomy": "human-assisted",
+      "brief": "Secrets, logins, input handling, dependencies.",
+      "now": "Not staffed yet. First run is M2.",
+      "state": "later",
+      "label": "Joins in M2",
+      "who": {
+        "model": "Opus 5.5",
+        "role": "reviewer"
+      }
+    }
+  ],
+  "goal": {
+    "vision": "Your team opens one private link, sees their projects, builds a flow by dragging blocks or describing it, and locks the version everyone agrees on. It replaces the whiteboard, and unlike the whiteboard it can be tested.",
+    "checks": [
+      {
+        "title": "Every check passes and the results are recorded",
+        "state": "done",
+        "label": "Green 10-01",
+        "note": "Lint, type checks, unit tests, build, browser tests."
+      },
+      {
+        "title": "Browser tests cover editing, validation, saving, undo",
+        "state": "done",
+        "label": "Done",
+        "note": "Since M0, extended every milestone."
+      },
+      {
+        "title": "Two accounts editing one flow live",
+        "state": "later",
+        "label": "M3",
+        "note": "Needs a Supabase project, which you create."
+      },
+      {
+        "title": "Deployed behind a login, live build matching the release",
+        "state": "running",
+        "label": "Partly",
+        "note": "Live since M0. The login is with you."
+      }
+    ]
+  },
+  "progress": [
+    {
+      "label": "Check 1",
+      "value": 20,
+      "max": 50
+    },
+    {
+      "label": "Check 2",
+      "value": 33,
+      "max": 50
+    },
+    {
+      "label": "Final",
+      "value": 42,
+      "max": 50
+    }
+  ],
+  "decisions": [
+    {
+      "date": "2026-10-01",
+      "title": "Ship every green gate",
+      "detail": "The live site had run M0 for three weeks while a green branch sat unshipped. From now on every green gate ships.",
+      "by": "jase",
+      "memory_ref": "2026-10-01 (Jase): ship every green gate"
+    },
+    {
+      "date": "2026-09-28",
+      "title": "A milestone closes on zero blockers and zero majors",
+      "detail": "Minors carry into the next milestone.",
+      "by": "jase",
+      "memory_ref": "2026-09-28 (Jase): a milestone closes on a round with zero blockers"
+    },
+    {
+      "date": "2026-09-27",
+      "title": "Selection has one writer",
+      "detail": "Two writers for selection unmounted the app on a slow phone.",
+      "by": "agent",
+      "memory_ref": "2026-09-27 (orchestrator): selection has one writer"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Gate",
+      "means": "A point where a person decides before the work goes on. It lands in Needs you as an ask.",
+      "example": "Gate A: approve the release candidate",
+      "not": "The repo gate, the script that runs `forge check`"
+    }
+  ],
+  "usage": [
+    {
+      "on": "2026-09-22",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 377000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-23",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 368000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-23",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 180000,
+      "runs": 1
+    },
+    {
+      "on": "2026-09-23",
+      "model": "Sonnet 5.5",
+      "role": "screens",
+      "tokens": 138000,
+      "runs": 2
+    },
+    {
+      "on": "2026-09-24",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 359000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-25",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 350000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-25",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 180000,
+      "runs": 1
+    },
+    {
+      "on": "2026-09-26",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 341000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-26",
+      "model": "Sonnet 5.5",
+      "role": "screens",
+      "tokens": 126000,
+      "runs": 2
+    },
+    {
+      "on": "2026-09-27",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 332000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-27",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 180000,
+      "runs": 1
+    },
+    {
+      "on": "2026-09-28",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 323000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-29",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 436000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-29",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 622000,
+      "runs": 2
+    },
+    {
+      "on": "2026-09-29",
+      "model": "Sonnet 5.5",
+      "role": "screens",
+      "tokens": 114000,
+      "runs": 2
+    },
+    {
+      "on": "2026-09-30",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 415000,
+      "runs": 3
+    },
+    {
+      "on": "2026-09-30",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 605000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-01",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 394000,
+      "runs": 3
+    },
+    {
+      "on": "2026-10-01",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 588000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-01",
+      "model": "Opus 5.5",
+      "role": "gauntlet",
+      "tokens": 140000,
+      "runs": 1
+    },
+    {
+      "on": "2026-10-02",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 373000,
+      "runs": 3
+    },
+    {
+      "on": "2026-10-02",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 571000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-02",
+      "model": "Sonnet 5.5",
+      "role": "screens",
+      "tokens": 102000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-03",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 352000,
+      "runs": 3
+    },
+    {
+      "on": "2026-10-03",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 554000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-04",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 331000,
+      "runs": 3
+    },
+    {
+      "on": "2026-10-04",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 537000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-04",
+      "model": "Opus 5.5",
+      "role": "gauntlet",
+      "tokens": 140000,
+      "runs": 1
+    },
+    {
+      "on": "2026-10-05",
+      "model": "Opus 5.5",
+      "role": "builder",
+      "tokens": 310000,
+      "runs": 3
+    },
+    {
+      "on": "2026-10-05",
+      "model": "Fable 5.1",
+      "role": "critic",
+      "tokens": 520000,
+      "runs": 2
+    },
+    {
+      "on": "2026-10-05",
+      "model": "Sonnet 5.5",
+      "role": "screens",
+      "tokens": 90000,
+      "runs": 2
+    }
+  ],
+  "usage_note": "Logged from each agent run's task notification since 2026-09-22."
+}
