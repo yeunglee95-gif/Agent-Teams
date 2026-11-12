@@ -1,0 +1,7 @@
+{
+  "name": "toolkit",
+  "version": "0.1.0",
+  "description": "General-purpose skills any team or app can use: watch a video in detail (frames plus transcript), and find and install skills from the open skills ecosystem. Third-party skills are kept unmodified apart from a Source section.",
+  "author": { "name": "Jase" },
+  "keywords": ["toolkit", "video", "watch", "find-skills", "skills"]
+}
