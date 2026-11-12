@@ -1,6 +1,6 @@
 # Agent Teams
 
-Jase's agent teams, in one private repo. Each team is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them: the dev team and the design team. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it. Decisions from 2026-11-01 on are in this repo's `MEMORY.md`.
+Jase's agent teams and shared tools, in one private repo. Each team or tool is a Claude Code plugin with its own version, and the repo is a plugin marketplace that lists them: the dev team, the design team, the toolkit, the Forge and four mods. Why it is set up this way is recorded once, in OS Flow's `MEMORY.md` (repo yeunglee95-gif/os-flow, Decisions, 2026-10-04); this file does not restate it. Decisions from 2026-11-01 on are in this repo's `MEMORY.md`.
 
 ## Layout
 
@@ -27,6 +27,13 @@ plugins/
     evals/                         behavior evals for the design-auditor
     THIRD_PARTY.md                 the account skills it references, not copies
     README.md, CHANGELOG.md
+  toolkit/                         general skills (watch, caveman, find-skills)
+  forge/
+    skills/forge/                  the /forge skill
+    master/                        the Forge's master renderer, contract, tool and build spec
+  crew-progress/, auto-handoff/,   mods (hooks that change Claude Code itself); each keeps its
+  cache-tax/, filetree/            LICENSE, THIRD_PARTY.md, README.md and CHANGELOG.md
+tools/install-plugins.sh           installs plugins from a local clone, reading the marketplace
 ```
 
 ## The dev team
@@ -53,6 +60,23 @@ claude plugin eval plugins/dev-team -j 4 --scaffold --allow-tools Bash Write Edi
 
 General skills for any team or app, starting with `watch` (watch a video in detail) and `find-skills` (search and install skills from the open ecosystem). A skill found with `find-skills` joins the toolkit, with its source and licence recorded, before any app relies on it. What each does and how to install it: `plugins/toolkit/README.md`.
 
+## The Forge
+
+The one build board every project keeps, as the `forge` plugin: the `/forge` skill plus the master renderer, contract (schema 1.4), tool and build spec, moved here from Claude OS on 2026-11-12. **The board moves only for asks, decisions and milestones; live progress goes to the crew-progress status file.** How a project uses it and how the renderer changes: `plugins/forge/README.md`.
+
+## The mods
+
+Four mods, first gathered for OS Flow's sessions and kept here for every project. Each records its upstream source, commit and changes in its own `THIRD_PARTY.md` and README.
+
+| Mod | What it does | Source |
+|---|---|---|
+| `crew-progress` | Claude's subagents and Codex's tasks side by side in role costumes, with Codex's plan limits, and a status file at `~/.claude/state/crew-progress/status.md` for live progress. A new role gets a costume when it is added | Fork of savvy-progress (johnnyvizz/claude-kit), MIT |
+| `auto-handoff` | At the second auto-compaction, a Haiku-written brief, `/clear`, and a fresh session that reads it and the project's memory file and status board | Fork of alexknowshtml/claude-auto-handoff `8d762ce`, MIT |
+| `cache-tax` | Keeps the prompt cache warm during breaks and asks before a cold send. Warming costs tokens | karanb192/cache-tax `c4f8cf2`, MIT, unchanged |
+| `filetree` | A file tree pane beside the chat that shows what Claude reads and writes | data-goblin/claude-code-filetree `3ce5b1c`, MIT, unchanged |
+
+Run a mod's tests with `claude plugin test plugins/<mod>`.
+
 ## The design team
 
 Two roles (0.2.0): the `designer` extends the app's design system and writes the design hand-off the dev team builds from, and also sets visual direction for marketing pieces when asked; the `design-auditor` checks the build against the hand-off and the design system, read-only, with findings going to the dev team's fixer. They run the dev team's Design stage and the design check in its Review stage. Five design skills on Jase's claude.ai account (`impeccable`, `ui-ux-pro-max`, `design-system`, `emil-design-eng`, `frontend-design`) are referenced by name, not copied; `plugins/design-team/THIRD_PARTY.md` records what each file shows and which role uses it for what. The app's own design system always wins over any skill's taste. How the team works and how to run its evals: `plugins/design-team/README.md`.
@@ -67,7 +91,7 @@ Do not make a team's folder until the team has roles in it.
 
 ## How an app uses a team
 
-- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams` (and `/plugin install design-team@agent-teams` for an app with screens).
+- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install dev-team@agent-teams` (and `/plugin install design-team@agent-teams` for an app with screens). The Forge and the mods install the same way, by name. From a local clone, for example in a cloud setup script, `bash tools/install-plugins.sh [names]` installs every plugin the marketplace lists, or only the ones named.
 - **Or copy it.** Cloud sessions do not install plugins from a repo's settings, so there copy `plugins/dev-team/agents/*.md` into the app's `.claude/agents/` and `plugins/dev-team/skills/*` into the app's `.claude/skills/`, from one pinned commit of this repo, and record that commit in the app's `routine/TEAM-VERSION.md`. Copy `licenses/`, `THIRD_PARTY.md` and `workflows/` alongside, into `.claude/agent-teams/`, and name `.claude/agent-teams/workflows/milestone-loop.md` in the app's `AGENTS.md` as the copy of the loop page.
 
 Each app keeps its own memory, specs, gate commands and specialists (personas, rubrics, domain reviewers) in its own repo. The roles read the app's `AGENTS.md` for all of these and stop to ask when it does not say.
