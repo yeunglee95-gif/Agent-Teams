@@ -1,3 +1,5 @@
+> **Vendored unchanged** from [karanb192/cache-tax](https://github.com/karanb192/cache-tax) at `c4f8cf2` (MIT, version 2.4.1). Install it from this repo with `/plugin install cache-tax@agent-teams`; the install commands below are upstream's. Apart from this note, every file here matches upstream byte for byte, `tests/` included. Left out: `docs/` and `site/` (the images, video and website the links below point to, which work only on GitHub upstream), and `.github/` (a pull request template and the Pages deploy workflow, which do nothing in this repo). Changes by version: `CHANGELOG.md`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="site/assets/cache-tax-dark.svg">
   <img src="site/assets/cache-tax-light.svg" alt="Cache Tax" width="64" height="64">

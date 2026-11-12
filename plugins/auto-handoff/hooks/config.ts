@@ -43,7 +43,7 @@ function pattern(v: unknown): RegExp | undefined {
 /** The /config values, each checked, with the manifest's defaults for anything missing or bad. */
 export function parseConfig(options: Record<string, unknown>): Config {
   return {
-  // OS Flow: 0 means the token threshold decides; any other count lets that many minus one
+  // Fork: 0 means the token threshold decides; any other count lets that many minus one
   // automatic compactions run and hands off in place of the next.
   handoffAtCompaction: typeof options.handoffAtCompaction === 'number' && Number.isFinite(options.handoffAtCompaction) && options.handoffAtCompaction >= 0 ? Math.floor(options.handoffAtCompaction) : DEFAULTS.handoffAtCompaction,
   threshold: num(options.threshold, DEFAULTS.threshold),

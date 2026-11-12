@@ -1,7 +1,7 @@
 {
   "name": "auto-handoff",
-  "version": "0.8.6-osflow.1",
-  "description": "OS Flow's fork of auto-handoff: at the second auto-compaction (configurable) a Haiku-written brief, /clear, and a seed that points the fresh session at the brief and at MEMORY.md and the Forge. Forked from alexknowshtml/claude-auto-handoff 8d762ce (MIT).",
+  "version": "0.8.6-fork.2",
+  "description": "A fork of auto-handoff: at the second auto-compaction (configurable) a Haiku-written brief, /clear, and a seed that points the fresh session at the brief and at the project's memory file and status board, as its AGENTS.md names them. Forked from alexknowshtml/claude-auto-handoff 8d762ce (MIT).",
   "author": {
     "name": "Alex Hillman",
     "url": "https://github.com/alexknowshtml"

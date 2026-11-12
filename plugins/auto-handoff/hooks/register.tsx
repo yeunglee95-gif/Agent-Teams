@@ -395,7 +395,7 @@ function showHandedOff($: EngineInterface, fresh: number) {
 async function configured($: EngineInterface): Promise<{ base: number; source: string }> {
   const env = Number(await $.env.get('AUTO_HANDOFF_TOKENS'))
   if (env > 0) return { base: env, source: 'AUTO_HANDOFF_TOKENS' }
-  // OS Flow: in compaction mode no token line applies; the compaction count decides (session.compact).
+  // Fork: in compaction mode no token line applies; the compaction count decides (session.compact).
   if (cfg.handoffAtCompaction > 0) return { base: Infinity, source: 'handoffAtCompaction in /config' }
   return { base: cfg.threshold, source: 'threshold in /config' }
 }
@@ -532,7 +532,7 @@ export const register: Register = (on, options) => {
       const line = await thresholdFor($, sessionId)
       const threshold = Number.isFinite(line) ? line : tokens
       await log($, `auto-compact session=${sessionId} projected=${tokens}`)
-      // OS Flow: let the first handoffAtCompaction - 1 automatic compactions run in this session.
+      // Fork: let the first handoffAtCompaction - 1 automatic compactions run in this session.
       if (cfg.handoffAtCompaction > 1) {
         const seen = Number(await $.store.get(`compactions:${sessionId}`) ?? 0) + 1
         if (seen < cfg.handoffAtCompaction) {

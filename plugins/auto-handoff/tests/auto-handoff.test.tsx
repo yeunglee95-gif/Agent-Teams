@@ -624,7 +624,7 @@ describe('auto-handoff', () => {
     expect(chunks.some(c => c.kind === 'text' && c.text?.includes('auto-handoff'))).toBe(true)
   })
 
-  test('the first auto-compact runs; the second is replaced by a handoff (OS Flow)', async ($, on) => {
+  test('the first auto-compact runs; the second is replaced by a handoff (fork)', async ($, on) => {
     const calls = engine(on, { tokens: 174_000 })
     await $.session.compact({ trigger: 'auto', messages: BASIC })
     expect(calls.compacts).toBe(1)
@@ -636,7 +636,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('in compaction mode no token threshold hands off at the end of a turn (OS Flow)', async ($, on) => {
+  test('in compaction mode no token threshold hands off at the end of a turn (fork)', async ($, on) => {
     const calls = engine(on, { tokens: 900_000 })
     await $.turn.complete(TURN)
     expect(calls.cleared).toBe(0)

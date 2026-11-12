@@ -1,3 +1,5 @@
+> **Vendored unchanged** from [data-goblin/claude-code-filetree](https://github.com/data-goblin/claude-code-filetree) at `3ce5b1c` (MIT, version 0.8.3). Install it from this repo with `/plugin install filetree@agent-teams`; the install commands below are upstream's. Apart from this note, every file here matches upstream byte for byte, `tests/` included. Left out: `docs/` and `media/` (the pages and images the links below point to, which work only on GitHub upstream), and upstream's own repo process, which does nothing here: `.github/` (CI, Codex auto-merge, credits and version-bump workflows), `.githooks/`, `scripts/ci/`, the nested `.claude-plugin/marketplace.json` and the `AGENTS.md` that sets upstream's release branches. So the Contributing section below applies to upstream only. Changes by version: `CHANGELOG.md`.
+
 <h1 align="center">Claude Code Filetree</h1>
 
 <p align="center">

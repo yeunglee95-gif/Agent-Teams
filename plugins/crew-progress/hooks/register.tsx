@@ -522,7 +522,7 @@ type Fill = (x: number, y: number, w: number, h: number, c: string, cls?: string
 const stamp = (f: Fill, x: number, y: number, rows: string[], map: Record<string, string>, cls?: string): void =>
   rows.forEach((row, dy) => [...row].forEach((ch, dx) => map[ch] && f(x + dx, y + dy, 1, 1, map[ch] ?? '', cls)))
 
-// OS Flow's crew (2026-11-12): the original pixel Clawd for Claude and a teal
+// The crew (2026-11-12): the original pixel Clawd for Claude and a teal
 // terminal-cube for Codex, both on the same body box (x 7-22, y 10-21) of the
 // 30x28 grid, so every role's hat and prop fits either one. The costume says
 // what the agent is doing: the designer wears a beret and paints, the fixer a
@@ -691,7 +691,9 @@ const COSTUMES: Record<string, Costume> = {
   plain: { hat: false, draw: (f, _t, body) => body(f) },
 }
 
-// Which costume each OS Flow role wears, and its accent colour.
+// Which costume each role wears, and its accent colour: the dev-team and design-team roles
+// (plugins/dev-team/agents, plugins/design-team/agents) plus Claude Code's Explore and Plan.
+// A new role gets a costume here when the role is added; without one it draws plain.
 const ROLE_COSTUME: Record<string, [costume: string, accent: string]> = {
   designer: ['designer', '#B5487A'],
   'design-auditor': ['designer', '#7F77DD'],
@@ -882,19 +884,27 @@ const compactSvg = (W: number, list: AgentRun[], planned: Planned[], t: ReturnTy
 
 // --- Codex: read from Codex's own session logs (~/.codex/sessions/YYYY/MM/DD/*.jsonl),
 // which carry each task's steps and tokens and the ChatGPT plan's rate limits.
-const CODEX_SESSIONS = '/root/.codex/sessions'
 const CODEX_RECENT = 5
+
+// Codex's logs and the status file both sit under the user's home. Windows sets USERPROFILE, not HOME;
+// with neither set there is no path to read or write, so the caller skips the step.
+async function homeDir($: EngineInterface): Promise<string> {
+  return (await $.env.get('HOME')) || (await $.env.get('USERPROFILE')) || ''
+}
 
 type CodexEntry = { name: string; kind: string; mtimeMs: number }
 
 async function codexRollouts($: EngineInterface): Promise<{ path: string; mtimeMs: number }[]> {
-  if (!(await $.fs.exists(CODEX_SESSIONS))) return []
+  const home = await homeDir($)
+  if (!home) return []
+  const sessions = `${home}/.codex/sessions`
+  if (!(await $.fs.exists(sessions))) return []
   const newestFirst = (a: CodexEntry, b: CodexEntry) => (a.name < b.name ? 1 : -1)
   const days: string[] = []
-  for (const y of (await $.fs.list(CODEX_SESSIONS)).filter(e => e.kind === 'dir').sort(newestFirst)) {
-    for (const m of (await $.fs.list(`${CODEX_SESSIONS}/${y.name}`)).filter(e => e.kind === 'dir').sort(newestFirst)) {
-      for (const d of (await $.fs.list(`${CODEX_SESSIONS}/${y.name}/${m.name}`)).filter(e => e.kind === 'dir').sort(newestFirst)) {
-        if (days.length < 2) days.push(`${CODEX_SESSIONS}/${y.name}/${m.name}/${d.name}`)
+  for (const y of (await $.fs.list(sessions)).filter(e => e.kind === 'dir').sort(newestFirst)) {
+    for (const m of (await $.fs.list(`${sessions}/${y.name}`)).filter(e => e.kind === 'dir').sort(newestFirst)) {
+      for (const d of (await $.fs.list(`${sessions}/${y.name}/${m.name}`)).filter(e => e.kind === 'dir').sort(newestFirst)) {
+        if (days.length < 2) days.push(`${sessions}/${y.name}/${m.name}/${d.name}`)
       }
     }
   }
@@ -981,9 +991,9 @@ const parseCodex = (path: string, mtimeMs: number, text: string): { task: CodexT
 }
 
 // The crew's state as a few lines of text, for a screen that draws no panel (a cloud session
-// watched in the Claude app): the orchestrator quotes this file in its summaries (Jase, 2026-11-12).
-// Rewritten on each Codex tick, only when the text changes.
-const STATUS_FILE = `${CODEX_SESSIONS.replace(/\/\.codex\/sessions$/, '')}/.claude/state/crew-progress/status.md`
+// watched in the Claude app): the orchestrator quotes this file in its summaries, at
+// ~/.claude/state/crew-progress/status.md. Rewritten on each Codex tick, only when the text changes.
+const STATUS_PATH = '.claude/state/crew-progress/status.md'
 let lastStatus = ''
 async function writeStatus($: EngineInterface, tasks: CodexTask[], limits: CodexLimits | null): Promise<void> {
   const at = Date.now()
@@ -1009,8 +1019,10 @@ async function writeStatus($: EngineInterface, tasks: CodexTask[], limits: Codex
   ]
   const text = lines.join('\n') + '\n'
   if (text === lastStatus) return
+  const home = await homeDir($)
+  if (!home) return
   lastStatus = text
-  await $.fs.write(STATUS_FILE, text)
+  await $.fs.write(`${home}/${STATUS_PATH}`, text)
 }
 
 let codexBusy = false

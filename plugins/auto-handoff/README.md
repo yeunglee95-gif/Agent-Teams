@@ -1,8 +1,9 @@
-> **OS Flow's fork** of [alexknowshtml/claude-auto-handoff](https://github.com/alexknowshtml/claude-auto-handoff) at 8d762ce (MIT). What changed (a-202, 2026-11-12):
-> - `handoffAtCompaction` (default 2): the first automatic compaction runs, the second becomes a handoff. 0 restores the token threshold below. `AUTO_HANDOFF_TOKENS` still forces a threshold for a test run.
-> - The phone viewer is off by default (`viewer` blank), since cloud sessions have no Tailscale.
-> - The brief points to MEMORY.md and the Forge instead of restating them, and adds a Not Yet Logged section; the fresh session follows AGENTS.md's read rule first.
-> - The upstream tests run with `handoffAtCompaction: 0`; two OS Flow tests cover the compaction count. Run `claude plugin test .` here.
+> **A fork** of [alexknowshtml/claude-auto-handoff](https://github.com/alexknowshtml/claude-auto-handoff) at `8d762ce` (MIT), first made for OS Flow (2026-11-12) and kept in Agent-Teams for every project. Install it with `/plugin install auto-handoff@agent-teams`. What changed from upstream:
+> - `handoffAtCompaction` (default 2): the first automatic compaction runs, and the second becomes a handoff. 0 restores the token threshold below, and `AUTO_HANDOFF_TOKENS` still forces a threshold for a test run.
+> - The viewer is off by default (`viewer` blank), because cloud sessions have no Tailscale.
+> - The brief names decisions and asks by their line in the project's memory file and status board instead of restating them, and adds a Not Yet Logged section. The fresh session follows the read rule in the project's AGENTS.md first.
+> - The upstream tests run with `handoffAtCompaction: 0`, and two tests marked `(fork)` cover the compaction count. Run `claude plugin test .` in this folder.
+> - `docs/` (the demo GIF and video) is not copied, so those links work only on GitHub upstream. Changes by version: `CHANGELOG.md`.
 
 # claude-auto-handoff
 
