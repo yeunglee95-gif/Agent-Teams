@@ -10,7 +10,7 @@ The one build board every project keeps, and the master of its renderer, contrac
 | `master/01 Forge Build Spec.md` | The brief and the decisions behind it |
 | `master/forge.schema.json` | The contract, version 1.4 (1.1 added `who`, ask `guide` and `links.chat`; there is no 1.2, whose releases changed only the renderer; 1.3 adds `glossary`, with its rules in the build spec 5.3a; 1.4 adds the status and usage fields behind the Where the build is panel, with their rules in the build spec 5.3b). `forge/forge.json` in every project repo obeys it |
 | `master/forge.example.json` | A complete worked example of every section |
-| `master/forge.html` | The renderer, 1.4.1. Copied into each repo as `forge/forge.html`; never edited there |
+| `master/forge.html` | The renderer, 1.4.2. Copied into each repo as `forge/forge.html`; never edited there |
 | `master/forge.mjs` | The tool: `validate`, `build`, `roadmap`, `check`, `touch`, `update`, `init`, `help`. Node 22, no packages |
 | `master/forge-lifecycle.mmd` | The map of where the Forge lives and how it stays current, in OS Flow's Mermaid import form (kind prefixes on the ids). `forge-lifecycle-preview.png` is a plain render of it from before the move |
 

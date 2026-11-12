@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.4.1 · master: Claude-OS/00_Resources/forge/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.4.2 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -450,7 +450,7 @@
 <script>
 (function () {
   'use strict';
-  var RENDERER = '1.4.1';
+  var RENDERER = '1.4.2';
   var STATES = ['needs-you', 'running', 'queued', 'later', 'parked', 'done'];
   var STATE_LABEL = { 'needs-you': 'Needs you', running: 'Running', queued: 'Queued', later: 'Later', parked: 'Parked', done: 'Done' };
   var KIND_LABEL = { decision: 'Your decision', action: 'Your action', look: 'Quick look' };
@@ -554,13 +554,16 @@
     // Page head
     var updated = new Date(d.updated); var mins = isNaN(updated) ? null : Math.max(0, Math.round((now - updated) / 60000));
     var ago = mins == null ? 'unreadable timestamp' : mins < 60 ? mins + ' min ago' : mins < 2880 ? Math.round(mins / 60) + ' h ago' : Math.round(mins / 1440) + ' days ago';
-    var stale = mins == null || mins > 1440;
+    // The board moves only for asks, decisions and milestones (Jase, 2026-11-12), so its age alone says nothing.
+    // It is behind when an open ask's default date has passed: that ask should have fired or been re-dated.
+    var pastDue = open.filter(overdue);
+    var stale = mins == null || pastDue.length > 0;
     var stamps = (p.stamps || []).map(function (s) { return '<span>' + esc(s.label) + ': <span class="sv">' + esc(s.value) + '</span></span>'; }).join('');
     app.appendChild(el(
       '<section class="top">' +
         '<h1>' + esc(title) + '<span class="dot">.</span></h1>' +
-        '<p class="stamp"><span>Updated ' + fmtTime(d.updated) + (ago ? ', ' + (stale ? '<span class="stale">' + ago + ', may be behind</span>' : ago) : '') + '</span>' + (links ? '<span class="links-m">' + links + '</span>' : '') + '</p>' +
-        (stale ? '<div class="banner">This page is more than a day old. The build only moves while a session runs; if one is running, ask it to republish.</div>' : '') +
+        '<p class="stamp"><span>Updated ' + fmtTime(d.updated) + (ago ? ', ' + (stale ? '<span class="stale">' + ago + ', behind</span>' : ago) : '') + '</span>' + (links ? '<span class="links-m">' + links + '</span>' : '') + '</p>' +
+        (stale ? '<div class="banner">' + (mins == null ? 'This page\'s update time cannot be read, so it may be behind.' : 'This page is behind: ' + pastDue.map(function (a) { return esc(a.id); }).join(', ') + (pastDue.length === 1 ? ' is' : ' are') + ' past ' + (pastDue.length === 1 ? 'its' : 'their') + ' default date.') + ' If a session is running, ask it to republish.</div>' : '') +
         '<details class="about"><summary>' + CHEV + '<span>About this board</span></summary><div class="about-body">' + (p.eyebrow ? '<p class="stamp">' + esc(p.eyebrow) + '</p>' : '') + '<p class="lede">' + inline(p.lede) + '</p>' + (stamps ? '<div class="stamp">' + stamps + '</div>' : '') + '</div></details>' +
       '</section>'));
 

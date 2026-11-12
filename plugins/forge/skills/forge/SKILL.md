@@ -16,7 +16,7 @@ Every build project keeps one board: `forge/forge.json` (the data, the one sourc
 - something new needs Jase (it goes in `asks`; nothing waits on him that is not on the board);
 - an ask closes (only Jase's reply or its firing default closes one; set `closed.by` accordingly, never anything else).
 
-**Live progress goes to the crew-progress status file, not the board.** A task finishing, a lane starting or a fix landing is read from `~/.claude/state/crew-progress/status.md` (written by the `crew-progress` plugin) and quoted in chat. Work rows, `last_shipped` and the usage log catch up at the board's next move, because step 1 walks every row. A quiet day leaves the board's 24-hour stale banner showing; that is expected under this rule.
+**Live progress goes to the crew-progress status file, not the board.** A task finishing, a lane starting or a fix landing is read from `~/.claude/state/crew-progress/status.md` (written by the `crew-progress` plugin) and quoted in chat. Work rows, `last_shipped` and the usage log catch up at the board's next move, because step 1 walks every row.
 
 Batch the changes of one turn into one republish.
 
@@ -37,7 +37,7 @@ Batch the changes of one turn into one republish.
    node forge/forge.mjs touch "<session or role>" && node forge/forge.mjs roadmap && node forge/forge.mjs build && node forge/forge.mjs check
    ```
 
-   Fix every failure `check` reports (schema, a glossary that breaks the spec 5.3a rules, roadmap drift, a decision without its MEMORY.md or ARCHIVE.md entry, a banned pattern, an ask closed by the wrong hand) and rerun. Clear its warnings too: an overdue default, an action ask without a guide, a missing `links.chat`, an empty glossary, and the 5.3b gaps (a desk without a model, an open milestone without a target, no `started`, a stale usage log). The stale-board warning is the exception: under the rule above it may stand on a quiet day. A warning about the renderer version means run `FORGE_MASTER=<this plugin>/master node forge/forge.mjs update`.
+   Fix every failure `check` reports (schema, a glossary that breaks the spec 5.3a rules, roadmap drift, a decision without its MEMORY.md or ARCHIVE.md entry, a banned pattern, an ask closed by the wrong hand) and rerun. Clear its warnings too: an overdue default, an action ask without a guide, a missing `links.chat`, an empty glossary, and the 5.3b gaps (a desk without a model, an open milestone without a target, no `started`, a stale usage log). A warning about the renderer version means run `FORGE_MASTER=<this plugin>/master node forge/forge.mjs update`.
 4. The ROADMAP.md block between the markers is generated; the prose around it is yours.
 5. **Publish.** If the Artifact tool is available: `Artifact publish` with `file_path: forge/board.html` and `url:` the project's artifact address from `project.links.artifact`, after an `Artifact read` of that address. Always pass the url; a publish without it creates a second page. If the tool is not available, commit the files and tell Jase the board is current in the repo.
 6. **Commit** `forge/forge.json`, `forge/board.html`, `ROADMAP.md` (and the memory file if a decision landed) in one commit whose message starts with `Forge:`.

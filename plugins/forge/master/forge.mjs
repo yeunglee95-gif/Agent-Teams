@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RENDERER_VERSION = '1.4.1';
+const RENDERER_VERSION = '1.4.2';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';
@@ -393,8 +393,8 @@ function cmdCheck(ctx) {
     else if (Date.parse(today) - Date.parse(days[days.length - 1]) > 7 * 24 * HOUR) warns.push(`$.usage: newest entry is ${days[days.length - 1]}, more than 7 days old; log each agent run's tokens`);
     if (!(Array.isArray(data.glossary) && data.glossary.length)) warns.push('$.glossary: empty; every Forge keeps its project\'s Words we use (build spec 5.3a): add each term the turn it is defined');
     if (!(data.project && data.project.links && data.project.links.chat)) warns.push('$.project.links.chat: missing; the board cannot show Answer in (set it to this build chat\'s claude.ai/code/session_... link)');
-    const age = Date.now() - Date.parse(data.updated);
-    if (age > 24 * HOUR) warns.push(`$.updated: ${data.updated} is ${Math.floor(age / HOUR)} hours old; the board shows the stale banner (run touch when it moves)`);
+    // No age warning: the board moves only for asks, decisions and milestones (Jase, 2026-11-12). It is behind
+    // when an open ask's default is overdue, which the asks check above already warns about.
   }
   const html = fs.existsSync(ctx.html) ? fs.readFileSync(ctx.html, 'utf8') : '';
   const v = /<!--\s*forge renderer (\d+)\.(\d+)\.(\d+)/.exec(html);
