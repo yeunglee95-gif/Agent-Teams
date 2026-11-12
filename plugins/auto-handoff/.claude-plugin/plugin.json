@@ -1,0 +1,55 @@
+{
+  "name": "auto-handoff",
+  "version": "0.8.6-osflow.1",
+  "description": "OS Flow's fork of auto-handoff: at the second auto-compaction (configurable) a Haiku-written brief, /clear, and a seed that points the fresh session at the brief and at MEMORY.md and the Forge. Forked from alexknowshtml/claude-auto-handoff 8d762ce (MIT).",
+  "author": {
+    "name": "Alex Hillman",
+    "url": "https://github.com/alexknowshtml"
+  },
+  "repository": "https://github.com/alexknowshtml/claude-auto-handoff",
+  "license": "MIT",
+  "userConfig": {
+    "handoffAtCompaction": {
+      "type": "number",
+      "title": "Hand off at this compaction",
+      "description": "Which automatic compaction becomes a handoff: 2 lets the first compaction run and hands off at the second. 0 uses the token threshold below instead, as the original mod does. AUTO_HANDOFF_TOKENS still forces a threshold for a test run.",
+      "default": 2
+    },
+    "threshold": {
+      "type": "number",
+      "title": "Handoff threshold (tokens)",
+      "description": "Context size that triggers a handoff. AUTO_HANDOFF_TOKENS overrides it for a test run. A seeded session hands off no sooner than 40k past its starting size; the panel above the prompt says so when this is set lower.",
+      "default": 160000
+    },
+    "maxConsecutiveHandoffs": {
+      "type": "number",
+      "title": "Handoffs in a row without a message",
+      "description": "Handoffs allowed before you type a prompt. Past this the mod pauses until you send one.",
+      "default": 2
+    },
+    "briefTemplate": {
+      "type": "string",
+      "title": "Brief template file",
+      "description": "Markdown file that tells Haiku which sections to write. Created with the defaults on first run; edit it to change the brief.",
+      "default": "~/.claude/auto-handoff/brief.md"
+    },
+    "instructionsTemplate": {
+      "type": "string",
+      "title": "Instructions template file",
+      "description": "Markdown file that tells the fresh session how to read the brief. Created with the defaults on first run.",
+      "default": "~/.claude/auto-handoff/instructions.md"
+    },
+    "ignoreFiles": {
+      "type": "string",
+      "title": "Ignored files (regex)",
+      "description": "Edited files matching this pattern are left out of the brief, such as auto-synced state or caches. Leave blank for none.",
+      "default": ""
+    },
+    "viewer": {
+      "type": "string",
+      "title": "Viewer address",
+      "description": "Where the mod serves a readable page for each brief, as host:port. \"tailscale\" as the host means this machine's Tailscale IP, so only your tailnet can open it; without Tailscale it serves on 127.0.0.1. Leave blank for no server; the link is then the local file.",
+      "default": ""
+    }
+  }
+}
