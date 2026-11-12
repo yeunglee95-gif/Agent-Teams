@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 (2026-11-12)
+
+- Added `caveman` (juliusbrussee/caveman core skill, Apache 2.0), unchanged apart from a Source section.
+
 ## 0.1.0 (2026-11-12)
 
 - First version: `watch` (claude-video 0.3.2) and `find-skills` (vercel-labs/skills), both MIT, unchanged apart from a Source section.
