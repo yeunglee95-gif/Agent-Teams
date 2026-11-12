@@ -30,6 +30,8 @@ Day one: Jase reads. Agents (cloud sessions) write. Nobody edits inline. The tea
 | 2026-10-02 | Vocabulary | Six states: done, running, needs-you, queued, later, parked; a free label beside the state | Per-project words (cosmetic unification); four states (too little nuance) |
 | 2026-10-02 | Gate PRD | Folds into the Forge page in OS Flow; the Applier is a later Forge feature; the PRD carries a superseded note | Separate Gate tool (two surfaces, one item in both); deciding later |
 | 2026-10-02 | Propagation | Renderer master in Claude OS, copied into each repo with a version stamp, refreshed by one command | Renderer only in OS Flow (nothing to read until it ships); hosted renderer reading private JSON |
+| 2026-11-12 | Home | The master moves to Agent-Teams as the `forge` plugin, so any project installs it like the other shared tools | Keeping it in Claude OS, which a project session cannot install |
+| 2026-11-12 | When the board moves | Only for asks, decisions and milestones; live progress goes to the crew-progress status file | Republishing after every completed task |
 | 2026-10-02 | Discipline | `/forge` skill, a gate script per repo, the 24-hour stale banner | A CLAUDE.md sentence alone |
 | 2026-10-02 | Never | No client, factory, finance or secret data; no shared URL without Jase; no decision only on the forge; no agent closing its own ask | — |
 | 2026-10-02 | Migration | This session migrates all three forges in one pass | Each project session migrating its own (recommended for repo ownership; Jase wants one pass and one reviewer) |
@@ -145,7 +147,7 @@ The OS Flow app's tokens from `app/src/styles/tokens.css`, light and dark: canva
 
 ## 8. Folder structure
 
-Claude OS (master): `00_Resources/forge/` holds this spec, `forge.html`, `forge.schema.json`, `forge.mjs`, `forge.example.json`, `README.md`; the skill at `.claude/skills/forge/SKILL.md`.
+Agent-Teams (master from 2026-11-12): `plugins/forge/master/` holds this spec, `forge.html`, `forge.schema.json`, `forge.mjs`, `forge.example.json` and the lifecycle map; the skill is `plugins/forge/skills/forge/SKILL.md` and the folder's guide is `plugins/forge/README.md`. Until then the master was Claude OS `00_Resources/forge/`, with the skill at `.claude/skills/forge/SKILL.md`.
 
 Each project repo: `forge/forge.json`, `forge/forge.html` (copy, do not edit), `forge/forge.schema.json` (copy), `forge/forge.mjs` (copy), `forge/banned.txt`, `forge/board.html` (built), `forge/legacy/` (the old board for a month), `forge/archive/`.
 
