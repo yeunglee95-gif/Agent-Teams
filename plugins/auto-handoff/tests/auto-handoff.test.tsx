@@ -144,6 +144,10 @@ function engine(on: On, opts: { tokens: number; files?: Record<string, string>; 
   return calls
 }
 
+// The upstream tests pin upstream's settings, so a change to the fork's defaults never changes what they test:
+// the 160k line, and the gate that stops a reply mid-way once it is past the line.
+const UPSTREAM = { handoffAtCompaction: 0, threshold: 160_000, midTurn: true }
+
 const STEP = { turnId: 't1', index: 1, model: 'claude-fable-5-1', messageCount: 10 }
 
 // Runs one model request through the chain and returns the chunks that came out.
@@ -179,7 +183,7 @@ async function settle(check: () => boolean) {
 }
 
 describe('auto-handoff', () => {
-  test('below the threshold nothing happens', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('below the threshold nothing happens', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 100_000 })
     await $.turn.complete(TURN)
     await settle(() => false)
@@ -187,7 +191,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(0)
   })
 
-  test('at the threshold: brief to disk, /clear, then seed the new session', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('at the threshold: brief to disk, /clear, then seed the new session', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -209,7 +213,7 @@ describe('auto-handoff', () => {
     expect(calls.seeded[0]?.split('\n').length).toBe(1)
   })
 
-  test('fires once per session', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('fires once per session', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -218,7 +222,7 @@ describe('auto-handoff', () => {
     expect(calls.completes).toBe(1)
   })
 
-  test('AUTO_HANDOFF_TOKENS lowers the threshold', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('AUTO_HANDOFF_TOKENS lowers the threshold', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 25_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -226,7 +230,7 @@ describe('auto-handoff', () => {
   })
 
   for (const name of ['AUTO_HANDOFF_DISABLE', 'DISABLE_AUTO_COMPACT']) {
-    test(`kill switch: ${name} set means no brief and no clear`, async ($, on) => {
+    test(`kill switch: ${name} set means no brief and no clear`, { options: UPSTREAM }, async ($, on) => {
       const calls = engine(on, { tokens: 190_000, env: { [name]: '1' } })
       await $.turn.complete(TURN)
       await settle(() => false)
@@ -235,14 +239,14 @@ describe('auto-handoff', () => {
     })
   }
 
-  test('subagent turns are ignored', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('subagent turns are ignored', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 190_000 })
     await $.turn.complete({ ...TURN, agentId: 'sub-1' })
     await settle(() => false)
     expect(calls.completes).toBe(0)
   })
 
-  test('a failed Haiku brief falls back to the facts and still hands off', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a failed Haiku brief falls back to the facts and still hands off', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 190_000, brief: null, messages: [msg('assistant', 'done', [edit('/repo/src/a.ts')])] })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -252,7 +256,7 @@ describe('auto-handoff', () => {
     expect(brief).toContain('- /repo/src/a.ts')
   })
 
-  test('a Haiku reply with no brief sections is replaced by the facts', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a Haiku reply with no brief sections is replaced by the facts', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 190_000, brief: 'Sure, I can help with that parser refactor!' })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -261,7 +265,7 @@ describe('auto-handoff', () => {
     expect(brief).toContain('## Last Real User Message (verbatim)\nplease refactor the parser')
   })
 
-  test('without sh the server cannot launch, and the link is the local file', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('without sh the server cannot launch, and the link is the local file', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, noSh: true })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -272,7 +276,7 @@ describe('auto-handoff', () => {
     expect(calls.seeded[0]).not.toContain('http://')
   })
 
-  test('a blank viewer setting means no server, and the link is the local file', { options: { handoffAtCompaction: 0, viewer: '' } }, async ($, on) => {
+  test('a blank viewer setting means no server, and the link is the local file', { options: { ...UPSTREAM, viewer: '' } }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -281,21 +285,21 @@ describe('auto-handoff', () => {
     expect(calls.seeded[0]).toContain('file:///home/test/.claude/state/auto-handoff/pages/old-session.html')
   })
 
-  test('the threshold userConfig field sets the threshold', { options: { handoffAtCompaction: 0, threshold: 100_000 } }, async ($, on) => {
+  test('the threshold userConfig field sets the threshold', { options: { ...UPSTREAM, threshold: 100_000 } }, async ($, on) => {
     const calls = engine(on, { tokens: 120_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
     expect(calls.cleared).toBe(1)
   })
 
-  test('AUTO_HANDOFF_TOKENS overrides the threshold field', { options: { handoffAtCompaction: 0, threshold: 100_000 } }, async ($, on) => {
+  test('AUTO_HANDOFF_TOKENS overrides the threshold field', { options: { ...UPSTREAM, threshold: 100_000 } }, async ($, on) => {
     const calls = engine(on, { tokens: 120_000, env: { AUTO_HANDOFF_TOKENS: '150000' } })
     await $.turn.complete(TURN)
     await settle(() => false)
     expect(calls.cleared).toBe(0)
   })
 
-  test('the brief opens with the handoff instructions', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the brief opens with the handoff instructions', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -310,7 +314,7 @@ describe('auto-handoff', () => {
     expect(calls.seeded[0]).toContain('follow its Instructions section')
   })
 
-  test('each brief gets a viewer page, and the chain links forward once the next session hands off', { options: { handoffAtCompaction: 0, viewer: 'tailscale:3846' } }, async ($, on) => {
+  test('each brief gets a viewer page, and the chain links forward once the next session hands off', { options: { ...UPSTREAM, viewer: 'tailscale:3846' } }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     const dir = '/home/test/.claude/state/auto-handoff'
     await $.turn.complete(TURN)
@@ -341,7 +345,7 @@ describe('auto-handoff', () => {
     expect(calls.written[`${dir}/pages/new-session-1.html`]).toContain('href="old-session.html"')
   })
 
-  test('a session seeded before a hot reload keeps its chain: lineage comes from the store', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a session seeded before a hot reload keeps its chain: lineage comes from the store', { options: UPSTREAM }, async ($, on) => {
     // Seen live: the reload wiped the in-memory lineage, and the next brief started a new chain.
     const dir = '/home/test/.claude/state/auto-handoff'
     const calls = engine(on, { tokens: 165_000, store: { 'lineage:old-session': { from: 'earlier', chain: 'first' } } })
@@ -355,7 +359,7 @@ describe('auto-handoff', () => {
     expect(calls.prompts[0]).not.toContain('Handoff depth')
   })
 
-  test('depth carries through the store across a hot reload', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('depth carries through the store across a hot reload', { options: UPSTREAM }, async ($, on) => {
     const dir = '/home/test/.claude/state/auto-handoff'
     const calls = engine(on, { tokens: 165_000, store: { 'lineage:old-session': { from: 'earlier', chain: 'first', depth: 3 } } })
     await $.turn.complete(TURN)
@@ -364,7 +368,7 @@ describe('auto-handoff', () => {
     expect(calls.prompts[0]).toContain('**Handoff depth:** 3')
   })
 
-  test('an unanswered last request puts a PRIORITY directive in the instructions', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('an unanswered last request puts a PRIORITY directive in the instructions', { options: UPSTREAM }, async ($, on) => {
     const brief = '## Last Request from the User\n"Make the thresholds vars"\nStatus: Partially answered.\n\n## Next Step\nAdd userConfig.'
     const calls = engine(on, { tokens: 165_000, brief })
     await $.turn.complete(TURN)
@@ -375,7 +379,7 @@ describe('auto-handoff', () => {
     expect(written.indexOf('**PRIORITY:')).toBeLessThan(written.indexOf('## Session Handoff Brief'))
   })
 
-  test('the brief template file sets the sections Haiku is asked for', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the brief template file sets the sections Haiku is asked for', { options: UPSTREAM }, async ($, on) => {
     const files = { '/home/test/.claude/auto-handoff/brief.md': 'Write only:\n\n## Mood\nHow it went.' }
     const calls = engine(on, { tokens: 165_000, files, brief: '## Mood\nGood.' })
     await $.turn.complete(TURN)
@@ -386,7 +390,7 @@ describe('auto-handoff', () => {
     expect(calls.written['/home/test/.claude/state/auto-handoff/old-session.md']).toContain('## Mood\nGood.')
   })
 
-  test('the instructions template file replaces the instructions', { options: { handoffAtCompaction: 0, instructionsTemplate: '/custom/i.md' } }, async ($, on) => {
+  test('the instructions template file replaces the instructions', { options: { ...UPSTREAM, instructionsTemplate: '/custom/i.md' } }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, files: { '/custom/i.md': '## Rules\nJust keep going.' } })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -394,7 +398,7 @@ describe('auto-handoff', () => {
     expect(brief.startsWith('## Rules\nJust keep going.')).toBe(true)
   })
 
-  test('without sh, the log is written through fs and keeps every line', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('without sh, the log is written through fs and keeps every line', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, noSh: true })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -403,7 +407,7 @@ describe('auto-handoff', () => {
     expect(log).toContain('brief written /home/test/.claude/state/auto-handoff/old-session.md')
   })
 
-  test('a new session writes missing templates and leaves existing ones alone', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a new session writes missing templates and leaves existing ones alone', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 1_000, files: { '/home/test/.claude/auto-handoff/brief.md': 'mine' } })
     await $.classic.SessionStart({ source: 'startup' })
     expect(files(calls.written)).toEqual(['/home/test/.claude/auto-handoff/instructions.md'])
@@ -424,7 +428,7 @@ describe('auto-handoff', () => {
     expect(hasUnansweredLastRequest('## Next Step\nStatus: Not answered')).toBe(false)
   })
 
-  test('the brief carries the transcript path, verify block and facts', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the brief carries the transcript path, verify block and facts', { options: UPSTREAM }, async ($, on) => {
     const messages = [
       msg('user', 'fix #846 please'),
       msg('assistant', 'committing', [edit('/repo/mod.ts', 'Write'), bash("git commit -m 'feat: x'", '[main 47edd8e] feat(mods): auto-handoff\n 2 files changed')]),
@@ -444,13 +448,13 @@ describe('auto-handoff', () => {
     expect(prompt.indexOf('## Extracted Facts')).toBeLessThan(prompt.indexOf('## Next Step'))
   })
 
-  test('a /clear from the user without a pending handoff seeds nothing', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a /clear from the user without a pending handoff seeds nothing', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 1_000 })
     await $.classic.SessionStart({ source: 'clear' })
     expect(calls.seeded.length).toBe(0)
   })
 
-  test('a seeded session that starts above the threshold does not loop', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a seeded session that starts above the threshold does not loop', { options: UPSTREAM }, async ($, on) => {
     // The 2026-10-03 live run: threshold 20k, every fresh session started at ~31k.
     const calls = engine(on, { tokens: 31_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await $.turn.complete(TURN)
@@ -468,7 +472,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(2)
   })
 
-  test('a seeded session measures its floor at its first request, not at the end of its first turn', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a seeded session measures its floor at its first request, not at the end of its first turn', { options: UPSTREAM }, async ($, on) => {
     // Seen live: the seed turn read the whole mod and ran the suite three times, 47k to 129k,
     // with the pre-request check off; the floor landed at 129k and the next handoff moved out to 179k.
     const calls = engine(on, { tokens: 165_000, stepUsage: true, toolChars: 560_000 })
@@ -502,21 +506,21 @@ describe('auto-handoff', () => {
     }
   }
 
-  test('progress guard: no more than two handoffs without a typed prompt', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('progress guard: no more than two handoffs without a typed prompt', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 31_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await unattendedRounds($, calls, 4)
     await settle(() => false)
     expect(calls.cleared).toBe(2)
   })
 
-  test('maxConsecutiveHandoffs sets the progress guard', { options: { handoffAtCompaction: 0, maxConsecutiveHandoffs: 1 } }, async ($, on) => {
+  test('maxConsecutiveHandoffs sets the progress guard', { options: { ...UPSTREAM, maxConsecutiveHandoffs: 1 } }, async ($, on) => {
     const calls = engine(on, { tokens: 31_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await unattendedRounds($, calls, 3)
     await settle(() => false)
     expect(calls.cleared).toBe(1)
   })
 
-  test('a seeded session gets 40k of headroom above its floor, not a config field', { options: { handoffAtCompaction: 0, headroom: 1_000_000, growth: 1_000_000 } }, async ($, on) => {
+  test('a seeded session gets 40k of headroom above its floor, not a config field', { options: { ...UPSTREAM, headroom: 1_000_000, growth: 1_000_000 } }, async ($, on) => {
     const calls = engine(on, { tokens: 120_000, env: { AUTO_HANDOFF_TOKENS: '100000' } })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -534,7 +538,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(2) // the ignored options did not hold it off
   })
 
-  test('a threshold too close to the floor is raised, and the panel names the env var', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a threshold too close to the floor is raised, and the panel names the env var', { options: UPSTREAM }, async ($, on) => {
     // The 2026-10-04 live run: AUTO_HANDOFF_TOKENS=80000 left in a shell, seeded sessions start at
     // ~45k. max(80k, 45k + 20k) was 80k, so each seeded session handed off after ~35k of work: eight times.
     const calls = engine(on, { tokens: 85_000, env: { AUTO_HANDOFF_TOKENS: '80000' } })
@@ -557,7 +561,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(2)
   })
 
-  test('the headroom warning names /config when the threshold field is the source', { options: { handoffAtCompaction: 0, threshold: 60_000 } }, async ($, on) => {
+  test('the headroom warning names /config when the threshold field is the source', { options: { ...UPSTREAM, threshold: 60_000 } }, async ($, on) => {
     const calls = engine(on, { tokens: 65_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -568,7 +572,7 @@ describe('auto-handoff', () => {
     expect(await band($)).toContain('(threshold in /config)')
   })
 
-  test('no headroom warning at the default threshold', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('no headroom warning at the default threshold', { options: {} }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -579,7 +583,7 @@ describe('auto-handoff', () => {
     expect(await band($)).not.toContain('threshold')
   })
 
-  test('progress guard: a typed prompt resumes handoffs', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('progress guard: a typed prompt resumes handoffs', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 31_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await unattendedRounds($, calls, 3)
     expect(calls.cleared).toBe(2)
@@ -589,7 +593,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(3)
   })
 
-  test('progress guard: a plugin or notification prompt is not progress', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('progress guard: a plugin or notification prompt is not progress', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 31_000, env: { AUTO_HANDOFF_TOKENS: '20000' } })
     await unattendedRounds($, calls, 3)
     await $.prompt.submit({ text: 'from a plugin', origin: { kind: 'plugin', name: 'other' } } as never)
@@ -599,7 +603,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(2)
   })
 
-  test('a turn whose tool output would cross the threshold stops before the next request', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a turn whose tool output would cross the threshold stops before the next request', { options: UPSTREAM }, async ($, on) => {
     // The 2026-10-03 case: measured 63k, then reads worth ~140k land in one turn.
     const calls = engine(on, { tokens: 63_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 560_000 })
     await $.tool.call({ tool: 'Read', file_path: '/big.txt' })
@@ -611,7 +615,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('tool output that lands while the response streams still counts', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('tool output that lands while the response streams still counts', { options: UPSTREAM }, async ($, on) => {
     // Seen live: eight reads ran mid-stream, then the stream's end zeroed the count.
     const calls = engine(on, { tokens: 61_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, streamToolChars: 400_000 })
     const stream = $.turn.step({ ...STEP, index: 1 })[Symbol.asyncIterator]()
@@ -624,7 +628,7 @@ describe('auto-handoff', () => {
     expect(chunks.some(c => c.kind === 'text' && c.text?.includes('auto-handoff'))).toBe(true)
   })
 
-  test('the first auto-compact runs; the second is replaced by a handoff (fork)', async ($, on) => {
+  test('the first auto-compact runs; the second is replaced by a handoff (fork)', { options: { handoffAtCompaction: 2 } }, async ($, on) => {
     const calls = engine(on, { tokens: 174_000 })
     await $.session.compact({ trigger: 'auto', messages: BASIC })
     expect(calls.compacts).toBe(1)
@@ -636,13 +640,13 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('in compaction mode no token threshold hands off at the end of a turn (fork)', async ($, on) => {
+  test('in compaction mode no token threshold hands off at the end of a turn (fork)', { options: { handoffAtCompaction: 2 } }, async ($, on) => {
     const calls = engine(on, { tokens: 900_000 })
     await $.turn.complete(TURN)
     expect(calls.cleared).toBe(0)
   })
 
-  test('auto-compact is replaced by a handoff', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('auto-compact is replaced by a handoff', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 174_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, store: { 'compactions:old-session': 1 } })
     const r = await $.session.compact({ trigger: 'auto', messages: BASIC })
     expect(r.skip).toContain('auto-handoff')
@@ -651,21 +655,21 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('a manual /compact is left alone', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a manual /compact is left alone', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 174_000, env: { AUTO_HANDOFF_TOKENS: '80000' } })
     await $.session.compact({ trigger: 'manual', messages: BASIC })
     expect(calls.compacts).toBe(1)
     expect(calls.completes).toBe(0)
   })
 
-  test('auto-compact goes ahead when the kill switch is set', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('auto-compact goes ahead when the kill switch is set', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 174_000, env: { AUTO_HANDOFF_TOKENS: '80000', AUTO_HANDOFF_DISABLE: 'x' } })
     await $.session.compact({ trigger: 'auto', messages: BASIC })
     expect(calls.compacts).toBe(1)
     expect(calls.cleared).toBe(0)
   })
 
-  test('small tool output under the threshold lets the request through', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('small tool output under the threshold lets the request through', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 63_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 20_000 })
     await $.tool.call({ tool: 'Read', file_path: '/small.txt' })
     await step($)
@@ -673,14 +677,14 @@ describe('auto-handoff', () => {
     expect(calls.completes).toBe(0)
   })
 
-  test('the first request of a turn is never stopped', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the first request of a turn is never stopped', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 63_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 560_000 })
     await $.tool.call({ tool: 'Read', file_path: '/big.txt' })
     await step($, 0)
     expect(calls.steps).toBe(1)
   })
 
-  test('a stale briefing marker from a mid-handoff reload is retried', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a stale briefing marker from a mid-handoff reload is retried', { options: UPSTREAM }, async ($, on) => {
     // Seen live: threshold fired, the mod reloaded 71 ms later, the marker stayed at 'briefing'.
     const calls = engine(on, { tokens: 165_000, store: { 'fired:old-session': 'briefing' } })
     await $.turn.complete(TURN)
@@ -689,14 +693,82 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('a clearing or seeded marker still means fired once', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a clearing or seeded marker still means fired once', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
     await $.turn.complete(TURN)
     await settle(() => false)
     expect(calls.completes).toBe(0)
   })
 
-  test('the panel above the prompt walks the handoff, then collapses', { options: { handoffAtCompaction: 0, viewer: 'tailscale:3846' } }, async ($, on) => {
+  // Seen live in a cloud session (2026-11-14 to 11-17): after the handoff the container restarted and the
+  // cloud resumed the seeded conversation under the old id, so the seeded marker blocked every later
+  // handoff and the session compacted at about 900k three times instead.
+  for (const source of ['resume', 'startup'] as const) {
+    test(`a session started (${source}) under the id it handed off from can hand off again (fork)`, { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+      const calls = engine(on, { tokens: 850_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
+      await $.classic.SessionStart({ source })
+      await $.turn.complete(TURN)
+      await settle(() => calls.cleared > 0)
+      expect(calls.completes).toBe(1)
+      expect(calls.cleared).toBe(1)
+      expect(calls.written['/home/test/.claude/state/auto-handoff/auto-handoff.log']).toContain('re-armed session=old-session')
+    })
+  }
+
+  test('a compaction or a /clear does not re-arm a session that handed off (fork)', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+    const calls = engine(on, { tokens: 850_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
+    await $.classic.SessionStart({ source: 'compact' })
+    await $.classic.SessionStart({ source: 'clear' })
+    await $.turn.complete(TURN)
+    await settle(() => false)
+    expect(calls.completes).toBe(0)
+  })
+
+  test('by default the line is 800k: a reply ending at 790k holds, one ending at 810k hands off (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 790_000 })
+    await $.turn.complete(TURN)
+    await settle(() => false)
+    expect(calls.completes).toBe(0)
+    calls.tokens = 810_000
+    await $.turn.complete(TURN)
+    await settle(() => calls.cleared > 0)
+    expect(calls.cleared).toBe(1)
+  })
+
+  test('by default a reply that crosses the line keeps working, and hands off when it ends (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 795_000, toolChars: 560_000 })
+    await $.tool.call({ tool: 'Read', file_path: '/big.txt' })
+    await $.tool.call({ tool: 'Read', file_path: '/big.txt' }) // projected past 800k: still runs
+    expect(calls.ran).toBe(2)
+    const chunks = await step($)
+    expect(calls.steps).toBe(1) // the next request goes through
+    expect(chunks.some(c => c.kind === 'text' && c.text?.includes('auto-handoff'))).toBe(false)
+    expect(calls.cleared).toBe(0)
+    calls.tokens = 935_000
+    await $.turn.complete(TURN)
+    await settle(() => calls.cleared > 0)
+    expect(calls.completes).toBe(1)
+    expect(calls.cleared).toBe(1)
+  })
+
+  test('by default an automatic compaction mid-reply still becomes a handoff: the overflow guard (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 900_000 })
+    const r = await $.session.compact({ trigger: 'auto', messages: BASIC })
+    expect(r.skip).toContain('auto-handoff')
+    expect(calls.compacts).toBe(0)
+    await settle(() => calls.cleared > 0)
+    expect(calls.cleared).toBe(1)
+  })
+
+  test('by default a tool call while a handoff is under way is still refused (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 810_000 })
+    await $.turn.complete(TURN)
+    await settle(() => calls.cleared > 0)
+    await $.tool.call({ tool: 'Read', file_path: '/small.txt' })
+    expect(calls.ran).toBe(0)
+  })
+
+  test('the panel above the prompt walks the handoff, then collapses', { options: { ...UPSTREAM, viewer: 'tailscale:3846' } }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, stepUsage: true })
     expect(await band($)).toBe('')
     await $.turn.complete(TURN)
@@ -724,7 +796,7 @@ describe('auto-handoff', () => {
     expect(calls.toasts).toEqual([])
   })
 
-  test('on the mobile app, which draws no band, the key moments go out as toasts', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('on the mobile app, which draws no band, the key moments go out as toasts', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, stepUsage: true, surfaces: ['terminal', 'mobile'] })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -738,7 +810,7 @@ describe('auto-handoff', () => {
     expect(calls.toasts).toEqual(['context 165k is past 160k: handing off', '↪ handed off · 165k → 47k'])
   })
 
-  test('a facts-only brief stays on the panel until dismissed', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a facts-only brief stays on the panel until dismissed', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, stepUsage: true, brief: null })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -755,7 +827,7 @@ describe('auto-handoff', () => {
     await ui.unmount()
   })
 
-  test('past the threshold, tool calls are refused before they run', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('past the threshold, tool calls are refused before they run', { options: UPSTREAM }, async ($, on) => {
     // Seen live: ~28 reads in one step took the session from 67k to 437k.
     const calls = engine(on, { tokens: 67_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 220_000 })
     const results = []
@@ -771,7 +843,7 @@ describe('auto-handoff', () => {
     expect(calls.compacts).toBe(0)
   })
 
-  test('a refused tool call hands off at turn end even when the real size comes in under the threshold', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a refused tool call hands off at turn end even when the real size comes in under the threshold', { options: UPSTREAM }, async ($, on) => {
     // Seen live: the gate projected 83.7k, the response measured 72.5k, and the session stopped with no handoff.
     const calls = engine(on, { tokens: 67_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 220_000 })
     await $.tool.call({ tool: 'Read', file_path: '/a.txt' })
@@ -783,7 +855,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('a refused tool call hands off at the next request, and the stop line does not claim a size under the threshold', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('a refused tool call hands off at the next request, and the stop line does not claim a size under the threshold', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 84_000, env: { AUTO_HANDOFF_TOKENS: '80000' } })
     const refused = await $.tool.call({ tool: 'Read', file_path: '/a.txt' })
     expect('deny' in refused).toBe(true)
@@ -797,7 +869,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(1)
   })
 
-  test('without a refusal, a turn that ends under the threshold does not hand off', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('without a refusal, a turn that ends under the threshold does not hand off', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 67_000, env: { AUTO_HANDOFF_TOKENS: '80000' }, toolChars: 4_000 })
     await $.tool.call({ tool: 'Read', file_path: '/a.txt' })
     await $.turn.complete(TURN)
@@ -805,7 +877,7 @@ describe('auto-handoff', () => {
     expect(calls.cleared).toBe(0)
   })
 
-  test("the person's own /clear dismisses the panel when no handoff is under way", { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test("the person's own /clear dismisses the panel when no handoff is under way", { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, stepUsage: true, brief: null })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -820,7 +892,7 @@ describe('auto-handoff', () => {
     expect(calls.seeded.length).toBe(1)
   })
 
-  test('the handoff\'s own /clear keeps the panel', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the handoff\'s own /clear keeps the panel', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000 })
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
@@ -829,20 +901,20 @@ describe('auto-handoff', () => {
     expect(await band($)).toContain('✓ cleared')
   })
 
-  test('the tool gate never blocks a session the mod will not hand off', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the tool gate never blocks a session the mod will not hand off', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, env: { AUTO_HANDOFF_DISABLE: 'x' }, toolChars: 220_000 })
     await $.tool.call({ tool: 'Read', file_path: '/a.txt' })
     await $.tool.call({ tool: 'Read', file_path: '/b.txt' })
     expect(calls.ran).toBe(2)
   })
 
-  test('the tool gate leaves subagents alone', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the tool gate leaves subagents alone', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 165_000, toolChars: 220_000 })
     await $.tool.call({ tool: 'Read', file_path: '/a.txt', agentId: 'sub-1' } as never)
     expect(calls.ran).toBe(1)
   })
 
-  test('the pre-request check honours the kill switch', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
+  test('the pre-request check honours the kill switch', { options: UPSTREAM }, async ($, on) => {
     const calls = engine(on, { tokens: 63_000, env: { AUTO_HANDOFF_TOKENS: '80000', AUTO_HANDOFF_DISABLE: 'x' }, toolChars: 560_000 })
     await $.tool.call({ tool: 'Read', file_path: '/big.txt' })
     await step($)

@@ -20,8 +20,12 @@ for p in "${wanted[@]}"; do
 done
 claude plugin marketplace add "$root" >/dev/null 2>&1 || claude plugin marketplace update "$market" >/dev/null
 failed=()
+# install succeeds on a plugin that is already installed without refreshing it, so update always runs after
+# it and is the step whose failure counts (OS Flow's auto-handoff stayed stale behind install || update).
+# The list below shows the marketplace's version; the copy that loads is in plugins/installed_plugins.json.
 for p in "${wanted[@]}"; do
-  claude plugin install "$p@$market" >/dev/null 2>&1 || claude plugin update "$p@$market" >/dev/null 2>&1 || failed+=("$p")
+  claude plugin install "$p@$market" >/dev/null 2>&1 || true
+  claude plugin update "$p@$market" >/dev/null 2>&1 || failed+=("$p")
 done
 claude plugin list 2>/dev/null | grep -F -e "@$market" || echo "install-plugins: none listed"
 [ ${#failed[@]} -eq 0 ] || { echo "install-plugins: failed: ${failed[*]}" >&2; exit 1; }

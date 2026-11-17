@@ -71,7 +71,7 @@ Four mods, first gathered for OS Flow's sessions and kept here for every project
 | Mod | What it does | Source |
 |---|---|---|
 | `crew-progress` | Claude's subagents and Codex's tasks side by side in role costumes, with Codex's plan limits, and a status file at `~/.claude/state/crew-progress/status.md` for live progress. A new role gets a costume when it is added | Fork of savvy-progress (johnnyvizz/claude-kit), MIT |
-| `auto-handoff` | At the second auto-compaction, a Haiku-written brief, `/clear`, and a fresh session that reads it and the project's memory file and status board | Fork of alexknowshtml/claude-auto-handoff `8d762ce`, MIT |
+| `auto-handoff` | When a reply ends past 800k tokens of context (upstream's 80% of the window, on a 1M window), a Haiku-written brief, `/clear`, and a fresh session that reads it and the project's memory file and status board | Fork of alexknowshtml/claude-auto-handoff `8d762ce`, MIT |
 | `cache-tax` | Keeps the prompt cache warm during breaks and asks before a cold send. Warming costs tokens | karanb192/cache-tax `c4f8cf2`, MIT, unchanged |
 | `filetree` | A file tree pane beside the chat that shows what Claude reads and writes | data-goblin/claude-code-filetree `3ce5b1c`, MIT, unchanged |
 

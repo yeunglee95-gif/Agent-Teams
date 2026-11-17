@@ -461,7 +461,8 @@ export const register: Register = (on, options) => {
         const tokens = (await $.session.usage()).context.tokens
         const projected = (tokens ?? 0) + unmeasured
         const threshold = await thresholdFor($, sessionId)
-        if (inFlight || pending || (tokens !== undefined && projected >= threshold && await canHandOff($, sessionId))) {
+        // Fork: with midTurn off, the line alone never refuses a call; the reply finishes and turn.complete hands off.
+        if (inFlight || pending || (cfg.midTurn && tokens !== undefined && projected >= threshold && await canHandOff($, sessionId))) {
           if (!inFlight && !pending) gated = sessionId
           await log($, `tool refused session=${sessionId} tool=${e.tool} projected=${projected} threshold=${threshold}`)
           return { deny: `[auto-handoff] Not run: the context is past the handoff threshold (${k(projected)} ≥ ${k(threshold)}). This session is handing off to a fresh one, which will redo this call. Make no more tool calls.` }
@@ -479,7 +480,8 @@ export const register: Register = (on, options) => {
   // crosses the threshold, end the turn here and hand off instead of sending a request
   // that may overflow the window.
   on('turn.step', async function* ($, e, next) {
-    if (!e.agentId && !inFlight && !pending && e.index > 0) {
+    // Fork: with midTurn off, no request is stopped mid-reply; the measuring below still runs.
+    if (cfg.midTurn && !e.agentId && !inFlight && !pending && e.index > 0) {
       try {
         const tokens = (await $.session.usage()).context.tokens
         const sessionId = await $.session.id()
@@ -583,6 +585,22 @@ export const register: Register = (on, options) => {
     if (e.source === 'startup') {
       await writeMissingTemplates($)
       await keepServing($)
+    }
+    // Fork: a cloud session resumes after a container restart under the id it started with, so after a
+    // handoff the seeded conversation runs again under the old id. Its seeded marker would block every
+    // later handoff (seen 2026-11-14 to 11-17: three compactions at about 900k instead), so a session
+    // that starts or resumes under an id that handed off is re-armed. A /clear or a compaction is not.
+    if (e.source === 'resume' || e.source === 'startup') {
+      try {
+        const id = await $.session.id()
+        const fired = await $.store.get(`fired:${id}`)
+        if (typeof fired === 'string' && fired.startsWith('seeded:')) {
+          await $.store.delete(`fired:${id}`)
+          await log($, `re-armed session=${id} (${e.source}; it had handed off to ${fired.slice('seeded:'.length)})`)
+        }
+      } catch (err) {
+        await log($, `re-arm error ${String(err)}`)
+      }
     }
     // A /clear of the person's own leaves no handoff to report; the panel from the last one goes too.
     if (e.source === 'clear' && !pending && !inFlight && shown) hidePanel($)
