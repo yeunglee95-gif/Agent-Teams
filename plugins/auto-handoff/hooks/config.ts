@@ -3,7 +3,10 @@
 
 export const BRIEF_DIR = '.claude/state/auto-handoff'
 // The two numbers are userConfig fields (plugin.json), set in /config. Defaults match the manifest.
-// threshold: matches HANDOFF_ARM_TOKENS in context-warning.ts.
+// threshold: Jase's 800k (2026-11-17), upstream's own sizing (160k, 80% of a 200k window) applied to a
+// 1M window. midTurn: upstream stops a reply mid-way once it is past the line, so one burst of reads
+// cannot overflow a 200k window; on a 1M window the fork lets the reply finish and hands off at its end,
+// and the engine's automatic compaction near the window still becomes a handoff at once (session.compact).
 // MIN_HEADROOM and maxUnattended are loop guards. A seeded session must grow MIN_HEADROOM past its
 // first-turn size (its floor) before it can hand off again, and at most maxUnattended handoffs may
 // run before the user types a prompt. MIN_HEADROOM is fixed: seeded sessions start near 45k, so at
@@ -18,10 +21,9 @@ export const BRIEF_DIR = '.claude/state/auto-handoff'
 // that never count as edits.
 // viewer: where the mod serves the brief pages, "host:port"; "tailscale" as the host means this
 // machine's Tailscale IP, or 127.0.0.1 without Tailscale. Blank: no server, and the link is the local file.
-export type Config = { handoffAtCompaction: number; threshold: number; maxUnattended: number; briefTemplate: string; instructionsTemplate: string; ignoreFiles?: RegExp; viewer: string }
-// Fork (Jase, 2026-11-17): hand off at upstream's token line, not at a compaction count. A 1M-token
-// session that compacts at about 900k re-reads that much on every turn before it does.
-export const DEFAULTS: Config = { handoffAtCompaction: 0, threshold: 160_000, maxUnattended: 2, briefTemplate: '~/.claude/auto-handoff/brief.md', instructionsTemplate: '~/.claude/auto-handoff/instructions.md', viewer: '' }
+export type Config = { handoffAtCompaction: number; threshold: number; midTurn: boolean; maxUnattended: number; briefTemplate: string; instructionsTemplate: string; ignoreFiles?: RegExp; viewer: string }
+// Fork (Jase, 2026-11-17): hand off at a token line, not at a compaction count, and at the end of a reply.
+export const DEFAULTS: Config = { handoffAtCompaction: 0, threshold: 800_000, midTurn: false, maxUnattended: 2, briefTemplate: '~/.claude/auto-handoff/brief.md', instructionsTemplate: '~/.claude/auto-handoff/instructions.md', viewer: '' }
 export const MIN_HEADROOM = 40_000
 // Each template's default, a file in the mod's templates/ folder.
 export const TEMPLATES = [['briefTemplate', 'brief.md'], ['instructionsTemplate', 'instructions.md']] as const
@@ -49,6 +51,7 @@ export function parseConfig(options: Record<string, unknown>): Config {
   // automatic compactions run and hands off in place of the next.
   handoffAtCompaction: typeof options.handoffAtCompaction === 'number' && Number.isFinite(options.handoffAtCompaction) && options.handoffAtCompaction >= 0 ? Math.floor(options.handoffAtCompaction) : DEFAULTS.handoffAtCompaction,
   threshold: num(options.threshold, DEFAULTS.threshold),
+  midTurn: typeof options.midTurn === 'boolean' ? options.midTurn : DEFAULTS.midTurn,
   maxUnattended: num(options.maxConsecutiveHandoffs, DEFAULTS.maxUnattended),
   briefTemplate: str(options.briefTemplate, DEFAULTS.briefTemplate),
   instructionsTemplate: str(options.instructionsTemplate, DEFAULTS.instructionsTemplate),

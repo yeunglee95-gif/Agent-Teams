@@ -2,6 +2,11 @@
 
 Fork versions only; upstream's own changelog is in `README.md`.
 
+## 0.8.6-fork.5 (2026-11-17)
+
+- `threshold` 800000: upstream's sizing (160k, 80% of a 200k window) applied to a 1M window (Jase, 2026-11-17).
+- `midTurn` (default false): past the threshold the reply finishes and the mod hands off at its end, instead of refusing the next tool call or request mid-reply. The engine's automatic compaction near the window still becomes a handoff at once. The upstream tests pin `midTurn: true`; four new fork tests: the 800k line, a reply that crosses it keeps working, the compaction guard, and a call during a handoff still refused. 90 of 90.
+
 ## 0.8.6-fork.4 (2026-11-17)
 
 - `threshold` is upstream's 160000 again (Jase: follow the downloaded mod's number). `handoffAtCompaction` stays 0.

@@ -461,7 +461,8 @@ export const register: Register = (on, options) => {
         const tokens = (await $.session.usage()).context.tokens
         const projected = (tokens ?? 0) + unmeasured
         const threshold = await thresholdFor($, sessionId)
-        if (inFlight || pending || (tokens !== undefined && projected >= threshold && await canHandOff($, sessionId))) {
+        // Fork: with midTurn off, the line alone never refuses a call; the reply finishes and turn.complete hands off.
+        if (inFlight || pending || (cfg.midTurn && tokens !== undefined && projected >= threshold && await canHandOff($, sessionId))) {
           if (!inFlight && !pending) gated = sessionId
           await log($, `tool refused session=${sessionId} tool=${e.tool} projected=${projected} threshold=${threshold}`)
           return { deny: `[auto-handoff] Not run: the context is past the handoff threshold (${k(projected)} ≥ ${k(threshold)}). This session is handing off to a fresh one, which will redo this call. Make no more tool calls.` }
@@ -479,7 +480,8 @@ export const register: Register = (on, options) => {
   // crosses the threshold, end the turn here and hand off instead of sending a request
   // that may overflow the window.
   on('turn.step', async function* ($, e, next) {
-    if (!e.agentId && !inFlight && !pending && e.index > 0) {
+    // Fork: with midTurn off, no request is stopped mid-reply; the measuring below still runs.
+    if (cfg.midTurn && !e.agentId && !inFlight && !pending && e.index > 0) {
       try {
         const tokens = (await $.session.usage()).context.tokens
         const sessionId = await $.session.id()

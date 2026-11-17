@@ -144,8 +144,9 @@ function engine(on: On, opts: { tokens: number; files?: Record<string, string>; 
   return calls
 }
 
-// The upstream tests pin upstream's settings, so a change to the fork's defaults never changes what they test.
-const UPSTREAM = { handoffAtCompaction: 0, threshold: 160_000 }
+// The upstream tests pin upstream's settings, so a change to the fork's defaults never changes what they test:
+// the 160k line, and the gate that stops a reply mid-way once it is past the line.
+const UPSTREAM = { handoffAtCompaction: 0, threshold: 160_000, midTurn: true }
 
 const STEP = { turnId: 't1', index: 1, model: 'claude-fable-5-1', messageCount: 10 }
 
@@ -704,7 +705,7 @@ describe('auto-handoff', () => {
   // handoff and the session compacted at about 900k three times instead.
   for (const source of ['resume', 'startup'] as const) {
     test(`a session started (${source}) under the id it handed off from can hand off again (fork)`, { options: { handoffAtCompaction: 0 } }, async ($, on) => {
-      const calls = engine(on, { tokens: 250_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
+      const calls = engine(on, { tokens: 850_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
       await $.classic.SessionStart({ source })
       await $.turn.complete(TURN)
       await settle(() => calls.cleared > 0)
@@ -715,7 +716,7 @@ describe('auto-handoff', () => {
   }
 
   test('a compaction or a /clear does not re-arm a session that handed off (fork)', { options: { handoffAtCompaction: 0 } }, async ($, on) => {
-    const calls = engine(on, { tokens: 250_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
+    const calls = engine(on, { tokens: 850_000, store: { 'fired:old-session': 'seeded:new-session-1' } })
     await $.classic.SessionStart({ source: 'compact' })
     await $.classic.SessionStart({ source: 'clear' })
     await $.turn.complete(TURN)
@@ -723,15 +724,48 @@ describe('auto-handoff', () => {
     expect(calls.completes).toBe(0)
   })
 
-  test('by default the context line is upstream 160k: below it nothing hands off, past it the session does (fork)', async ($, on) => {
-    const calls = engine(on, { tokens: 155_000 })
+  test('by default the line is 800k: a reply ending at 790k holds, one ending at 810k hands off (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 790_000 })
     await $.turn.complete(TURN)
     await settle(() => false)
     expect(calls.completes).toBe(0)
-    calls.tokens = 165_000
+    calls.tokens = 810_000
     await $.turn.complete(TURN)
     await settle(() => calls.cleared > 0)
     expect(calls.cleared).toBe(1)
+  })
+
+  test('by default a reply that crosses the line keeps working, and hands off when it ends (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 795_000, toolChars: 560_000 })
+    await $.tool.call({ tool: 'Read', file_path: '/big.txt' })
+    await $.tool.call({ tool: 'Read', file_path: '/big.txt' }) // projected past 800k: still runs
+    expect(calls.ran).toBe(2)
+    const chunks = await step($)
+    expect(calls.steps).toBe(1) // the next request goes through
+    expect(chunks.some(c => c.kind === 'text' && c.text?.includes('auto-handoff'))).toBe(false)
+    expect(calls.cleared).toBe(0)
+    calls.tokens = 935_000
+    await $.turn.complete(TURN)
+    await settle(() => calls.cleared > 0)
+    expect(calls.completes).toBe(1)
+    expect(calls.cleared).toBe(1)
+  })
+
+  test('by default an automatic compaction mid-reply still becomes a handoff: the overflow guard (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 900_000 })
+    const r = await $.session.compact({ trigger: 'auto', messages: BASIC })
+    expect(r.skip).toContain('auto-handoff')
+    expect(calls.compacts).toBe(0)
+    await settle(() => calls.cleared > 0)
+    expect(calls.cleared).toBe(1)
+  })
+
+  test('by default a tool call while a handoff is under way is still refused (fork)', async ($, on) => {
+    const calls = engine(on, { tokens: 810_000 })
+    await $.turn.complete(TURN)
+    await settle(() => calls.cleared > 0)
+    await $.tool.call({ tool: 'Read', file_path: '/small.txt' })
+    expect(calls.ran).toBe(0)
   })
 
   test('the panel above the prompt walks the handoff, then collapses', { options: { ...UPSTREAM, viewer: 'tailscale:3846' } }, async ($, on) => {

@@ -1,7 +1,7 @@
 {
   "name": "auto-handoff",
-  "version": "0.8.6-fork.4",
-  "description": "A fork of auto-handoff: when the context passes 160k tokens, as upstream does (or, if set, at an automatic compaction) a Haiku-written brief, /clear, and a seed that points the fresh session at the brief and at the project's memory file and status board, as its AGENTS.md names them. Forked from alexknowshtml/claude-auto-handoff 8d762ce (MIT).",
+  "version": "0.8.6-fork.5",
+  "description": "A fork of auto-handoff: when a reply ends with the context past 800k tokens (or, if set, at an automatic compaction) a Haiku-written brief, /clear, and a seed that points the fresh session at the brief and at the project's memory file and status board, as its AGENTS.md names them. Forked from alexknowshtml/claude-auto-handoff 8d762ce (MIT).",
   "author": {
     "name": "Alex Hillman",
     "url": "https://github.com/alexknowshtml"
@@ -19,7 +19,13 @@
       "type": "number",
       "title": "Handoff threshold (tokens)",
       "description": "Context size that triggers a handoff. AUTO_HANDOFF_TOKENS overrides it for a test run. A seeded session hands off no sooner than 40k past its starting size; the panel above the prompt says so when this is set lower.",
-      "default": 160000
+      "default": 800000
+    },
+    "midTurn": {
+      "type": "boolean",
+      "title": "Hand off mid-reply",
+      "description": "Off: once the context is past the threshold the reply finishes, then the mod hands off; an automatic compaction near the window still becomes a handoff at once. On, as upstream: past the threshold the next tool call or request is refused and the handoff starts mid-reply, which a 200k window needs.",
+      "default": false
     },
     "maxConsecutiveHandoffs": {
       "type": "number",
