@@ -584,6 +584,22 @@ export const register: Register = (on, options) => {
       await writeMissingTemplates($)
       await keepServing($)
     }
+    // Fork: a cloud session resumes after a container restart under the id it started with, so after a
+    // handoff the seeded conversation runs again under the old id. Its seeded marker would block every
+    // later handoff (seen 2026-11-14 to 11-17: three compactions at about 900k instead), so a session
+    // that starts or resumes under an id that handed off is re-armed. A /clear or a compaction is not.
+    if (e.source === 'resume' || e.source === 'startup') {
+      try {
+        const id = await $.session.id()
+        const fired = await $.store.get(`fired:${id}`)
+        if (typeof fired === 'string' && fired.startsWith('seeded:')) {
+          await $.store.delete(`fired:${id}`)
+          await log($, `re-armed session=${id} (${e.source}; it had handed off to ${fired.slice('seeded:'.length)})`)
+        }
+      } catch (err) {
+        await log($, `re-arm error ${String(err)}`)
+      }
+    }
     // A /clear of the person's own leaves no handoff to report; the panel from the last one goes too.
     if (e.source === 'clear' && !pending && !inFlight && shown) hidePanel($)
     if (e.source !== 'clear' || !pending) return r

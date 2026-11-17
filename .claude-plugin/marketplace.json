@@ -33,7 +33,7 @@
     {
       "name": "auto-handoff",
       "source": "./plugins/auto-handoff",
-      "description": "A mod: at the second auto-compaction, a Haiku-written brief, /clear, and a fresh session that reads it and the project's memory file and status board (a fork of alexknowshtml/claude-auto-handoff 8d762ce, MIT)."
+      "description": "A mod: past 160k tokens of context (upstream's line), a Haiku-written brief, /clear, and a fresh session that reads it and the project's memory file and status board (a fork of alexknowshtml/claude-auto-handoff 8d762ce, MIT)."
     },
     {
       "name": "cache-tax",

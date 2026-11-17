@@ -1,8 +1,9 @@
 > **A fork** of [alexknowshtml/claude-auto-handoff](https://github.com/alexknowshtml/claude-auto-handoff) at `8d762ce` (MIT), first made for OS Flow (2026-11-12) and kept in Agent-Teams for every project. Install it with `/plugin install auto-handoff@agent-teams`. What changed from upstream:
-> - `handoffAtCompaction` (default 2): the first automatic compaction runs, and the second becomes a handoff. 0 restores the token threshold below, and `AUTO_HANDOFF_TOKENS` still forces a threshold for a test run.
+> - The handoff line is upstream's, 160k tokens (`threshold`), so a session on a 1M-token window hands off long before it compacts. `handoffAtCompaction` (default 0) can instead hand off at a given automatic compaction: 2 lets the first one run and hands off at the second. `AUTO_HANDOFF_TOKENS` still forces a threshold for a test run.
+> - A session that starts or resumes under the id it already handed off from is re-armed. A cloud session does that after a container restart: it resumes the seeded conversation under its original id, and the old marker blocked every later handoff.
 > - The viewer is off by default (`viewer` blank), because cloud sessions have no Tailscale.
 > - The brief names decisions and asks by their line in the project's memory file and status board instead of restating them, and adds a Not Yet Logged section. The fresh session follows the read rule in the project's AGENTS.md first.
-> - The upstream tests run with `handoffAtCompaction: 0`, and two tests marked `(fork)` cover the compaction count. Run `claude plugin test .` in this folder.
+> - The upstream tests pin upstream's settings (`UPSTREAM` in the test file), and the tests marked `(fork)` cover the default line, the compaction count and the re-arm. Run `claude plugin test .` in this folder.
 > - `docs/` (the demo GIF and video) is not copied, so those links work only on GitHub upstream. Changes by version: `CHANGELOG.md`.
 
 # claude-auto-handoff

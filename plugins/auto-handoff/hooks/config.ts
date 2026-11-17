@@ -19,7 +19,9 @@ export const BRIEF_DIR = '.claude/state/auto-handoff'
 // viewer: where the mod serves the brief pages, "host:port"; "tailscale" as the host means this
 // machine's Tailscale IP, or 127.0.0.1 without Tailscale. Blank: no server, and the link is the local file.
 export type Config = { handoffAtCompaction: number; threshold: number; maxUnattended: number; briefTemplate: string; instructionsTemplate: string; ignoreFiles?: RegExp; viewer: string }
-export const DEFAULTS: Config = { handoffAtCompaction: 2, threshold: 160_000, maxUnattended: 2, briefTemplate: '~/.claude/auto-handoff/brief.md', instructionsTemplate: '~/.claude/auto-handoff/instructions.md', viewer: '' }
+// Fork (Jase, 2026-11-17): hand off at upstream's token line, not at a compaction count. A 1M-token
+// session that compacts at about 900k re-reads that much on every turn before it does.
+export const DEFAULTS: Config = { handoffAtCompaction: 0, threshold: 160_000, maxUnattended: 2, briefTemplate: '~/.claude/auto-handoff/brief.md', instructionsTemplate: '~/.claude/auto-handoff/instructions.md', viewer: '' }
 export const MIN_HEADROOM = 40_000
 // Each template's default, a file in the mod's templates/ folder.
 export const TEMPLATES = [['briefTemplate', 'brief.md'], ['instructionsTemplate', 'instructions.md']] as const
