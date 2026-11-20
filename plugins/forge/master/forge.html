@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.5.0 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.5.1 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -187,6 +187,14 @@
   details.whyfold > summary .chev { transform: rotate(-90deg); }
   details[open].whyfold > summary .chev { transform: rotate(0deg); }
   details.whyfold ul { margin: 4px 0 0; padding-left: 22px; color: var(--ink-2); font-size: 13.5px; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 2px 0 10px; }
+  .jump > span { font-size: 12.5px; color: var(--ink-3); margin-right: 2px; }
+  .jump a { font-family: var(--mono, 'IBM Plex Mono', monospace); font-size: 12.5px; padding: 3px 9px; min-height: 26px; display: inline-flex; align-items: center; border-radius: 9999px; background: var(--panel-2); color: var(--ink); text-decoration: none; }
+  .jump a.over { background: var(--hold-wash); color: var(--hold-ink); font-weight: 600; }
+  .asks > .grp { font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); padding: 14px 0 2px; border-top: 1px solid var(--line); margin: 0; }
+  .asks > .grp:first-child { border-top: 0; padding-top: 2px; }
+  .asks > .grp span { color: var(--ink-3); font-weight: 500; margin-left: 4px; }
+  .asks > .grp + .ask { border-top: 0; padding-top: 6px; }
   details.more-asks, details.closed-asks { border-top: 1px solid var(--line); padding-top: 12px; }
   details.closed-asks > summary { color: var(--ink-3); font-weight: 500; font-size: 13.5px; }
   details.more-asks > .asks { margin-top: 6px; }
@@ -541,12 +549,12 @@
     var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     function daysLeft(a) { if (!a.default || !a.default.fires_on) return null; var fp = a.default.fires_on.split('-'); return Math.round((new Date(+fp[0], +fp[1] - 1, +fp[2]) - today0) / 864e5); }
     function overdue(a) { var l = daysLeft(a); return l != null && l < 0; }
+    // Open asks group by priority, and inside a group run in id order, so Jase can find a number by scanning
+    // (renderer 1.5.1, Jase 2026-11-20). An overdue default keeps its tag and the banner instead of jumping up.
+    function idNum(a) { var m = /(\d+)$/.exec(a.id || ''); return m ? +m[1] : 1e9; }
     var open = asks.filter(function (a) { return !a.closed; }).sort(function (a, b) {
-      // Overdue defaults first: they should already have fired, so they are the most urgent thing on the board.
-      if (overdue(a) !== overdue(b)) return overdue(a) ? -1 : 1;
-      var pa = PRIO[a.priority], pb = PRIO[b.priority]; if (pa !== pb) return pa - pb;
-      var fa = a.default ? a.default.fires_on : '9999', fb = b.default ? b.default.fires_on : '9999'; if (fa !== fb) return fa < fb ? -1 : 1;
-      var oa = a.opened || '', ob = b.opened || ''; return oa < ob ? -1 : oa > ob ? 1 : 0;
+      var pa = PRIO[a.priority], pb = PRIO[b.priority]; if (pa == null) pa = 3; if (pb == null) pb = 3; if (pa !== pb) return pa - pb;
+      return idNum(a) - idNum(b);
     });
     var closed = asks.filter(function (a) { return a.closed; }).sort(function (a, b) { return a.closed.on < b.closed.on ? 1 : a.closed.on > b.closed.on ? -1 : 0; });
 
@@ -616,11 +624,17 @@
     }
     var TOP = 3, top = open.slice(0, TOP), rest = open.slice(TOP);
     var nOver = open.filter(overdue).length;
-    var askHtml = top.map(askArticle).join('');
-    var restHtml = rest.length ? '<details class="more-asks"><summary>' + CHEV + '<span>Show ' + rest.length + ' more, in the same order</span></summary><div class="asks">' + rest.map(askArticle).join('') + '</div></details>' : '';
+    var GROUP = { now: 'Answer now', soon: 'Answer soon', later: 'Answer later' };
+    var groupN = {}; open.forEach(function (a) { groupN[a.priority] = (groupN[a.priority] || 0) + 1; });
+    var lastGroup = null;
+    function withHeads(list) { return list.map(function (a) { var h = ''; if (a.priority !== lastGroup) { lastGroup = a.priority; h = '<p class="grp">' + esc(GROUP[a.priority] || 'No priority') + ' <span>' + (groupN[a.priority] || 0) + '</span></p>'; } return h + askArticle(a); }).join(''); }
+    var askHtml = withHeads(top);
+    var restHtml = rest.length ? '<details class="more-asks"><summary>' + CHEV + '<span>Show ' + rest.length + ' more, in the same order</span></summary><div class="asks">' + withHeads(rest) + '</div></details>' : '';
+    // Jump to: every open ask by number; a click opens its fold and scrolls to it (the reveal below).
+    var jump = open.length > 1 ? '<nav class="jump" aria-label="Jump to an ask"><span>Jump to</span>' + open.slice().sort(function (a, b) { return idNum(a) - idNum(b); }).map(function (a) { return '<a href="#' + esc(a.id) + '" class="' + (overdue(a) ? 'over' : '') + '">' + esc(a.id) + '</a>'; }).join('') + '</nav>' : '';
     var closedHtml = closed.length ? '<details class="closed-asks"><summary>' + CHEV + '<span>Show ' + closed.length + ' recently closed</span></summary><ul class="closed-list">' + closed.map(function (a) { return '<li><time>' + esc(a.closed.on) + '</time><span><span class="aid">' + esc(a.id) + '</span><b>' + esc(a.title) + '</b>, closed by ' + (a.closed.by === 'default' ? 'its default' : 'you') + (a.closed.outcome ? ': ' + inline(a.closed.outcome) : '') + '</span></li>'; }).join('') + '</ul></details>' : '';
-    var subTxt = open.length ? open.length + ' open' + (nOver ? ', ' + nOver + ' overdue' : '') + '. ' + (open.length > TOP ? 'The top three first, the rest fold below them. ' : '') + 'Overdue first, then by priority and firing date. An item with a default fires on its date unless you say otherwise.' : 'Nothing needs you.';
-    var needsHtml = '<section class="panel" aria-labelledby="needs"><header><h2 id="needs">Needs you</h2><span class="count' + (open.length ? ' hot' : '') + '">' + open.length + ' open</span></header><p class="sub">' + subTxt + '</p>' + (open.length ? '<div class="asks">' + askHtml + '</div>' + restHtml : '<p class="empty">Nothing needs you. New asks land here, first on the page, when the build needs a decision or an action from you.</p>') + closedHtml + '</section>';
+    var subTxt = open.length ? open.length + ' open' + (nOver ? ', ' + nOver + ' overdue' : '') + '. ' + (open.length > TOP ? 'The top three first, the rest fold below them. ' : '') + 'Grouped by priority, in number order inside each group. An item with a default fires on its date unless you say otherwise.' : 'Nothing needs you.';
+    var needsHtml = '<section class="panel" aria-labelledby="needs"><header><h2 id="needs">Needs you</h2><span class="count' + (open.length ? ' hot' : '') + '">' + open.length + ' open</span></header><p class="sub">' + subTxt + '</p>' + jump + (open.length ? '<div class="asks">' + askHtml + '</div>' + restHtml : '<p class="empty">Nothing needs you. New asks land here, first on the page, when the build needs a decision or an action from you.</p>') + closedHtml + '</section>';
 
     // Row: Needs you beside the status panel. On a phone Needs you comes first and the panel follows.
     var work = (d.work || []).slice();

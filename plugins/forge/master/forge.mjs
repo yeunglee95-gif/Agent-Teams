@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RENDERER_VERSION = '1.5.0';
+const RENDERER_VERSION = '1.5.1';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';
@@ -209,12 +209,12 @@ const byOrder = (a, b) => (a.order == null ? 1e9 : a.order) - (b.order == null ?
 const prioKey = (w) => (w.urgent ? 0 : 1) * 100 + STATES.indexOf(w.state) * 10;
 
 function sortOpenAsks(asks) {
+  // Same order as the board (renderer 1.5.1): priority, then id number.
+  const num = (a) => { const m = /(\d+)$/.exec(a.id || ''); return m ? +m[1] : 1e9; };
   return asks.filter((a) => !a.closed).sort((a, b) => {
-    const pa = PRIO[a.priority], pb = PRIO[b.priority];
+    const pa = PRIO[a.priority] ?? 3, pb = PRIO[b.priority] ?? 3;
     if (pa !== pb) return pa - pb;
-    const fa = a.default ? a.default.fires_on : '9999', fb = b.default ? b.default.fires_on : '9999';
-    if (fa !== fb) return fa < fb ? -1 : 1;
-    return (a.opened || '') < (b.opened || '') ? -1 : 1;
+    return num(a) - num(b);
   });
 }
 
