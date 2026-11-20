@@ -596,7 +596,7 @@
         items.push('Reply in the build chat: ' + esc(say) + '.' + (chat ? ' <a class="go" href="' + chat + '" target="_blank" rel="noopener">Build chat' + ARR + '</a>' : ''));
       }
       var todo = '<div class="todo"><h4>What to do' + (g.time ? ' <small>' + esc(g.time) + '</small>' : '') + '</h4><ol>' + items.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
-        (a.kind === 'action' && gsteps.length ? '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p>' : '') + '</div>';
+        (gsteps.some(function (st) { return /password|secret|api key|token|密码|密钥/i.test(st.text || ''); }) ? '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p>' : '') + '</div>';
       // The case for the recommendation folds: the steps above are what Jase needs first.
       // A recommendation that only repeats the recommended option's label adds nothing; any other one stays visible.
       var plainRec = String(a.recommendation || '').replace(/\*\*/g, '').replace(/[.!]+$/, '').trim().toLowerCase();
