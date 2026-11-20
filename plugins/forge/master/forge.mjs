@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RENDERER_VERSION = '1.4.2';
+const RENDERER_VERSION = '1.5.0';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';
@@ -345,6 +345,28 @@ function findHit(node, re, p = '$') {
   return null;
 }
 
+// Plain asks (renderer 1.5.0, Jase 2026-11-20): Jase reads Needs you as a checklist, so ask text follows
+// the caveman voice (toolkit plugin) with the limits in the build spec 5.2. Only the English fields are read.
+const ASK_LIMITS = { titleWords: 10, sentenceWords: 20, whySentences: 2 };
+function sentences(t) { return String(t).replace(/`[^`]*`/g, 'X').split(/(?<=[.!?])\s+/).filter((x) => x.trim()); }
+function words(t) { return String(t).split(/\s+/).filter(Boolean).length; }
+function plainAsk(a, i) {
+  const out = [], at = `$.asks[${i}] ${a.id}`;
+  if (a.title && words(a.title) > ASK_LIMITS.titleWords) out.push(`${at}.title: ${words(a.title)} words; say the one thing to do in ${ASK_LIMITS.titleWords} or fewer`);
+  if (a.why && sentences(a.why).length > ASK_LIMITS.whySentences) out.push(`${at}.why: ${sentences(a.why).length} sentences; keep ${ASK_LIMITS.whySentences} and move detail to ref`);
+  const texts = [['title', a.title], ['why', a.why], ['holds_up', a.holds_up], ['recommendation', a.recommendation]];
+  (a.options || []).forEach((o, j) => texts.push([`options[${j}]`, o.label], [`options[${j}].consequence`, o.consequence]));
+  (a.reasoning || []).forEach((r, j) => texts.push([`reasoning[${j}]`, r]));
+  ((a.guide && a.guide.steps) || []).forEach((st, j) => texts.push([`guide.steps[${j}]`, st.text]));
+  for (const [k, t] of texts) {
+    if (!t) continue;
+    if (/\u2014/.test(t)) out.push(`${at}.${k}: em dash; use a comma, colon or period`);
+    const long = sentences(t).find((x) => words(x) > ASK_LIMITS.sentenceWords);
+    if (long) out.push(`${at}.${k}: a ${words(long)}-word sentence; split it to ${ASK_LIMITS.sentenceWords} words or fewer`);
+  }
+  return out;
+}
+
 function cmdCheck(ctx) {
   const fails = [], warns = [];
   const { data, text, failures } = validate(ctx);
@@ -377,11 +399,12 @@ function cmdCheck(ctx) {
         warns.push(`$.asks[${i}] ${a.id}: default was due ${a.default.fires_on} and the ask is still open; fire it (close with by "default") or set a new fires_on`);
       }
       if (a.kind === 'action' && !(a.guide && Array.isArray(a.guide.steps) && a.guide.steps.length)) {
-        warns.push(`$.asks[${i}] ${a.id}: action ask without guide.steps; add the step-by-step guide Jase opens with More`);
+        warns.push(`$.asks[${i}] ${a.id}: action ask without guide.steps; add the steps Jase follows under What to do`);
       }
       ((a.guide && a.guide.steps) || []).forEach((st, j) => {
         if (st && st.url && !/^https:\/\//.test(st.url)) warns.push(`$.asks[${i}].guide.steps[${j}].url: not https, the board will not link it`);
       });
+      plainAsk(a, i).forEach((w) => warns.push(w));
     });
     // Status panel (1.4), build spec 5.3b: the panel hides what is missing, so these only warn.
     const pj = data.project || {};
@@ -438,8 +461,10 @@ function copyMaster(masterDir, ctx) {
     console.log(`copied ${path.join(masterDir, f)} -> ${rel(ctx, path.join(ctx.forgeDir, f))}`);
   }
   // The /forge skill travels with the repo too, so any session on this repo (Jase's or a teammate's)
-  // has the procedure without access to the Claude OS repo. Master: Claude-OS/.claude/skills/forge/SKILL.md.
-  const skillSrc = path.resolve(masterDir, '..', '..', '.claude', 'skills', 'forge', 'SKILL.md');
+  // has the procedure without the plugin installed. Master: Agent-Teams plugins/forge/skills/forge/SKILL.md,
+  // beside master/; the old Claude OS layout (.claude/skills two levels up) is still read if present.
+  const skillSrc = [path.resolve(masterDir, '..', 'skills', 'forge', 'SKILL.md'), path.resolve(masterDir, '..', '..', '.claude', 'skills', 'forge', 'SKILL.md')].find((f) => fs.existsSync(f))
+    || path.resolve(masterDir, '..', 'skills', 'forge', 'SKILL.md');
   if (fs.existsSync(skillSrc)) {
     const skillDir = path.join(ctx.repoRoot, '.claude', 'skills', 'forge');
     fs.mkdirSync(skillDir, { recursive: true });
@@ -509,9 +534,10 @@ const HELP = `forge.mjs: forge/forge.json is the one source for the board and th
   node forge/forge.mjs check             validate, roadmap drift, memory_refs (MEMORY.md or ARCHIVE.md), banned.txt, renderer version, staleness,
                                          overdue defaults, action asks without a guide, a missing build-chat link, and the 1.4
                                          status fields (a desk without a model, an open milestone without a target, no started,
-                                         a usage log empty or over 7 days old); all of these warn
+                                         a usage log empty or over 7 days old) and ask text that is not plain (build spec 5.2);
+                                         all of these warn
   node forge/forge.mjs touch [who]       set updated to now (+08:00) and updated_by
-  node forge/forge.mjs update            copy renderer, schema and this script from the master (FORGE_MASTER)
+  node forge/forge.mjs update            copy renderer, schema, this script and the /forge skill from the master (FORGE_MASTER)
   node forge/forge.mjs init <id> "<Name>" <business> <owner/repo>   scaffold forge/ in a new repo
   node forge/forge.mjs help              this list`;
 

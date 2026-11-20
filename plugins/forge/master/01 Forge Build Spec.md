@@ -31,6 +31,7 @@ Day one: Jase reads. Agents (cloud sessions) write. Nobody edits inline. The tea
 | 2026-10-02 | Gate PRD | Folds into the Forge page in OS Flow; the Applier is a later Forge feature; the PRD carries a superseded note | Separate Gate tool (two surfaces, one item in both); deciding later |
 | 2026-10-02 | Propagation | Renderer master in Claude OS, copied into each repo with a version stamp, refreshed by one command | Renderer only in OS Flow (nothing to read until it ships); hosted renderer reading private JSON |
 | 2026-11-12 | Home | The master moves to Agent-Teams as the `forge` plugin, so any project installs it like the other shared tools | Keeping it in Claude OS, which a project session cannot install |
+| 2026-11-20 | Ask writing and layout (renderer 1.5.0) | Caveman voice with word limits that `check` warns on; steps unfolded under What to do on every ask, ending in a linked reply step; reasoning folds (Jase, 2026-11-20) | Long `why` paragraphs and a guide folded behind a button, which Jase found hard to follow |
 | 2026-11-12 | When the board moves | Only for asks, decisions and milestones; live progress goes to the crew-progress status file | Republishing after every completed task |
 | 2026-10-02 | Discipline | `/forge` skill, a gate script per repo, a stale banner (24-hour rule replaced 2026-11-12, below) | A CLAUDE.md sentence alone |
 | 2026-11-12 | Stale banner (renderer 1.4.2) | The banner shows only while an open ask's default date has passed, naming the asks; `check` drops its 24-hour warning (Jase, 2026-11-12) | The 24-hour banner, which a quiet board now shows every day because the board moves only for asks, decisions and milestones |
@@ -70,6 +71,8 @@ Every text field accepts a `_zh` twin. IDs are stable strings (`a-012`, `w-045`,
 ### 5.2 Asks (needs-you)
 
 `id, title, kind (decision | action | look), priority (now | soon | later), why, holds_up, options[{label, recommended, consequence}], recommendation, reasoning[], default{action, fires_on}, opened, closed{on, by (jase | default), outcome}`.
+
+Writing (Jase, 2026-11-20): every ask reads as a checklist in the caveman voice (toolkit plugin). `title` is the one thing to do in 10 words or fewer; `why` is at most two sentences; every English sentence in title, why, holds_up, recommendation, options, reasoning and guide steps is 20 words or fewer, with no em dash. Detail beyond that goes in `ref`. `check` warns on each breach. Renderer 1.5.0 shows every open ask's steps unfolded under What to do: a decision's options as step 1, a look's `names` as step 1, the guide's steps next, then a reply step linking `project.links.chat` unless the guide already ends there.
 
 Rules: an ask with a `default` fires on `fires_on` unless Jase vetoes, except kinds the default may never carry (a public URL, an outbound message, money, a client, partner or factory commitment). `closed.by` is only `jase` or `default`; the gate fails on anything else. Open asks sort by priority, then by `fires_on`, then by `opened`. Closed asks stay in the file for 30 days, then move to `forge/archive/asks-YYYY.json`.
 
