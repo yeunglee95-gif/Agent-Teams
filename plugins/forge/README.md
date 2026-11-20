@@ -33,7 +33,7 @@ Refresh the copies with `FORGE_MASTER=<this plugin>/master node forge/forge.mjs 
 
 ## Changing the renderer or the contract
 
-Edit the master here, bump the version comment on line 2 of `forge.html` and `RENDERER_VERSION` in `forge.mjs`, screenshot the example at 1440 and 390 in both themes, get a Fable review, then **republish the sample board** (build `forge.example.json` with the new renderer and publish it to [Forge Sample Board](https://claude.ai/artifact/2DYtfEnQnRxeByy1JNhxXe), the one place Jase sees the template before any board changes) and send Jase the link with the rollout question. Only after his "proceed" run `update` in each project repo (the `check` there warns until it is done). A contract change that adds a field is a minor bump (1.1); one that removes or renames a field is a major bump and needs a migration note. Bump this plugin's version and `CHANGELOG.md` in the same change.
+Edit the master here, bump the version comment on line 2 of `forge.html` and `RENDERER_VERSION` in `forge.mjs`, screenshot the example at 1440 and 390 in both themes, get a Fable review, then **republish the sample board** (build `forge.example.json` with the new renderer and publish it to [Forge Sample Board](https://claude.ai/artifact/Lnkh5sDVDF57kBLjspURDm), the one place Jase sees the template before any board changes) and send Jase the link with the rollout question. Only after his "proceed" run `update` in each project repo (the `check` there warns until it is done). A contract change that adds a field is a minor bump (1.1); one that removes or renames a field is a major bump and needs a migration note. Bump this plugin's version and `CHANGELOG.md` in the same change.
 
 ## Style
 
