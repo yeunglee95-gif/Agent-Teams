@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 (2026-11-20)
+
+- Added `agent-browser` skill: browser automation for AI agents via the agent-browser CLI. Written by this team.
+
 ## 0.2.0 (2026-11-12)
 
 - Added `caveman` (juliusbrussee/caveman core skill, Apache 2.0), unchanged apart from a Source section.
