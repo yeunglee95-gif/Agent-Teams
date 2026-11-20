@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (2026-11-20)
+
+- Renderer 1.5.0: every open ask shows its steps unfolded under What to do, with a link button on each step that has a page (Jase, 2026-11-20). A decision's options become step 1 and a look's names step 1; the last step is the reply, linking the build chat. The reasoning folds under "Why we suggest this", a default reads "If you do nothing", and the never-paste-a-password note shows only on steps that mention a password, secret, key or token.
+- Asks are written in the caveman voice: a title of 10 words or fewer, a `why` of two sentences at most, every sentence 20 words or fewer, no em dash (build spec 5.2). `check` warns on each breach.
+- `check`'s sentence counter skips abbreviations such as "e.g." and counts a stop before a closing quote or bold mark. Older guides that end in an unlinked "reply in the build chat" step get the chat link, and get no second reply step.
+- `update` now copies the `/forge` skill from this plugin into the project's `.claude/skills/forge/`; it had looked only in the old Claude OS layout, so project copies went stale. A project on 1.4.x runs `update` twice: the first run still uses its old script, which skips the skill.
+
 ## 0.2.0 (2026-11-12)
 
 - Renderer 1.4.2: the stale banner shows only while an open ask's default date has passed, and names those asks, instead of after 24 hours (Jase, 2026-11-12). Under the move rule a quiet board is current, so the age banner misled. The stamp still shows the board's age. `check` drops its 24-hour warning; its overdue-default warning covers the new rule.

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.4.2 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.5.0 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -163,7 +163,6 @@
   .ask .opts .c { grid-column: 2; color: var(--ink-2); }
   .ask .opts .rec-mark { font-size: 12px; font-weight: 600; color: var(--pass); grid-column: 1; display: inline-flex; gap: 5px; align-items: center; }
   .ask .reco { font-size: 14px; }
-  .ask .reco ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 13.5px; }
   .ask .meta { display: flex; gap: 4px 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); }
   .ask .meta b { color: var(--ink-2); font-weight: 600; }
   .ask .names { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -171,17 +170,23 @@
   .ask .def b { font-weight: 600; }
   .ask .def.fired { background: var(--hold-wash); }
   .ask .def.fired b { color: var(--hold-ink); }
-  details.guide { border-radius: var(--r-small); background: var(--panel-2); padding: 9px 11px; }
-  details.guide > summary, details.more-asks > summary, details.closed-asks > summary { display: flex; gap: 8px; align-items: center; font-weight: 600; font-size: 14px; }
-  details.guide > summary .chev, details.more-asks > summary .chev, details.closed-asks > summary .chev { transform: rotate(-90deg); }
-  details[open].guide > summary .chev, details[open].more-asks > summary .chev, details[open].closed-asks > summary .chev { transform: rotate(0deg); }
-  details.guide summary small { font-weight: 400; color: var(--ink-3); font-size: 13px; }
-  details.guide .gmeta { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-3); margin: 8px 0 4px; }
-  details.guide .gmeta b { color: var(--ink-2); font-weight: 600; }
-  details.guide ol { margin: 6px 0 0; padding-left: 22px; display: grid; gap: 6px; font-size: 14px; }
-  details.guide ol li { padding-left: 2px; overflow-wrap: anywhere; }
-  details.guide ol a { white-space: nowrap; font-weight: 600; }
-  details.guide .safe { font-size: 12.5px; color: var(--ink-3); margin-top: 8px; }
+  .ask .todo { border-radius: var(--r-small); background: var(--panel-2); padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-width: 0; }
+  .ask .todo h4 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 8px; align-items: baseline; }
+  .ask .todo h4 small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); font-size: 12.5px; }
+  .ask .todo ol { margin: 0; padding-left: 22px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; font-size: 14px; }
+  .ask .todo ol > li { padding-left: 2px; overflow-wrap: anywhere; min-width: 0; }
+  .ask .todo ol > li::marker { font-weight: 700; color: var(--ink-2); }
+  .ask .todo .opts { margin-top: 6px; }
+  .ask .todo .opts li { background: var(--panel); }
+  .ask .todo .names { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }
+  .ask .todo .names .tag { background: var(--panel); }
+  .ask a.go { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; max-width: 100%; padding: 3px 12px; margin: 2px 0 0 2px; border-radius: 9999px; background: var(--ink); color: var(--ground); font-size: 13px; font-weight: 600; text-decoration: none; white-space: normal; vertical-align: middle; }
+  .ask a.go:hover { opacity: .88; }
+  .ask .todo .safe { font-size: 12.5px; color: var(--ink-3); }
+  details.whyfold > summary { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+  details.whyfold > summary .chev { transform: rotate(-90deg); }
+  details[open].whyfold > summary .chev { transform: rotate(0deg); }
+  details.whyfold ul { margin: 4px 0 0; padding-left: 22px; color: var(--ink-2); font-size: 13.5px; }
   details.more-asks, details.closed-asks { border-top: 1px solid var(--line); padding-top: 12px; }
   details.closed-asks > summary { color: var(--ink-3); font-weight: 500; font-size: 13.5px; }
   details.more-asks > .asks { margin-top: 6px; }
@@ -569,28 +574,45 @@
 
     // Needs you
     function askArticle(a) {
-      var opts = (a.options || []).length ? '<ul class="opts">' + a.options.map(function (o) { return '<li class="' + (o.recommended ? 'rec' : '') + '">' + (o.recommended ? '<span class="rec-mark">' + mark('done', 12) + 'Recommended</span>' : '') + '<b style="grid-column:' + (o.recommended ? '2' : '1 / -1') + '">' + esc(o.label) + '</b>' + (o.consequence ? '<span class="c">' + inline(o.consequence) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '';
-      var reco = a.recommendation || (a.reasoning || []).length ? '<div class="reco">' + (a.recommendation ? '<b>Recommendation:</b> ' + inline(a.recommendation) : '') + ((a.reasoning || []).length ? '<ul>' + a.reasoning.map(function (r) { return '<li>' + inline(r) + '</li>'; }).join('') + '</ul>' : '') + '</div>' : '';
-      var names = (a.names || []).length ? '<div class="names">' + a.names.map(function (n) { return '<span class="tag">' + esc(n) + '</span>'; }).join('') + '</div>' : '';
+      // Every open ask reads as a short checklist (renderer 1.5.0, Jase 2026-11-20): one plain line on why,
+      // then numbered steps, always unfolded, with a link on each step that has a page, ending in the reply.
+      var g = a.guide || {}, gsteps = g.steps || [], items = [];
+      var recOpt = (a.options || []).filter(function (o) { return o.recommended; })[0];
+      if ((a.options || []).length) {
+        items.push('<b>Pick one.</b><ul class="opts">' + a.options.map(function (o) { return '<li class="' + (o.recommended ? 'rec' : '') + '">' + (o.recommended ? '<span class="rec-mark">' + mark('done', 12) + 'Recommended</span>' : '') + '<b style="grid-column:' + (o.recommended ? '2' : '1 / -1') + '">' + esc(o.label) + '</b>' + (o.consequence ? '<span class="c">' + inline(o.consequence) + '</span>' : '') + '</li>'; }).join('') + '</ul>');
+      }
+      if ((a.names || []).length) items.push('<b>Check these.</b> <span class="names">' + a.names.map(function (n) { return '<span class="tag">' + esc(n) + '</span>'; }).join('') + '</span>');
+      gsteps.forEach(function (st, k) {
+        // An older guide's closing "reply in the build chat" step without a link gets the chat's link.
+        var h = st.url ? safeHref(st.url) : (k === gsteps.length - 1 && chat && /build chat/i.test(st.text || '') ? chat : null);
+        if (!st.url && h) st = { text: st.text, link: 'Build chat' };
+        items.push(inline(st.text) + (h ? ' <a class="go" href="' + h + '" target="_blank" rel="noopener">' + esc(st.link || hostOf(st.url)) + ARR + '</a>' : ''));
+      });
+      // The last step is always the reply, unless the guide already ends by linking the build chat.
+      var last = gsteps[gsteps.length - 1] || {};
+      var endsInChat = gsteps.length && ((chat && last.url === p.links.chat) || /build chat/i.test(last.text || ''));
+      if (!endsInChat) {
+        var say = a.kind === 'decision' ? (recOpt ? '"' + a.id + ': ' + recOpt.label.replace(/[.!]+$/, '') + '", or the option you pick' : '"' + a.id + ':" and your answer') : a.kind === 'look' ? '"' + a.id + ': ok", or your corrections' : '"' + a.id + ': done"';
+        items.push('Reply in the build chat: ' + esc(say) + '.' + (chat ? ' <a class="go" href="' + chat + '" target="_blank" rel="noopener">Build chat' + ARR + '</a>' : ''));
+      }
+      var todo = '<div class="todo"><h4>What to do' + (g.time ? ' <small>' + esc(g.time) + '</small>' : '') + '</h4><ol>' + items.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
+        (gsteps.some(function (st) { return /password|secret|api key|token|密码|密钥/i.test(st.text || ''); }) ? '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p>' : '') + '</div>';
+      // The case for the recommendation folds: the steps above are what Jase needs first.
+      // A recommendation that only repeats the recommended option's label adds nothing; any other one stays visible.
+      var plainRec = String(a.recommendation || '').replace(/\*\*/g, '').replace(/[.!]+$/, '').trim().toLowerCase();
+      var recoLine = a.recommendation && !(recOpt && plainRec === recOpt.label.replace(/[.!]+$/, '').trim().toLowerCase()) ? '<p class="reco"><b>We suggest:</b> ' + inline(a.recommendation) + '</p>' : '';
+      var why = (a.reasoning || []).length ? '<details class="whyfold"><summary>' + CHEV + '<span>Why we suggest this</span></summary><ul>' + a.reasoning.map(function (r) { return '<li>' + inline(r) + '</li>'; }).join('') + '</ul></details>' : '';
       var def = '';
       if (a.default) {
         var left = daysLeft(a);
         def = left < 0
           ? '<div class="def fired"><b>Overdue since ' + esc(a.default.fires_on) + ' (' + (-left) + ' day' + (left === -1 ? '' : 's') + '):</b> the default, ' + inline(a.default.action) + ', should have fired. The build chat fires it or sets a new date at its next update; say now if you object.</div>'
-          : '<div class="def"><b>' + (left === 0 ? 'Default fires today' : 'Default fires ' + esc(a.default.fires_on) + ' (' + left + ' day' + (left === 1 ? '' : 's') + ')') + ':</b> ' + inline(a.default.action) + ' unless you say otherwise.</div>';
-      }
-      var g = a.guide, guide = '';
-      if (g && (g.steps || []).length) {
-        var gsum = g.steps.length + ' step' + (g.steps.length === 1 ? '' : 's') + (g.time ? ', ' + esc(g.time) : '');
-        guide = '<details class="guide"><summary>' + CHEV + '<span>Show the step-by-step guide <small>(' + gsum + ')</small></span></summary>' +
-          '<div class="gmeta">' + (g.where ? '<span><b>Where:</b> ' + esc(g.where) + '</span>' : '') + (g.time ? '<span><b>Time:</b> ' + esc(g.time) + '</span>' : '') + (g.checked ? '<span><b>Steps checked:</b> ' + esc(g.checked) + '</span>' : '') + '</div>' +
-          '<ol>' + g.steps.map(function (st) { var h = st.url && safeHref(st.url); return '<li>' + inline(st.text) + (h ? ' <a href="' + h + '" target="_blank" rel="noopener">' + esc(st.link || hostOf(st.url)) + ' ↗</a>' : '') + '</li>'; }).join('') + '</ol>' +
-          '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p></details>';
+          : '<div class="def"><b>' + (left === 0 ? 'If you do nothing, today' : 'If you do nothing, on ' + esc(a.default.fires_on) + ' (' + left + ' day' + (left === 1 ? '' : 's') + ')') + ':</b> ' + inline(String(a.default.action).replace(/[.!]+$/, '')) + '.</div>';
       }
       var opened = a.opened ? '<span><b>Opened:</b> ' + esc(a.opened) + ' (' + daysBetween(new Date(a.opened), now) + ' d)</span>' : '';
       return '<article class="ask" id="' + esc(a.id) + '"><div class="r1">' + mark('needs-you', 14) + '<h3><span class="aid">' + esc(a.id) + '</span>' + esc(a.title) + (overdue(a) ? '<span class="tag overdue">Overdue</span>' : '') + '</h3><span class="k">' + esc(KIND_LABEL[a.kind] || a.kind) + (a.priority ? ', answer ' + esc(a.priority) : '') + '</span></div>' +
-        '<div class="body"><p class="why">' + inline(a.why) + '</p>' + opts + reco + names + def + guide +
-        '<p class="meta"><span><b>Holds up:</b> ' + inline(a.holds_up || 'nothing') + '</span>' + opened + (a.ref ? '<span><b>Detail:</b> <span class="mono">' + esc(a.ref) + '</span></span>' : '') + '</p></div></article>';
+        '<div class="body"><p class="why">' + inline(a.why) + '</p>' + todo + recoLine + why + def +
+        '<p class="meta"><span><b>Holds up:</b> ' + inline(a.holds_up || 'nothing') + '</span>' + opened + (g.where ? '<span><b>Where:</b> ' + esc(g.where) + '</span>' : '') + (g.checked ? '<span><b>Steps checked:</b> ' + esc(g.checked) + '</span>' : '') + (a.ref ? '<span><b>Detail:</b> <span class="mono">' + esc(a.ref) + '</span></span>' : '') + '</p></div></article>';
     }
     var TOP = 3, top = open.slice(0, TOP), rest = open.slice(TOP);
     var nOver = open.filter(overdue).length;
