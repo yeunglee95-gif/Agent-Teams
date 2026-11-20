@@ -41,6 +41,6 @@ Capsule, the Claude OS design system in `DESIGN.md` at the Claude OS root (rende
 
 ## Source
 
-Written by Jase's sessions in Claude OS (approved 2026-10-02) and moved here unchanged apart from what `CHANGELOG.md` 0.1.0 lists. Line 2 of `forge.html` and the comments in `forge.mjs` still name Claude OS as the master; renaming them changes the renderer's bytes, so it waits for the next renderer release and its review.
+Written by Jase's sessions in Claude OS (approved 2026-10-02) and moved here unchanged apart from what `CHANGELOG.md` 0.1.0 lists. The Claude OS copy was removed on 2026-11-20; its history stays in that repo's git log.
 
 The branch `claude/forge-template` in OS Flow (`3f457e01`, 2026-10-05) carries renderer 1.4.0; the Claude OS master at `13f1038` carries 1.4.1, which adds each ask's and work row's id beside its title, with the same schema. 1.4.1 is the newer, so it is the one here.
