@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (2026-11-20)
+
+- Renderer 1.5.1: open asks group under Answer now, Answer soon and Answer later, in id order inside each group, so the numbers no longer jump (Jase, 2026-11-20). A Jump to row lists every open id; a tap opens its fold and scrolls to it. An overdue default keeps its tag and the banner instead of moving to the top. The ROADMAP block uses the same order.
+
 ## 0.3.0 (2026-11-20)
 
 - Renderer 1.5.0: every open ask shows its steps unfolded under What to do, with a link button on each step that has a page (Jase, 2026-11-20). A decision's options become step 1 and a look's names step 1; the last step is the reply, linking the build chat. The reasoning folds under "Why we suggest this", a default reads "If you do nothing", and the never-paste-a-password note shows only on steps that mention a password, secret, key or token.

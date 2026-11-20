@@ -74,7 +74,7 @@ Every text field accepts a `_zh` twin. IDs are stable strings (`a-012`, `w-045`,
 
 Writing (Jase, 2026-11-20): every ask reads as a checklist in the caveman voice (toolkit plugin). `title` is the one thing to do in 10 words or fewer; `why` is at most two sentences; every English sentence in title, why, holds_up, recommendation, options, reasoning and guide steps is 20 words or fewer, with no em dash. Detail beyond that goes in `ref`. `check` warns on each breach. Renderer 1.5.0 shows every open ask's steps unfolded under What to do: a decision's options as step 1, a look's `names` as step 1, the guide's steps next, then a reply step linking `project.links.chat` unless the guide already ends there.
 
-Rules: an ask with a `default` fires on `fires_on` unless Jase vetoes, except kinds the default may never carry (a public URL, an outbound message, money, a client, partner or factory commitment). `closed.by` is only `jase` or `default`; the gate fails on anything else. Open asks sort by priority, then by `fires_on`, then by `opened`. Closed asks stay in the file for 30 days, then move to `forge/archive/asks-YYYY.json`.
+Rules: an ask with a `default` fires on `fires_on` unless Jase vetoes, except kinds the default may never carry (a public URL, an outbound message, money, a client, partner or factory commitment). `closed.by` is only `jase` or `default`; the gate fails on anything else. Open asks group by priority under headings and run in id order inside each group, with a Jump to row of every open id (renderer 1.5.1, Jase 2026-11-20); an overdue default keeps its tag and the banner rather than moving to the top. Closed asks stay in the file for 30 days, then move to `forge/archive/asks-YYYY.json`.
 
 ### 5.3 Work rows
 
