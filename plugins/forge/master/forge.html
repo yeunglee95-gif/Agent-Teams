@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.5.1 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.5.2 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -180,8 +180,11 @@
   .ask .todo .opts li { background: var(--panel); }
   .ask .todo .names { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }
   .ask .todo .names .tag { background: var(--panel); }
-  .ask a.go { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; max-width: 100%; padding: 3px 12px; margin: 2px 0 0 2px; border-radius: 9999px; background: var(--ink); color: var(--ground); font-size: 13px; font-weight: 600; text-decoration: none; white-space: normal; vertical-align: middle; }
-  .ask a.go:hover { opacity: .88; }
+  /* Step links read as text (renderer 1.5.2, Jase 2026-11-20): the step's own size, a coral underline, a small arrow. */
+  .ask a.go { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--hold); text-decoration-thickness: 1.5px; text-underline-offset: 3px; overflow-wrap: anywhere; }
+  .ask a.go .arr { display: inline-flex; margin-left: 3px; color: var(--hold-ink); vertical-align: 0; }
+  .ask a.go:hover { text-decoration-thickness: 2.5px; }
+  .ask a.go:focus-visible { outline: 2px solid var(--hold); outline-offset: 2px; border-radius: 3px; }
   .ask .todo .safe { font-size: 12.5px; color: var(--ink-3); }
   details.whyfold > summary { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
   details.whyfold > summary .chev { transform: rotate(-90deg); }

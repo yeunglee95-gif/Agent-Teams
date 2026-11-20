@@ -1,7 +1,7 @@
 {
   "name": "forge",
-  "version": "0.3.2",
-  "description": "The Forge, the one build board every project keeps: the /forge skill plus the master renderer (1.5.1), contract (schema 1.4), tool and build spec. The board moves only for asks, decisions and milestones; live progress goes to the crew-progress status file.",
+  "version": "0.3.3",
+  "description": "The Forge, the one build board every project keeps: the /forge skill plus the master renderer (1.5.2), contract (schema 1.4), tool and build spec. The board moves only for asks, decisions and milestones; live progress goes to the crew-progress status file.",
   "author": {
     "name": "Jase"
   },

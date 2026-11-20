@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3 (2026-11-20)
+
+- Renderer 1.5.2: a step's link reads as text, at the step's own size with a coral underline and a small arrow, instead of a white pill button (Jase, 2026-11-20). The pills drew the eye away from the steps.
+
 ## 0.3.2 (2026-11-20)
 
 - `update` without `FORGE_MASTER` looks for the master in an `Agent-Teams` clone beside the project, at `plugins/forge/master`, instead of the Claude OS folder, which is removed (Jase, 2026-11-20). Project copies of `forge.mjs` pick this up at their next `update`.

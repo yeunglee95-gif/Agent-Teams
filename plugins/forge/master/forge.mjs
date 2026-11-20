@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RENDERER_VERSION = '1.5.1';
+const RENDERER_VERSION = '1.5.2';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';

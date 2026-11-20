@@ -4,11 +4,12 @@ _The memory home for this repo. OS Flow reads it as Agent-Teams' memory (it is l
 
 ## Current State
 
-- **Versions:** dev-team 0.10.0, design-team 0.3.0, toolkit 0.2.0, forge 0.3.2, crew-progress 0.2.0, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
+- **Versions:** dev-team 0.10.0, design-team 0.3.0, toolkit 0.2.0, forge 0.3.3, crew-progress 0.2.0, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
 - **History before 2026-11-01:** decisions about this repo were logged in OS Flow's memory (repo yeunglee95-gif/OS-Flow), from the 2026-10-04 set-up entries in `ARCHIVE.md` § Decisions index to the later ones in `memory/team-and-m4.md` and `memory/forge-and-process.md`. They stay there; new decisions go below.
 
 ## Decisions
 
+- **2026-11-20 (Jase): a step's link on the Forge reads as an underlined text link, not a white pill button (forge 0.3.3, renderer 1.5.2).** The pills stood out more than the steps they belong to; the coral underline keeps the link findable.
 - **2026-11-20 (Jase): the old Forge master in Claude OS `00_Resources/forge/` is removed, not replaced with a pointer, and `update` now falls back to an `Agent-Teams` clone beside the project (forge 0.3.2).** It was frozen at renderer 1.4.1 with nothing reading it; Claude OS's `/forge` skill copy is refreshed from this plugin.
 - **2026-11-20 (Jase): open asks group by priority and run in id order inside each group, with a Jump to row of every open id (forge 0.3.1, renderer 1.5.1).** Jase could not find an ask because overdue-first and firing-date sorting made the numbers jump; rejected pure id order, which would bury a "now" ask among "later" ones.
 - **2026-11-20 (Jase): the Forge's Needs you becomes a checklist: every ask is written in the caveman voice with word limits `check` warns on, and renderer 1.5.0 shows its steps unfolded with links, ending in a linked reply step (forge 0.3.0).** Jase found the long `why` paragraphs and the folded guide hard to follow; rejected keeping the layout and only rewording, since decision asks had no steps to show at all.
