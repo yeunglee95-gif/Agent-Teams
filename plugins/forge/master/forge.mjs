@@ -8,7 +8,7 @@
 //
 // Run from a project repo as `node forge/forge.mjs <command>`; `help` lists the commands.
 // Paths come from this file's location: forge/ is its folder, the repo root its parent.
-// In the Claude OS master folder (00_Resources/forge, recognised by forge.example.json
+// In the master folder (Agent-Teams plugins/forge/master, recognised by forge.example.json
 // beside this file) the repo root is three levels up and the example is the data file.
 
 import fs from 'node:fs';
@@ -48,7 +48,7 @@ const rel = (ctx, p) => path.relative(ctx.repoRoot, p) || p;
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 function refuseInMaster(ctx, cmd) {
   if (!ctx.master) return false;
-  console.log(`forge ${cmd}: refused in the Claude OS master folder; run it from a project repo (master mode only validates and checks the example).`);
+  console.log(`forge ${cmd}: refused in the master folder; run it from a project repo (master mode only validates and checks the example).`);
   return true;
 }
 
@@ -454,7 +454,7 @@ function cmdTouch(ctx, args) {
 
 function findMaster(ctx) {
   const tried = [];
-  for (const p of [process.env.FORGE_MASTER, path.resolve(ctx.repoRoot, '..', 'Claude-OS', '00_Resources', 'forge')]) {
+  for (const p of [process.env.FORGE_MASTER, path.resolve(ctx.repoRoot, '..', 'Agent-Teams', 'plugins', 'forge', 'master')]) {
     if (!p) continue;
     const abs = path.resolve(p);
     tried.push(abs);

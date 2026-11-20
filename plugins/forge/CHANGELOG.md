@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 (2026-11-20)
+
+- `update` without `FORGE_MASTER` looks for the master in an `Agent-Teams` clone beside the project, at `plugins/forge/master`, instead of the Claude OS folder, which is removed (Jase, 2026-11-20). Project copies of `forge.mjs` pick this up at their next `update`.
+
 ## 0.3.1 (2026-11-20)
 
 - Renderer 1.5.1: open asks group under Answer now, Answer soon and Answer later, in id order inside each group, so the numbers no longer jump (Jase, 2026-11-20). A Jump to row lists every open id; a tap opens its fold and scrolls to it. An overdue default keeps its tag and the banner instead of moving to the top. The ROADMAP block uses the same order.
