@@ -97,7 +97,7 @@
           "ref": { "type": "string", "description": "File or page that holds the detail." },
           "guide": {
             "type": "object", "required": ["steps", "checked"], "additionalProperties": false,
-            "description": "Step-by-step guide behind the ask's More button, for a hands-on task only Jase can do (a password, a secret, a payment, a dashboard setting). Says where to paste a secret, never the secret.",
+            "description": "Step-by-step guide the board shows unfolded under What to do, for a hands-on task only Jase can do (a password, a secret, a payment, a dashboard setting). Says where to paste a secret, never the secret.",
             "properties": {
               "where": { "type": "string", "description": "The place it happens, e.g. 'Supabase dashboard'." }, "where_zh": { "type": "string" },
               "time": { "type": "string", "description": "Rough time, e.g. 'about 5 min'." }, "time_zh": { "type": "string" },

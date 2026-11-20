@@ -170,17 +170,17 @@
   .ask .def b { font-weight: 600; }
   .ask .def.fired { background: var(--hold-wash); }
   .ask .def.fired b { color: var(--hold-ink); }
-  .ask .todo { border-radius: var(--r-small); background: var(--panel-2); padding: 10px 12px; display: grid; gap: 6px; }
+  .ask .todo { border-radius: var(--r-small); background: var(--panel-2); padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-width: 0; }
   .ask .todo h4 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 8px; align-items: baseline; }
   .ask .todo h4 small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); font-size: 12.5px; }
-  .ask .todo ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; font-size: 14px; }
-  .ask .todo ol li { padding-left: 2px; overflow-wrap: anywhere; }
-  .ask .todo ol li::marker { font-weight: 700; color: var(--ink-2); }
+  .ask .todo ol { margin: 0; padding-left: 22px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; font-size: 14px; }
+  .ask .todo ol > li { padding-left: 2px; overflow-wrap: anywhere; min-width: 0; }
+  .ask .todo ol > li::marker { font-weight: 700; color: var(--ink-2); }
   .ask .todo .opts { margin-top: 6px; }
   .ask .todo .opts li { background: var(--panel); }
   .ask .todo .names { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }
   .ask .todo .names .tag { background: var(--panel); }
-  .ask a.go { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; margin-left: 2px; border-radius: 9999px; background: var(--ink); color: var(--ground); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; vertical-align: 1px; }
+  .ask a.go { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; max-width: 100%; padding: 3px 12px; margin: 2px 0 0 2px; border-radius: 9999px; background: var(--ink); color: var(--ground); font-size: 13px; font-weight: 600; text-decoration: none; white-space: normal; vertical-align: middle; }
   .ask a.go:hover { opacity: .88; }
   .ask .todo .safe { font-size: 12.5px; color: var(--ink-3); }
   details.whyfold > summary { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
@@ -582,25 +582,32 @@
         items.push('<b>Pick one.</b><ul class="opts">' + a.options.map(function (o) { return '<li class="' + (o.recommended ? 'rec' : '') + '">' + (o.recommended ? '<span class="rec-mark">' + mark('done', 12) + 'Recommended</span>' : '') + '<b style="grid-column:' + (o.recommended ? '2' : '1 / -1') + '">' + esc(o.label) + '</b>' + (o.consequence ? '<span class="c">' + inline(o.consequence) + '</span>' : '') + '</li>'; }).join('') + '</ul>');
       }
       if ((a.names || []).length) items.push('<b>Check these.</b> <span class="names">' + a.names.map(function (n) { return '<span class="tag">' + esc(n) + '</span>'; }).join('') + '</span>');
-      gsteps.forEach(function (st) { var h = st.url && safeHref(st.url); items.push(inline(st.text) + (h ? ' <a class="go" href="' + h + '" target="_blank" rel="noopener">' + esc(st.link || hostOf(st.url)) + ARR + '</a>' : '')); });
+      gsteps.forEach(function (st, k) {
+        // An older guide's closing "reply in the build chat" step without a link gets the chat's link.
+        var h = st.url ? safeHref(st.url) : (k === gsteps.length - 1 && chat && /build chat/i.test(st.text || '') ? chat : null);
+        if (!st.url && h) st = { text: st.text, link: 'Build chat' };
+        items.push(inline(st.text) + (h ? ' <a class="go" href="' + h + '" target="_blank" rel="noopener">' + esc(st.link || hostOf(st.url)) + ARR + '</a>' : ''));
+      });
       // The last step is always the reply, unless the guide already ends by linking the build chat.
-      var endsInChat = gsteps.length && /claude\.ai\/code\//.test(gsteps[gsteps.length - 1].url || '');
+      var last = gsteps[gsteps.length - 1] || {};
+      var endsInChat = gsteps.length && ((chat && last.url === p.links.chat) || /build chat/i.test(last.text || ''));
       if (!endsInChat) {
-        var say = a.kind === 'decision' ? (recOpt ? '"' + a.id + ': ' + recOpt.label + '", or the option you pick' : '"' + a.id + ':" and your answer') : a.kind === 'look' ? '"' + a.id + ': ok", or your corrections' : '"' + a.id + ': done"';
-        var chatHref = p.links && p.links.chat && safeHref(p.links.chat);
-        items.push('Reply in the build chat: ' + esc(say) + '.' + (chatHref ? ' <a class="go" href="' + chatHref + '" target="_blank" rel="noopener">Build chat' + ARR + '</a>' : ''));
+        var say = a.kind === 'decision' ? (recOpt ? '"' + a.id + ': ' + recOpt.label.replace(/[.!]+$/, '') + '", or the option you pick' : '"' + a.id + ':" and your answer') : a.kind === 'look' ? '"' + a.id + ': ok", or your corrections' : '"' + a.id + ': done"';
+        items.push('Reply in the build chat: ' + esc(say) + '.' + (chat ? ' <a class="go" href="' + chat + '" target="_blank" rel="noopener">Build chat' + ARR + '</a>' : ''));
       }
       var todo = '<div class="todo"><h4>What to do' + (g.time ? ' <small>' + esc(g.time) + '</small>' : '') + '</h4><ol>' + items.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
         (a.kind === 'action' && gsteps.length ? '<p class="safe">Type passwords and keys only into the page a step names. Never paste them into chat or onto this board.</p>' : '') + '</div>';
       // The case for the recommendation folds: the steps above are what Jase needs first.
-      var recoLine = a.recommendation && !recOpt ? '<p class="reco"><b>We suggest:</b> ' + inline(a.recommendation) + '</p>' : '';
+      // A recommendation that only repeats the recommended option's label adds nothing; any other one stays visible.
+      var plainRec = String(a.recommendation || '').replace(/\*\*/g, '').replace(/[.!]+$/, '').trim().toLowerCase();
+      var recoLine = a.recommendation && !(recOpt && plainRec === recOpt.label.replace(/[.!]+$/, '').trim().toLowerCase()) ? '<p class="reco"><b>We suggest:</b> ' + inline(a.recommendation) + '</p>' : '';
       var why = (a.reasoning || []).length ? '<details class="whyfold"><summary>' + CHEV + '<span>Why we suggest this</span></summary><ul>' + a.reasoning.map(function (r) { return '<li>' + inline(r) + '</li>'; }).join('') + '</ul></details>' : '';
       var def = '';
       if (a.default) {
         var left = daysLeft(a);
         def = left < 0
           ? '<div class="def fired"><b>Overdue since ' + esc(a.default.fires_on) + ' (' + (-left) + ' day' + (left === -1 ? '' : 's') + '):</b> the default, ' + inline(a.default.action) + ', should have fired. The build chat fires it or sets a new date at its next update; say now if you object.</div>'
-          : '<div class="def"><b>' + (left === 0 ? 'If you do nothing, today' : 'If you do nothing, on ' + esc(a.default.fires_on) + ' (' + left + ' day' + (left === 1 ? '' : 's') + ')') + ':</b> ' + inline(a.default.action) + '.</div>';
+          : '<div class="def"><b>' + (left === 0 ? 'If you do nothing, today' : 'If you do nothing, on ' + esc(a.default.fires_on) + ' (' + left + ' day' + (left === 1 ? '' : 's') + ')') + ':</b> ' + inline(String(a.default.action).replace(/[.!]+$/, '')) + '.</div>';
       }
       var opened = a.opened ? '<span><b>Opened:</b> ' + esc(a.opened) + ' (' + daysBetween(new Date(a.opened), now) + ' d)</span>' : '';
       return '<article class="ask" id="' + esc(a.id) + '"><div class="r1">' + mark('needs-you', 14) + '<h3><span class="aid">' + esc(a.id) + '</span>' + esc(a.title) + (overdue(a) ? '<span class="tag overdue">Overdue</span>' : '') + '</h3><span class="k">' + esc(KIND_LABEL[a.kind] || a.kind) + (a.priority ? ', answer ' + esc(a.priority) : '') + '</span></div>' +

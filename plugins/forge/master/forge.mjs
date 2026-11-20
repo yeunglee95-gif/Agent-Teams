@@ -348,20 +348,29 @@ function findHit(node, re, p = '$') {
 // Plain asks (renderer 1.5.0, Jase 2026-11-20): Jase reads Needs you as a checklist, so ask text follows
 // the caveman voice (toolkit plugin) with the limits in the build spec 5.2. Only the English fields are read.
 const ASK_LIMITS = { titleWords: 10, sentenceWords: 20, whySentences: 2 };
-function sentences(t) { return String(t).replace(/`[^`]*`/g, 'X').split(/(?<=[.!?])\s+/).filter((x) => x.trim()); }
-function words(t) { return String(t).split(/\s+/).filter(Boolean).length; }
+// Abbreviations whose stop does not end a sentence, so "e.g. Vercel" stays one sentence.
+const ABBR = /\b(e\.g|i\.e|vs|etc|No|Dr|Mr|Ms|Mrs|Inc|Ltd|approx|incl)\.$/i;
+function splitAt(t, re) {
+  const out = [];
+  for (const x of String(t).replace(/`[^`]*`/g, 'X').split(re)) { if (!x.trim()) continue; if (out.length && ABBR.test(out[out.length - 1])) out[out.length - 1] += ' ' + x; else out.push(x); }
+  return out;
+}
+// Sentences end at . ! ? (also before a closing quote, bracket or bold mark) or a line break; clauses also at ;.
+function sentences(t) { return splitAt(t, /(?<=[.!?]["')\]*]*)\s+|\n+/); }
+function clauses(t) { return splitAt(t, /(?<=[.!?;]["')\]*]*)\s+|\n+/); }
+function words(t) { return String(t).replace(/`[^`]*`/g, 'X').split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length; }
 function plainAsk(a, i) {
   const out = [], at = `$.asks[${i}] ${a.id}`;
   if (a.title && words(a.title) > ASK_LIMITS.titleWords) out.push(`${at}.title: ${words(a.title)} words; say the one thing to do in ${ASK_LIMITS.titleWords} or fewer`);
   if (a.why && sentences(a.why).length > ASK_LIMITS.whySentences) out.push(`${at}.why: ${sentences(a.why).length} sentences; keep ${ASK_LIMITS.whySentences} and move detail to ref`);
-  const texts = [['title', a.title], ['why', a.why], ['holds_up', a.holds_up], ['recommendation', a.recommendation]];
-  (a.options || []).forEach((o, j) => texts.push([`options[${j}]`, o.label], [`options[${j}].consequence`, o.consequence]));
+  const texts = [['title', a.title], ['why', a.why], ['holds_up', a.holds_up], ['recommendation', a.recommendation], ['default.action', a.default && a.default.action]];
+  (a.options || []).forEach((o, j) => texts.push([`options[${j}].label`, o.label], [`options[${j}].consequence`, o.consequence]));
   (a.reasoning || []).forEach((r, j) => texts.push([`reasoning[${j}]`, r]));
   ((a.guide && a.guide.steps) || []).forEach((st, j) => texts.push([`guide.steps[${j}]`, st.text]));
   for (const [k, t] of texts) {
     if (!t) continue;
     if (/\u2014/.test(t)) out.push(`${at}.${k}: em dash; use a comma, colon or period`);
-    const long = sentences(t).find((x) => words(x) > ASK_LIMITS.sentenceWords);
+    const long = clauses(t).find((x) => words(x) > ASK_LIMITS.sentenceWords);
     if (long) out.push(`${at}.${k}: a ${words(long)}-word sentence; split it to ${ASK_LIMITS.sentenceWords} words or fewer`);
   }
   return out;
