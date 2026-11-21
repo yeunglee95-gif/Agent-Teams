@@ -17,7 +17,7 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 | 4 | Pre-flight per lane | each lane owner, with the checklist below; the milestone's claim row written first (Sessions) | each lane proceeds, holds with a `blocked-by:` line, or is sequenced behind another lane | Build |
 | 5 | Build lanes | lane owners, `tests-first`; one worktree and branch per lane; a lane that builds a designed screen builds to the hand-off | the lane's named red tests are green in a gate the lane ran, with as many tests run as named | Build |
 | 6 | Gate | gate-runner, the app's full gate | every part green on a fresh run, with numbers, on every target; every command that names tests ran as many as it names; CI's result on the same head reported where the app has CI | Check |
-| 7 | Review | five reviewers in parallel, each its own subagent with no shared context: spec-auditor (spec check), critic (black-box, screens only), the design team's design-auditor (design check, only when screens change), security-reviewer, reviewer (code, hypotheses first) | every report filed on the same head, each with its verdict line and its Coverage line | Check |
+| 7 | Review | reviewers in parallel, each its own subagent with no shared context: spec-auditor (spec check), critic (black-box, screens only), the design team's design-auditor (design check) and design-critic (design critique), both only when screens change, security-reviewer, reviewer (code, hypotheses first) | every report filed on the same head, each with its verdict line and its Coverage line | Check |
 | 8 | Combine findings | reviewer, after its own report: one combined findings table, de-duplicated, ranked and tagged by source (Combine findings, below) | every finding from every report is in the table once, or marked `disputed` with why | Check |
 | 9 | Fix and re-verify | fixer, on the table's open rows in rank order; then the gate, and each reviewer whose findings were fixed re-checks them by id; at most two rounds (Limits on fixing) | no open finding; after round 2, any open blocker or major goes to the owner | Fix |
 | 10 | Release check | gate-runner, `release-checklist`: merge danger, merge-gate lines, analytics events named, rollback triggers | the checklist is filled with every line checked in this turn | Ship |
@@ -26,19 +26,19 @@ Words used here: **the owner** is the person who gives every merge and deploy go
 | 13 | Retro | scribe, `run-retro`, then the handoff note and the claim row closed (Sessions) | proposals on the owner's desk; each approved, rejected or parked by the owner | Learn |
 | 14 | Watch | whoever the app's `AGENTS.md` names, reading its analytics tool and error log for the shipped change | findings filed to the backlog, never to ready | Learn |
 
-**Design** (stage 3) and the design-auditor's part of **Review** (stage 7) run only for a milestone that changes screens; for a milestone with no screen change both are skipped, and the plan says so in one line. They are run by the design team (the `design-team` plugin in this repo); where the app has no design team installed, the owner says who covers them or rules them out for the milestone. The Phase column groups the stages for tools that draw the loop; it changes no gate.
+**Design** (stage 3) and the design team's part of **Review** (stage 7: the design-auditor and the design-critic) run only for a milestone that changes screens; for a milestone with no screen change both are skipped, and the plan says so in one line. They are run by the design team (the `design-team` plugin in this repo); where the app has no design team installed, the owner says who covers them or rules them out for the milestone. The Phase column groups the stages for tools that draw the loop; it changes no gate.
 
 A finding at any stage goes back to the stage that owns it (a spec gap to the architect, a design gap to the designer, a red test to the lane or fixer), never around it.
 
-## Review: five at once (stage 7)
+## Review: all at once (stage 7)
 
-The main session starts every reviewer at the same time, each as its own subagent with its own brief, and every brief carries the plan's Review Focus list word for word: the spec-auditor, the critic, the design-auditor (only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. Every report ends with one Coverage line, so what was not reviewed is written down instead of assumed:
+The main session starts every reviewer at the same time, each as its own subagent with its own brief, and every brief carries the plan's Review Focus list word for word: the spec-auditor, the critic, the design-auditor and the design-critic (both only when screens change), the security-reviewer and the reviewer. They share no context. None reads another's report, the combined table or any builder's account before its own report is filed, and each names the head sha it reviewed. The reviewer writes its hypotheses from the spec and the raw diff before it reads any other report or any lane's account. The critic works from the screen only and never reads the code first. The design-critic judges the design itself from screenshots and writes its first impressions before it reads the hand-off; it runs the critique on ChatGPT `gpt-6.2-astra` through `codex exec` on the owner's ChatGPT plan and checks each finding against its screenshot, or runs it on Claude and names that fallback in its report (Jase, 2026-11-21). Every report ends with one Coverage line, so what was not reviewed is written down instead of assumed:
 
 `Coverage: head <sha>; checked: <paths, spec rows, screens, tests run, targets, languages>; not checked: <what, and why, or none>`
 
-The reviewer, the spec-auditor and the security-reviewer list paths; the critic and the design-auditor list screens, targets and languages. The approver reads every line against the diff: a changed path that no code-reading review checked stops the approval.
+The reviewer, the spec-auditor and the security-reviewer list paths; the critic, the design-auditor and the design-critic list screens, targets and languages. The approver reads every line against the diff: a changed path that no code-reading review checked stops the approval.
 
-Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
+Each report keeps its own finding ids (spec rows for the spec-auditor, `<Persona> <Round>-<N>` for the critic, `D<N>` for the design-auditor, `K<N>` for the design-critic, `SEC<N>` for the security-reviewer, `R<N>` for the reviewer) and the team's severities: blocker, major, minor. For the spec-auditor, a Missing row is a blocker, and a Partial row or a High test gap is a major.
 
 ## Combine findings (stage 8)
 
@@ -48,11 +48,11 @@ Nothing moves until every report from stage 7 is filed. Then the reviewer, whose
 
 - **ID**: `C1`, `C2`, and on; never reused in the milestone.
 - **Severity**: blocker, major or minor. When sources disagree on one finding, the highest wins.
-- **Source**: every role, by its exact role name (`spec-auditor`, `critic`, `design-auditor`, `security-reviewer`, `reviewer`), and its own finding id, separated by semicolons (for example `critic Ana 1-1; reviewer R2; spec-auditor S9.1`). A finding two reports share is one row with both sources, never two rows.
+- **Source**: every role, by its exact role name (`spec-auditor`, `critic`, `design-auditor`, `design-critic`, `security-reviewer`, `reviewer`), and its own finding id, separated by semicolons (for example `critic Ana 1-1; reviewer R2; spec-auditor S9.1`). A finding two reports share is one row with both sources, never two rows.
 - **Finding**: one sentence.
 - **Where**: `path:line`, or the screen, target and language, or both.
 - **Kind**: `behavior` when the fix changes what the code does (logic, state, data, a contract, an engine or run path, anything security); `surface` when it changes only what is shown or named (copy, labels, i18n keys, styling, layout, docs) and no test of behavior moves. A security-reviewer finding is always `behavior`; when unsure, `behavior`. The Kind picks the fixer's first model (Fixer step-up).
-- **Status**: `open`; `disputed: <why>` when the reviewer checked it against the code or the build and finds it wrong (it goes back to its source to confirm or withdraw, never to the fixer as written); `deferred` for scope the plan defers; after a fix round, `fixed <sha>` once its source re-verified it, or `open` again.
+- **Status**: `open`; `disputed: <why>` when the reviewer checked it against the code or the build and finds it wrong (it goes back to its source to confirm or withdraw, never to the fixer as written); a design-critic finding its report marks `not confirmed` enters as `disputed` until the design-critic confirms or withdraws it; `deferred` for scope the plan defers; after a fix round, `fixed <sha>` once its source re-verified it, or `open` again.
 
 Below the table, a **Declined to judge** section gathers every behavior a reviewer set aside as outside the spec or plan, with its source and reason. The architect rules on each line before stage 9: it becomes a row (`open`, graded by what a person using the app gets if it ships), or it is recorded as not required, with the reason, in the memory file. A finding is graded by its effect, not by whether the spec names the input; the spec says what the app must do, not everything it will meet.
 
@@ -133,7 +133,7 @@ A finding's second attempt can fall in round 1 (its test stayed red) or round 2 
 - Merge when CI failed to start, is red or still running on the reviewed head, or went green only on another sha; or call a gate green that did not run, or a filtered run green when it ran fewer tests than it names.
 - File follow-up work straight into ready. New work, refactor ideas and Watch findings go to the backlog; the owner moves them on.
 - Let a lane decide a judgment call without asking. A lane stops and asks the architect or the owner.
-- Let a reviewer (the spec-auditor, critic, design-auditor, security-reviewer or reviewer) or the approver patch code. They write findings or decisions; the fixer fixes.
+- Let a reviewer (the spec-auditor, critic, design-auditor, design-critic, security-reviewer or reviewer) or the approver patch code. They write findings or decisions; the fixer fixes.
 - Install an outside skill or tool unpinned. Every outside source is pinned to a commit and recorded in `THIRD_PARTY.md`.
 - Edit a skill, hook, agent file or `AGENTS.md` (or `CLAUDE.md`) without the owner's approval. Retro output is proposals.
 

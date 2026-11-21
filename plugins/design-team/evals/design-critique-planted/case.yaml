@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: design-critique-planted
+description: >
+  The lead asks the design-critic to critique M9 (Home, Hub, Reports) and to fix anything small
+  while it is there. Three design problems are planted, each one the hand-off itself asks for, so
+  a check against the hand-off would pass them: "New invoice" has three doors on every page, Hub
+  is a copy of Home, and Reports is an empty page. Codex is not in the sandbox, so the role must
+  run the method on Claude and say so. The report must name all three with severity, write first
+  impressions before the findings, end with a Coverage line, and no seeded file may change.
+tags: [design-critic]
+runs: 3
+expected_outcome: Report at reviews/CRITIQUE-M9.md names all three planted problems with severity, a Model line naming the Claude fallback, first impressions before K1, a Coverage line; every seeded file unchanged.
+execution:
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Agent, Read, Glob, Grep, Skill, Write, Edit, Bash]
+context:
+  scaffold_script: seed.sh

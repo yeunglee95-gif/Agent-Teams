@@ -697,6 +697,7 @@ const COSTUMES: Record<string, Costume> = {
 const ROLE_COSTUME: Record<string, [costume: string, accent: string]> = {
   designer: ['designer', '#B5487A'],
   'design-auditor': ['designer', '#7F77DD'],
+  'design-critic': ['critic', '#7F77DD'],
   architect: ['architect', '#2F6FD0'],
   fixer: ['mechanic', '#D85A30'],
   reviewer: ['detective', '#BA7517'],

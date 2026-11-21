@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-11-21)
+
+- The design team's new `design-critic` wears the critic's costume in the design team's violet.
+
 ## 0.2.0 (2026-11-12)
 
 - Moved from OS Flow (`tools/claude-mods`, branch `fix/r50-derivations` at `6b0b2234`) to Agent-Teams.

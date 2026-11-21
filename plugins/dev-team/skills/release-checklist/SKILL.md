@@ -10,7 +10,7 @@ You prepare the checklist. The approver reads it to decide APPROVE or ESCALATE, 
 ## Before
 
 - [ ] Gate green on the release commit, every part and every target, with numbers (the `verify-before-done` skill).
-- [ ] Every Review-stage report filed on the reviewed head (spec-auditor, critic, design-auditor when screens changed, security-reviewer, reviewer); the combined findings table has no open row; the reviewer's verified-fixed table signed.
+- [ ] Every Review-stage report filed on the reviewed head (spec-auditor, critic, design-auditor and design-critic when screens changed, security-reviewer, reviewer); the combined findings table has no open row; the reviewer's verified-fixed table signed.
 - [ ] Security review done for this milestone, and for any dependency change since.
 - [ ] No hit from the `no-quiet-lowering` skill since the branch point.
 - [ ] Database changes: what they change, tested on a copy, and whether they can be undone.
