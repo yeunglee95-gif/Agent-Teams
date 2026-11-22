@@ -34,6 +34,7 @@ plugins/
   crew-progress/, auto-handoff/,   mods (hooks that change Claude Code itself); each keeps its
   cache-tax/, filetree/            LICENSE, THIRD_PARTY.md, README.md and CHANGELOG.md
 tools/install-plugins.sh           installs plugins from a local clone, reading the marketplace
+shelf/                             skills kept for a future need, never loaded (shelf/README.md)
 ```
 
 ## The dev team

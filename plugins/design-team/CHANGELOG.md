@@ -1,5 +1,10 @@
 # design-team changelog
 
+## 0.4.1 (2026-11-22)
+
+- Two ideas from oil-oil/oil-ui at `eebeee4` (MIT), rewritten, no text copied (Jase, 2026-11-22). `design-critique`: after its first impressions and before the hand-off, the design-critic walks the running app blind, picks the main path itself and logs where it got stuck, took a wrong turn or hesitated (at most three findings), or writes `Walk: static only`. `design-handoff`: each screen's Purpose names its one main element and main action per key state, and how every other action is demoted.
+- `oil-ui` as a whole skill and `Awwwards-mcp` are in `skills/REJECTED.md`.
+
 ## 0.4.0 (2026-11-21)
 
 - New role `design-critic` and its skill `design-critique` (Jase, 2026-11-21). In the dev team's Review stage, when screens change, it judges the design itself from screenshots (each page's main job, layout, competing controls, consistency, usability) and writes first impressions before it reads the hand-off. It runs the critique on ChatGPT `gpt-6.2-astra` through `codex exec` on the owner's ChatGPT plan and checks each `K<N>` finding against its screenshot; without that route it runs the method on Claude and names the fallback on its report's Model line. The method is OS Flow's own, which now has its one home here.

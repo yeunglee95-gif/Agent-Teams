@@ -24,7 +24,11 @@ Per screen, then across screens:
 5. **Consistency.** Similar pages that behave differently. Desktop and phone that disagree.
 6. **Usability heuristics.** Visibility of state, the user's own words, control and freedom, error prevention, recognition over recall.
 
-Write **First impressions** first: three to five lines per screen, before any finding. Only then may the hand-off be read, to mark findings the hand-off itself asked for (they stay findings: a weak hand-off is the reason this check exists).
+Write **First impressions** first: three to five lines per screen, before any finding.
+
+**Then walk the running app blind** (Jase, 2026-11-22), still before the hand-off. Serve the reviewed head as the app's `AGENTS.md` says and drive it in a browser (the toolkit's `agent-browser`, or Playwright), never reading its code. In your own words, write what the product is and who it is for, then pick the one path you think matters most and follow it from a real entry point to a result. Log each step as **saw**, **why I did it**, **what happened**, and mark a step **stuck** (cannot go on), **wrong turn** (the result was not what you expected, so you went back) or **hesitated** (had to guess or compare). Note whether you could tell the app was working, done or failed, and whether that feedback appeared near the action. Report at most three walk findings, each as a `K<N>` with **observed** (where, what you did, what happened, the screenshot), **likely cause** and **result to aim for**. When the app cannot be served or operated, write `Walk: static only` and why; never claim a walk you did not make.
+
+Only then may the hand-off be read, to mark findings the hand-off itself asked for (they stay findings: a weak hand-off is the reason this check exists).
 
 ## Each finding
 
@@ -40,9 +44,10 @@ Write **First impressions** first: three to five lines per screen, before any fi
 
 1. First line: the verdict, `CLEAN` or `fix-required` with counts by severity.
 2. Second line: `Model: <model> via <route>`, for example `Model: gpt-6.2-astra via codex exec (ChatGPT plan)` or `Model: Claude <model> (fallback: <reason>)`.
-3. First impressions, per screen.
-4. Findings, highest severity first.
-5. Last line, the dev team's Coverage line: `Coverage: head <sha>; checked: <screens, targets, themes, languages>; not checked: <what, and why, or none>`.
+3. Third line: `Walk: <the path walked and how far it got>`, or `Walk: static only (<why>)`.
+4. First impressions, per screen, then the walk log.
+5. Findings, highest severity first.
+6. Last line, the dev team's Coverage line: `Coverage: head <sha>; checked: <screens, targets, themes, languages>; not checked: <what, and why, or none>`.
 
 ## The Claude reader
 
@@ -50,4 +55,4 @@ A finding from another model joins the combined findings table only after a Clau
 
 ## Source
 
-Adapted from OS Flow's `routine/BRIEF-design-critique.md` and stage 7 of its `routine/milestone-loop.md` (yeunglee95-gif/os-flow, branch `m4b/integrate-w3` at `8dddce85`), Jase's own method, so this file is now its one home.
+The blind walk is an idea from `references/ux-reviewer.md` in oil-oil/oil-ui at `eebeee4` (MIT, Copyright (c) 2026 oil-oil), rewritten; no text copied. The rest is adapted from OS Flow's `routine/BRIEF-design-critique.md` and stage 7 of its `routine/milestone-loop.md` (yeunglee95-gif/os-flow, branch `m4b/integrate-w3` at `8dddce85`), Jase's own method, so this file is now its one home.
