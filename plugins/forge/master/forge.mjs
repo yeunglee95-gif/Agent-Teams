@@ -14,8 +14,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 
-const RENDERER_VERSION = '1.5.2';
+const RENDERER_VERSION = '1.6.0';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';
@@ -23,6 +24,76 @@ const MARK_END = '<!-- /GENERATED:forge -->';
 const STATES = ['needs-you', 'running', 'queued', 'later', 'parked', 'done']; // renderer's priority order
 const PRIO = { now: 0, soon: 1, later: 2 };
 const HOUR = 3600000;
+
+// ---------- database store (contract 1.5, Jase 2026-11-20, OS Flow a-237 "b") ----------
+// A board whose project.store is "db" keeps its records in the published page's own database, so a change is a
+// small data write instead of a republish (one republish read the whole 750 KB page, about 440k tokens). forge.json
+// stays the source under git. The page's collection "board" holds one "meta" document (everything but the big
+// lists) and the lists in fixed chunks of CHUNK records, "<section>-<n>": editing one ask rewrites one chunk.
+export const STORE_COLLECTION = 'board';
+export const CHUNK = 25;
+export const CHUNKED = ['asks', 'decisions', 'work'];
+const DOC_MAX = 240 * 1024; // the store's limit is 256 KiB a document
+const BATCH_MAX_WRITES = 50, BATCH_MAX_BYTES = 900 * 1024; // ArtifactData batch: 50 writes, 1 MiB body
+
+export function boardDocs(d) {
+  const docs = new Map();
+  const meta = {};
+  for (const [k, v] of Object.entries(d)) if (!CHUNKED.includes(k)) meta[k] = v;
+  docs.set('meta', { kind: 'meta', data: meta });
+  for (const section of CHUNKED) {
+    const list = Array.isArray(d[section]) ? d[section] : [];
+    for (let n = 0; n * CHUNK < list.length; n++) docs.set(`${section}-${n}`, { kind: 'chunk', section, n, items: list.slice(n * CHUNK, (n + 1) * CHUNK) });
+  }
+  return docs;
+}
+
+// The renderer carries the same assembly (forge.html, assembleBoard); keep the two in step.
+export function assembleBoard(docs) {
+  const meta = docs.find((x) => x.id === 'meta');
+  const d = { ...((meta && meta.body.data) || {}) };
+  for (const section of CHUNKED) {
+    const parts = docs.filter((x) => x.body && x.body.kind === 'chunk' && x.body.section === section).sort((a, b) => a.body.n - b.body.n);
+    d[section] = parts.flatMap((x) => x.body.items || []);
+  }
+  // Key order as forge.json writes it, so a round trip compares equal.
+  const order = ['forge', 'project', 'updated', 'updated_by', 'headline', 'asks', 'milestones', 'work', 'team', 'goal', 'progress', 'decisions', 'glossary', 'usage', 'usage_note', 'extensions'];
+  const out = {};
+  for (const k of order) if (k in d) out[k] = d[k];
+  for (const k of Object.keys(d)) if (!(k in out)) out[k] = d[k];
+  return out;
+}
+
+const hashOf = (body) => crypto.createHash('sha256').update(JSON.stringify(body)).digest('hex').slice(0, 16);
+
+// What to write: a set for every new or changed document (pinned to its last version when it has one), a delete for
+// every recorded document the board no longer produces. state = { docs: { id: { hash, version } } }.
+export function planSync(docs, state) {
+  const known = (state && state.docs) || {};
+  const writes = [];
+  for (const [id, body] of docs) {
+    const h = hashOf(body), k = known[id];
+    if (k && k.hash === h && k.version) continue;
+    const w = { op: 'set', id, body, hash: h };
+    if (k && k.version) w.if_version = k.version;
+    writes.push(w);
+  }
+  for (const [id, k] of Object.entries(known)) if (!docs.has(id) && k.version) writes.push({ op: 'delete', id, if_version: k.version });
+  return { writes };
+}
+
+// After the batch: versions maps a document id to the version the write returned, or "deleted". A write with no
+// entry stays unrecorded, so the next sync repeats it.
+export function recordVersions(state, plan, versions) {
+  const docs = { ...((state && state.docs) || {}) };
+  for (const w of plan.writes) {
+    const v = versions[w.id];
+    if (v == null) continue;
+    if (w.op === 'delete' || v === 'deleted') { delete docs[w.id]; continue; }
+    docs[w.id] = { hash: w.hash, version: Number(v) };
+  }
+  return { ...(state || {}), docs };
+}
 
 // ---------- paths ----------
 
@@ -168,6 +239,10 @@ function checkRules(d, errs, now = Date.now()) {
   const uses14 = ['started', 'finish', 'last_shipped'].filter((k) => k in p).map((k) => `$.project.${k}`)
     .concat(ms.some((m) => m && ['target', 'ships', 'progress'].some((k) => k in m)) ? ['$.milestones[].target/ships/progress'] : [])
     .concat(['usage', 'usage_note'].filter((k) => k in d).map((k) => `$.${k}`));
+  if (d.project && d.project.store === 'db') {
+    if (fv && Number(fv[1]) < 5) errs.push(`$.project.store: "db" needs contract 1.5 or later; set forge to "1.5" (this file says ${JSON.stringify(d.forge)}) and run update for the 1.6 renderer`);
+    if (!(d.project.links && d.project.links.artifact)) errs.push('$.project.store: "db" needs project.links.artifact, the page whose database holds the records');
+  }
   if (uses14.length && fv && Number(fv[1]) < 4) errs.push(`${uses14[0]}: a 1.4 field needs contract 1.4 or later; set forge to "1.4" (this file says ${JSON.stringify(d.forge)}) and run update for the 1.4 renderer`);
   const prev = p.finish && Array.isArray(p.finish.previous) ? p.finish.previous : [];
   prev.forEach((x, i) => {
@@ -287,13 +362,16 @@ function cmdValidate(ctx) {
 }
 
 function build(ctx) {
-  const { text, failures } = validate(ctx);
+  let { text, failures } = validate(ctx);
   if (failures.length) {
     failures.forEach((f) => console.log(`FAIL ${f}`));
     console.log(`forge build: refused, validate has ${failures.length} failure(s)`);
     return 1;
   }
   const html = fs.readFileSync(ctx.html, 'utf8');
+  // A database board (contract 1.5) publishes a shell: the renderer plus the little it needs to find its data.
+  const d0 = JSON.parse(text);
+  if (d0.project && d0.project.store === 'db') text = JSON.stringify({ forge: d0.forge, project: { name: d0.project.name, store: 'db', links: d0.project.links } });
   if (!html.includes(PLACEHOLDER)) { console.log(`FAIL ${rel(ctx, ctx.html)}: placeholder ${PLACEHOLDER} not found`); return 1; }
   // Inside a script element only these sequences can end or confuse it; both sit inside JSON strings.
   const safe = text.trim().replace(/<\/script/gi, (m) => '<\\/' + m.slice(2)).replace(/<!--/g, '\\u003c!--');
@@ -415,6 +493,10 @@ function cmdCheck(ctx) {
       });
       plainAsk(a, i).forEach((w) => warns.push(w));
     });
+    if (data.project && data.project.store === 'db') {
+      const pending = planSync(boardDocs(data), readState(ctx)).writes;
+      if (pending.length) warns.push(`board database: ${pending.length} document(s) not synced (${pending.slice(0, 5).map((w) => w.id).join(', ')}${pending.length > 5 ? ', ...' : ''}); run node forge/forge.mjs sync and apply its batch`);
+    }
     // Status panel (1.4), build spec 5.3b: the panel hides what is missing, so these only warn.
     const pj = data.project || {};
     if (!pj.started) warns.push('$.project.started: missing; set it once to the day the build began, so the board shows days building');
@@ -437,6 +519,77 @@ function cmdCheck(ctx) {
   warns.forEach((w) => console.log(`WARN ${w}`));
   console.log(`forge check: ${fails.length} failures, ${warns.length} warnings`);
   return fails.length ? 1 : 0;
+}
+
+// One line per live row, for the walk the skill's step 1 asks for, without reading closed history (Jase, 2026-11-22).
+export function liveRows(d) {
+  const out = [];
+  for (const a of d.asks || []) if (a && !a.closed) out.push(`ask ${a.id} [${a.priority || '-'}${a.default ? ', default ' + a.default.fires_on : ''}] ${a.title}`);
+  for (const m of d.milestones || []) if (m && m.state !== 'done') out.push(`milestone ${m.code} [${m.state}${m.target ? ', target ' + m.target : ''}] ${m.name}`);
+  for (const w of d.work || []) if (w && w.state !== 'done') out.push(`work ${w.id} [${w.state}${w.label ? ': ' + w.label : ''}] ${w.title}`);
+  return out;
+}
+function cmdRows(ctx) { const d = readJson(ctx.data); liveRows(d).forEach((l) => console.log(l)); console.log(`forge rows: ${liveRows(d).length} live rows; closed asks and done rows are left out`); return 0; }
+
+function syncPaths(ctx) {
+  const dir = path.join(ctx.forgeDir, '.sync');
+  return { dir, state: path.join(ctx.forgeDir, 'sync-state.json'), plan: path.join(dir, 'plan.json') };
+}
+function readState(ctx) { const p = syncPaths(ctx).state; return fs.existsSync(p) ? readJson(p) : { docs: {} }; }
+
+function cmdSync(ctx, args) {
+  if (refuseInMaster(ctx, 'sync')) return 1;
+  const sp = syncPaths(ctx);
+  if (args[0] === '--record') return cmdRecord(ctx, args.slice(1));
+  const { failures } = validate(ctx);
+  if (failures.length) { failures.forEach((f) => console.log(`FAIL ${f}`)); console.log('forge sync: refused, validate fails'); return 1; }
+  const data = readJson(ctx.data);
+  if (!(data.project && data.project.store === 'db')) { console.log('forge sync: this board embeds its data (no project.store "db"); publish forge/board.html instead'); return 1; }
+  const url = data.project.links.artifact;
+  const plan = planSync(boardDocs(data), readState(ctx));
+  fs.rmSync(sp.dir, { recursive: true, force: true });
+  fs.mkdirSync(sp.dir, { recursive: true });
+  fs.writeFileSync(path.join(sp.dir, '.gitignore'), '*\n'); // working files, never committed
+  if (!plan.writes.length) { console.log('forge sync: the board database is current; nothing to write'); return 0; }
+  const batches = []; let cur = [], bytes = 0;
+  for (const w of plan.writes) {
+    const entry = { op: w.op, collection: STORE_COLLECTION, doc_id: w.id };
+    let size = 200;
+    if (w.op === 'set') {
+      const body = JSON.stringify(w.body);
+      if (Buffer.byteLength(body) > DOC_MAX) { console.log(`FAIL ${w.id}: ${Buffer.byteLength(body)} bytes, over the store's 256 KiB a document; shorten its records`); return 1; }
+      const f = path.join(sp.dir, `${w.id}.json`); fs.writeFileSync(f, body); entry.file_path = f; size += Buffer.byteLength(body);
+    }
+    if (w.if_version) entry.if_version = w.if_version;
+    if (cur.length && (cur.length >= BATCH_MAX_WRITES || bytes + size > BATCH_MAX_BYTES)) { batches.push(cur); cur = []; bytes = 0; }
+    cur.push(entry); bytes += size;
+  }
+  if (cur.length) batches.push(cur);
+  batches.forEach((b, i) => fs.writeFileSync(path.join(sp.dir, `batch-${i + 1}.json`), JSON.stringify({ url, writes: b }, null, 2)));
+  fs.writeFileSync(sp.plan, JSON.stringify({ writes: plan.writes.map(({ body, ...w }) => w) }, null, 2));
+  console.log(`forge sync: ${plan.writes.length} write(s) in ${batches.length} batch(es) for ${url}`);
+  batches.forEach((b, i) => console.log(`  ${rel(ctx, path.join(sp.dir, `batch-${i + 1}.json`))}: ${b.map((w) => `${w.op} ${w.doc_id}${w.if_version ? '@' + w.if_version : ''}`).join(', ')}`));
+  console.log('Apply each with one ArtifactData batch call (its url and writes), then record the versions it returns:');
+  console.log('  node forge/forge.mjs sync --record <doc_id>=<version> ... (a delete: <doc_id>=deleted)');
+  return 0;
+}
+
+function cmdRecord(ctx, pairs) {
+  const sp = syncPaths(ctx);
+  if (!fs.existsSync(sp.plan)) { console.log('forge sync --record: no pending sync; run node forge/forge.mjs sync first'); return 1; }
+  const versions = {};
+  for (const p of pairs) {
+    const m = /^([A-Za-z0-9_.~:@+-]+)=(\d+|deleted)$/.exec(p);
+    if (!m) { console.log(`FAIL ${p}: expected <doc_id>=<version> or <doc_id>=deleted`); return 1; }
+    versions[m[1]] = m[2];
+  }
+  const plan = readJson(sp.plan);
+  const next = recordVersions(readState(ctx), plan, versions);
+  fs.writeFileSync(sp.state, JSON.stringify(next, null, 2) + '\n');
+  const left = plan.writes.filter((w) => versions[w.id] == null);
+  if (left.length) { fs.writeFileSync(sp.plan, JSON.stringify({ writes: left }, null, 2)); console.log(`forge sync: recorded ${plan.writes.length - left.length}; still to record: ${left.map((w) => w.id).join(', ')}`); }
+  else { fs.rmSync(sp.dir, { recursive: true, force: true }); console.log(`forge sync: recorded ${plan.writes.length}; the board database is current (commit ${rel(ctx, sp.state)})`); }
+  return 0;
 }
 
 function hkNow() { return new Date(Date.now() + 8 * HOUR).toISOString().slice(0, 19) + '+08:00'; }
@@ -546,6 +699,9 @@ const HELP = `forge.mjs: forge/forge.json is the one source for the board and th
                                          a usage log empty or over 7 days old) and ask text that is not plain (build spec 5.2);
                                          all of these warn
   node forge/forge.mjs touch [who]       set updated to now (+08:00) and updated_by
+  node forge/forge.mjs rows              one line per open ask, open milestone and work row not done (the cheap walk)
+  node forge/forge.mjs sync              a database board (project.store "db"): write only the changed records as ArtifactData batches
+  node forge/forge.mjs sync --record <doc_id>=<version> ...   record the versions those writes returned
   node forge/forge.mjs update            copy renderer, schema, this script and the /forge skill from the master (FORGE_MASTER)
   node forge/forge.mjs init <id> "<Name>" <business> <owner/repo>   scaffold forge/ in a new repo
   node forge/forge.mjs help              this list`;
@@ -558,6 +714,8 @@ function main(argv) {
     case 'roadmap': return cmdRoadmap(CTX, args);
     case 'check': return cmdCheck(CTX);
     case 'touch': return cmdTouch(CTX, args);
+    case 'sync': return cmdSync(CTX, args);
+    case 'rows': return cmdRows(CTX);
     case 'update': return cmdUpdate(CTX);
     case 'init': return cmdInit(args);
     case 'help': case '--help': case '-h': console.log(HELP); return 0;
@@ -565,4 +723,4 @@ function main(argv) {
   }
 }
 
-process.exitCode = main(process.argv.slice(2));
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) process.exitCode = main(process.argv.slice(2));

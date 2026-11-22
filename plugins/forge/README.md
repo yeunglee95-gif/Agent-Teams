@@ -8,10 +8,11 @@ The one build board every project keeps, and the master of its renderer, contrac
 |---|---|
 | `skills/forge/SKILL.md` | The `/forge` skill: when the board moves and the procedure a session follows that turn |
 | `master/01 Forge Build Spec.md` | The brief and the decisions behind it |
-| `master/forge.schema.json` | The contract, version 1.4 (1.1 added `who`, ask `guide` and `links.chat`; there is no 1.2, whose releases changed only the renderer; 1.3 adds `glossary`, with its rules in the build spec 5.3a; 1.4 adds the status and usage fields behind the Where the build is panel, with their rules in the build spec 5.3b). `forge/forge.json` in every project repo obeys it |
+| `master/forge.schema.json` | The contract, version 1.4 (1.1 added `who`, ask `guide` and `links.chat`; there is no 1.2, whose releases changed only the renderer; 1.3 adds `glossary`, with its rules in the build spec 5.3a; 1.4 adds the status and usage fields behind the Where the build is panel, with their rules in the build spec 5.3b; 1.5 adds `project.store`, the database store, with its rules in 5.3c). `forge/forge.json` in every project repo obeys it |
 | `master/forge.example.json` | A complete worked example of every section |
-| `master/forge.html` | The renderer, 1.5.2. Copied into each repo as `forge/forge.html`; never edited there |
-| `master/forge.mjs` | The tool: `validate`, `build`, `roadmap`, `check`, `touch`, `update`, `init`, `help`. Node 22, no packages |
+| `master/forge.html` | The renderer, 1.6.0. Copied into each repo as `forge/forge.html`; never edited there |
+| `master/forge.mjs` | The tool: `validate`, `build`, `roadmap`, `check`, `touch`, `rows`, `sync`, `update`, `init`, `help`. Node 22, no packages |
+| `master/forge.test.mjs` | Tests for the database store and the renderer reading it: `node --test master/forge.test.mjs` (the renderer test needs Playwright) |
 | `master/forge-lifecycle.mmd` | The map of where the Forge lives and how it stays current, in OS Flow's Mermaid import form (kind prefixes on the ids). `forge-lifecycle-preview.png` is a plain render of it from before the move |
 
 **The board moves only for asks, decisions and milestones; live progress goes to the crew-progress status file** (Jase, 2026-11-12). The skill holds the full rule.
@@ -27,6 +28,8 @@ forge/
   banned.txt         one regex per line that must never appear in the JSON (client names, factory names, token shapes)
   board.html         built page (JSON inlined); the file published as the project's private artifact
   archive/           closed asks older than 30 days
+  sync-state.json    a database board only: each database document's hash and version, committed
+  .sync/             a database board only: sync's batch files, never committed
 ```
 
 Refresh the copies with `FORGE_MASTER=<this plugin>/master node forge/forge.mjs update`. `node forge/forge.mjs check` runs in the repo's gate. It fails on a schema error, on a glossary that breaks the build spec 5.3a rules, on status or usage fields that break the 5.3b rules, on ROADMAP.md drifting from the JSON, on a decision whose `memory_ref` is not in MEMORY.md or ARCHIVE.md, on a banned pattern, and on an ask closed by anyone but Jase or its default. It warns (without failing) on an overdue default, an action ask without a guide, ask text that breaks the build spec 5.2 writing limits, a missing build-chat link, an empty glossary, a board more than a day old, and the 5.3b gaps (a desk without a model, an open milestone without a target, no `started`, a usage log empty or over 7 days old).

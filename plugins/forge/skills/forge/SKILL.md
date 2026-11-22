@@ -22,7 +22,9 @@ Batch the changes of one turn into one republish.
 
 ## The procedure
 
-1. **Read the whole file first.** Open `forge/forge.json` and walk every row of `work`, every ask and every milestone against reality, not just the part you were thinking about. Appending is not updating. Look for duplicates while you are there.
+**Small changes, never a rewrite (Jase, 2026-11-20).** Every read and every write of the board costs tokens in proportion to its size, and OS Flow's is 750 KB. So a session walks the live rows with `rows`, edits `forge/forge.json` in place by id (an Edit of the exact lines, or a short script that changes the named records), and never reads closed history or rewrites the whole file. A database board (`project.store: "db"`, contract 1.5) sends only the changed records with `sync`; its page is republished only when the renderer changes.
+
+1. **Walk every live row first.** Run `node forge/forge.mjs rows`: one line per open ask, open milestone and work row not done. Check each against reality, not just the part you were thinking about. Appending is not updating. Look for duplicates while you are there. Open the full record in `forge/forge.json` only for the rows you change.
 2. **Edit the JSON.** Six states only: `done`, `running`, `needs-you`, `queued`, `later`, `parked`; put nuance in `label`. Keep ids stable, never reuse one. The Team room and Lined up after are derived from `work`, so there is no second list to keep; a running row sits under the Team desk whose role (or `who.role`) equals its `who.role`, otherwise under Unassigned. An ask that may carry a default gets `default: {action, fires_on}`; never on a public URL, an outbound message, money, or a client, partner or factory commitment.
    - **Who is doing it.** Every `running` or `queued` work row you have assigned carries `who: {model, role}`: the model as named today (`"Opus 5.5"`, `"Fable 5.1"`, `"Sonnet 5.5"`; for your own work, your session's model as `get_session` reports it) and the role you dispatched (`builder`, `critic`, `planner`, `screens`, `gauntlet`), or a person's name as `model` for human work. Team desks carry it too. Write it as it is now and never rename old rows when models change. It records who the work was given to; a platform fallback is not tracked.
    - **Write every ask plain (Jase, 2026-11-20).** Jase reads Needs you as a checklist, so ask text uses the caveman voice from the toolkit plugin (`plugins/toolkit/skills/caveman/SKILL.md` in Agent-Teams): answer first, short words, one idea per sentence, every not, never and only kept. Its rule that files get plain prose does not cover ask text. The limits, which `check` warns on, are in the build spec 5.2:
@@ -43,8 +45,19 @@ Batch the changes of one turn into one republish.
 
    Fix every failure `check` reports (schema, a glossary that breaks the spec 5.3a rules, roadmap drift, a decision without its MEMORY.md or ARCHIVE.md entry, a banned pattern, an ask closed by the wrong hand) and rerun. Clear its warnings too: an overdue default, an action ask without a guide, ask text that is not plain, a missing `links.chat`, an empty glossary, and the 5.3b gaps (a desk without a model, an open milestone without a target, no `started`, a stale usage log). A warning about the renderer version means run `FORGE_MASTER=<this plugin>/master node forge/forge.mjs update`.
 4. The ROADMAP.md block between the markers is generated; the prose around it is yours.
-5. **Publish.** If the Artifact tool is available: `Artifact publish` with `file_path: forge/board.html` and `url:` the project's artifact address from `project.links.artifact`, after an `Artifact read` of that address. Always pass the url; a publish without it creates a second page. If the tool is not available, commit the files and tell Jase the board is current in the repo.
-6. **Commit** `forge/forge.json`, `forge/board.html`, `ROADMAP.md` (and the memory file if a decision landed) in one commit whose message starts with `Forge:`.
+5. **Publish.**
+   - **A database board** (`project.store: "db"`): run `node forge/forge.mjs sync`. It writes only the changed records as batch files in `forge/.sync/`. Apply each with one `ArtifactData` `batch` call (its `url` and `writes`), then record what the call returned: `node forge/forge.mjs sync --record <doc_id>=<version> ...` (`<doc_id>=deleted` for a delete). A batch refused because a version moved means someone else wrote that record: `ArtifactData` `list` the `board` collection, record its versions, and sync again. Republish `forge/board.html` only after `update` brings a new renderer, keeping the page's stored capabilities.
+   - **An embedded board** (no `store`): `Artifact publish` with `file_path: forge/board.html` and `url:` the project's artifact address from `project.links.artifact`, after an `Artifact read` of that address. Always pass the url; a publish without it creates a second page.
+   - If neither tool is available, commit the files and tell Jase the board is current in the repo.
+6. **Commit** `forge/forge.json`, `forge/board.html`, `ROADMAP.md`, `forge/sync-state.json` on a database board (and the memory file if a decision landed) in one commit whose message starts with `Forge:`.
+
+## Moving a board to its database (contract 1.5)
+
+Do this once per project, with Jase's go, when its board is large enough that a republish is costly:
+
+1. Run `update` (renderer 1.6.0), set `"forge": "1.5"` and `project.store: "db"`, then `build`: `forge/board.html` becomes a small shell.
+2. Republish that shell at the board's existing `url`, declaring `capabilities: {"db": {"rules": [{"path": "", "read": "view", "write": "admin"}]}}`, so everyone with the link reads and only Jase and editors write.
+3. Run `sync`; the first one loads every record. Apply and record its batches as in step 5, then check the page draws.
 
 ## Scaffolding a new project
 

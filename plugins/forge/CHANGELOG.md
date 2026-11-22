@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 (2026-11-22)
+
+- Contract 1.5 and renderer 1.6.0: a board can keep its records in the published page's own database (`project.store: "db"`, build spec 5.3c; Jase, 2026-11-20, OS Flow a-237 "b"). `sync` writes only the changed chunks as `ArtifactData` batches and `sync --record` saves their versions, so a moved ask costs a data write instead of a republish (about 440k tokens on OS Flow). `build` makes a database board's page a shell; boards without `store` embed as before.
+- `rows` prints one line per live row, and the skill's first step walks that instead of reading the whole file: small changes by id, never a rewrite (Jase, 2026-11-20).
+- Tests in `master/forge.test.mjs`: 8 pass, including the renderer drawing from a database and from embedded data. Checked live on 2026-11-22 against a throwaway page: a first load of 4 documents, then a one-ask change that wrote one 2.6 KB chunk, read back with the same content.
+
 ## 0.3.3 (2026-11-20)
 
 - Renderer 1.5.2: a step's link reads as text, at the step's own size with a coral underline and a small arrow, instead of a white pill button (Jase, 2026-11-20). The pills drew the eye away from the steps.

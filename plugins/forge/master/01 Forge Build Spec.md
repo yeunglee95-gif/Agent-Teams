@@ -31,6 +31,7 @@ Day one: Jase reads. Agents (cloud sessions) write. Nobody edits inline. The tea
 | 2026-10-02 | Gate PRD | Folds into the Forge page in OS Flow; the Applier is a later Forge feature; the PRD carries a superseded note | Separate Gate tool (two surfaces, one item in both); deciding later |
 | 2026-10-02 | Propagation | Renderer master in Claude OS, copied into each repo with a version stamp, refreshed by one command | Renderer only in OS Flow (nothing to read until it ships); hosted renderer reading private JSON |
 | 2026-11-12 | Home | The master moves to Agent-Teams as the `forge` plugin, so any project installs it like the other shared tools | Keeping it in Claude OS, which a project session cannot install |
+| 2026-11-22 | Records in the page's database (contract 1.5, renderer 1.6.0) | Asks, decisions and work in the published page's own database, written by `sync` as changed chunks only; forge.json stays the source; `rows` for a cheap walk (Jase, 2026-11-20, OS Flow a-237 "b") | Republishing the whole page per move (about 440k tokens on OS Flow); a directory of small pages (a-237 "a") |
 | 2026-11-20 | Ask writing and layout (renderer 1.5.0) | Caveman voice with word limits that `check` warns on; steps unfolded under What to do on every ask, ending in a linked reply step; reasoning folds (Jase, 2026-11-20) | Long `why` paragraphs and a guide folded behind a button, which Jase found hard to follow |
 | 2026-11-12 | When the board moves | Only for asks, decisions and milestones; live progress goes to the crew-progress status file | Republishing after every completed task |
 | 2026-10-02 | Discipline | `/forge` skill, a gate script per repo, a stale banner (24-hour rule replaced 2026-11-12, below) | A CLAUDE.md sentence alone |
@@ -94,7 +95,7 @@ This section is the one home for the glossary rules; the README, the `/forge` sk
 - `validate` fails on any of the above; `check` warns when a board has no glossary, and `init` starts every new board with `glossary: []`.
 - **Every Forge keeps one** (Jase, 2026-10-05). A term goes in the turn it is defined, and the project's specs, AGENTS.md and other files link to the Forge for it rather than restating it. Entries keep the author's order.
 
-Contract versions: 1.1 added `who`, ask `guide` and `links.chat`; there is no contract 1.2 (the 1.2.x releases changed the renderer only); 1.3 adds `glossary`; 1.4 adds the status and usage fields (5.3b).
+Contract versions: 1.1 added `who`, ask `guide` and `links.chat`; there is no contract 1.2 (the 1.2.x releases changed the renderer only); 1.3 adds `glossary`; 1.4 adds the status and usage fields (5.3b); 1.5 adds `project.store` (5.3c).
 
 ### 5.3b Where the build is (status and usage fields, contract 1.4)
 
@@ -113,6 +114,17 @@ This section is the one home for the status panel's rules (Jase, 2026-10-05); th
 - **Tokens** are labelled "Agent tokens logged (partial: the build chat's own use is not counted)": the last 7 days (today and the six before) and all time, in human units (4.2M), and a per-model split bar for the last 7 days in Capsule's block-kind hues (Fable violet, Opus blue, Sonnet teal, Haiku slate; never coral).
 - **Token tips**, at most two, in this order, none when no rule fires: (1) Fable over 40% of the last 7 days: "Fable used N% of this week's tokens. Route in-between checks to Opus (gk-gauntlet); keep Fable for milestone reviews." (2) Tokens per run over 250k, over the last 7 days' entries that carry `runs`: "Agent runs average X tokens. Brief each one with the exact files to read so it reads less." (3) The last 7 days more than 1.5 times the 7 before: "Token use is up N% on last week." The renderer computes them; no tip is AI-written, so a republish spends nothing.
 - **Logging usage.** After each agent run, add its `subagent_tokens` from the task notification to that day's entry for the model (and role), plus 1 to `runs`, in the turn's one update; never a separate publish for usage.
+
+### 5.3c The database store (`project.store`, contract 1.5)
+
+This section is the one home for the store's rules (Jase, 2026-11-20, OS Flow a-237 "b"). A republish read the whole live page first, about 440k tokens on OS Flow's 750 KB board, even when one ask changed.
+
+- **Where the records live.** With `project.store: "db"` the published page keeps the board in its own database, collection `board`: a `meta` document with every field except `asks`, `decisions` and `work`, and those three in chunks of 25 records, `<section>-<n>`. Editing one record rewrites one chunk.
+- **The repo stays the source.** `forge/forge.json` holds the full board under git and `check` validates it as before. `sync` compares it with `forge/sync-state.json` (each document's hash and last version) and writes only the changed documents, plus a delete for a chunk that no longer exists, as `ArtifactData` batch files (50 writes and 900 KB at most each). `sync --record` saves the versions the writes returned; a write left unrecorded is repeated by the next sync.
+- **The page.** `build` makes `board.html` a shell (the renderer, the project name and links). The renderer reads the collection, joins it as `forge.mjs` does, and draws again on every change. A board without `store` embeds its data as before.
+- **Access.** The page declares `db` with read `view` and write `admin`: everyone with the link reads, only the owner and editors write.
+- **Reading cheaply.** `rows` prints one line per live row, so the skill's walk of every row reads no closed history.
+- `validate` fails a `store: "db"` board that says a contract below 1.5 or has no `links.artifact`; `check` warns while documents are not synced. Tests: `master/forge.test.mjs`.
 
 ### 5.4 The renderer: `forge/forge.html`
 
