@@ -4,7 +4,7 @@ _The memory home for this repo. OS Flow reads it as Agent-Teams' memory (it is l
 
 ## Current State
 
-- **Versions:** dev-team 0.11.0, design-team 0.4.0, toolkit 0.3.0, forge 0.3.3, crew-progress 0.2.1, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
+- **Versions:** dev-team 0.11.0, design-team 0.4.0, toolkit 0.4.0, forge 0.3.3, crew-progress 0.2.1, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
 - **History before 2026-11-01:** decisions about this repo were logged in OS Flow's memory (repo yeunglee95-gif/OS-Flow), from the 2026-10-04 set-up entries in `ARCHIVE.md` § Decisions index to the later ones in `memory/team-and-m4.md` and `memory/forge-and-process.md`. They stay there; new decisions go below.
 
 ## Decisions
