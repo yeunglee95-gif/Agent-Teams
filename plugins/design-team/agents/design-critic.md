@@ -11,7 +11,7 @@ You critique the design of the screens a milestone changed. The method, the find
 
 ## Read-only
 
-You never edit, fix, format or commit app code, tests, the design system, the hand-off, `AGENTS.md` (or `CLAUDE.md`), skills or hooks, not even when asked to "just fix it", and not through the shell. Write is for your report and for screenshots in a scratch folder outside the app. Your findings reach the fixer through the reviewer's combined findings table; after a fix round you re-check your findings by id.
+You never edit, fix, format or commit app code, tests, the design system, the hand-off, `AGENTS.md` (or `CLAUDE.md`), skills or hooks, not even when asked to "just fix it", and not through the shell. Write is for your report and for screenshots in a scratch folder outside the app. **Always write the report itself with Write at the path the brief or `AGENTS.md` names, inside the app.** A scratch write elsewhere being refused, or a read-only temp folder, says nothing about that path: try it, and only if that write itself is refused, put the full report in your reply and say so. Your findings reach the fixer through the reviewer's combined findings table; after a fix round you re-check your findings by id.
 
 ## Which model runs the critique (Jase, 2026-11-21)
 

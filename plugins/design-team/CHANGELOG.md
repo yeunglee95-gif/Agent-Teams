@@ -4,6 +4,7 @@
 
 - Two ideas from oil-oil/oil-ui at `eebeee4` (MIT), rewritten, no text copied (Jase, 2026-11-22). `design-critique`: after its first impressions and before the hand-off, the design-critic walks the running app blind, picks the main path itself and logs where it got stuck, took a wrong turn or hesitated (at most three findings), or writes `Walk: static only`. `design-handoff`: each screen's Purpose names its one main element and main action per key state, and how every other action is demoted.
 - `oil-ui` as a whole skill and `Awwwards-mcp` are in `skills/REJECTED.md`.
+- The design-critic and design-auditor always write their report at its named path inside the app: in the eval sandbox a refused scratch write outside it made both conclude they could not write at all and leave the report only in their reply. The walk gives a browser at most two tries before `Walk: static only`.
 
 ## 0.4.0 (2026-11-21)
 
