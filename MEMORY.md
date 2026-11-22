@@ -4,11 +4,13 @@ _The memory home for this repo. OS Flow reads it as Agent-Teams' memory (it is l
 
 ## Current State
 
-- **Versions:** dev-team 0.10.0, design-team 0.3.0, toolkit 0.2.0, forge 0.3.3, crew-progress 0.2.0, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
+- **Versions:** dev-team 0.11.0, design-team 0.4.0, toolkit 0.3.0, forge 0.3.3, crew-progress 0.2.1, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
 - **History before 2026-11-01:** decisions about this repo were logged in OS Flow's memory (repo yeunglee95-gif/OS-Flow), from the 2026-10-04 set-up entries in `ARCHIVE.md` § Decisions index to the later ones in `memory/team-and-m4.md` and `memory/forge-and-process.md`. They stay there; new decisions go below.
 
 ## Decisions
 
+- **2026-11-21 (Jase): a design critique joins the shared loop's Review stage as the design team's new `design-critic` role, run on ChatGPT `gpt-6.2-astra` through `codex exec` on the owner's ChatGPT plan, with a Claude fallback named on its report (design-team 0.4.0, dev-team 0.11.0).** The design-auditor passes a weak hand-off, which is how OS Flow's competing buttons and look-alike pages got through; rejected a second mode of the design-auditor, because a separate context judges without anchoring on the hand-off, and skipping the critique for owners without a ChatGPT plan.
+- **2026-11-21 (Jase): cache-tax keeps its defaults: Auto keepwarm on, a 3-hour window after a cold write and 6 hours for `/keepwarm`, one ping per 50 idle minutes.** An abandoned 6-hour window costs at most 7 pings, about 9% of one full re-read; rejected turning Auto keepwarm off, and windows of 24 hours or more are for days he will come back.
 - **2026-11-20 (Jase): a step's link on the Forge reads as an underlined text link, not a white pill button (forge 0.3.3, renderer 1.5.2).** The pills stood out more than the steps they belong to; the coral underline keeps the link findable.
 - **2026-11-20 (Jase): the old Forge master in Claude OS `00_Resources/forge/` is removed, not replaced with a pointer, and `update` now falls back to an `Agent-Teams` clone beside the project (forge 0.3.2).** It was frozen at renderer 1.4.1 with nothing reading it; Claude OS's `/forge` skill copy is refreshed from this plugin.
 - **2026-11-20 (Jase): open asks group by priority and run in id order inside each group, with a Jump to row of every open id (forge 0.3.1, renderer 1.5.1).** Jase could not find an ask because overdue-first and firing-date sorting made the numbers jump; rejected pure id order, which would bury a "now" ask among "later" ones.

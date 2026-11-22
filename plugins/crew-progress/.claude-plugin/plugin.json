@@ -1,6 +1,6 @@
 {
   "name": "crew-progress",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The crew panel (/crew) and progress bar: Claude's subagents and Codex's tasks side by side in role costumes, with Codex's ChatGPT plan limits and a status file at ~/.claude/state/crew-progress/status.md. Forked from savvy-progress by johnnyvizz (MIT).",
   "author": {
     "name": "Jase, forked from johnnyvizz/claude-kit savvy-progress"

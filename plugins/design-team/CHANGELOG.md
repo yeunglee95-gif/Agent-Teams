@@ -1,5 +1,10 @@
 # design-team changelog
 
+## 0.4.0 (2026-11-21)
+
+- New role `design-critic` and its skill `design-critique` (Jase, 2026-11-21). In the dev team's Review stage, when screens change, it judges the design itself from screenshots (each page's main job, layout, competing controls, consistency, usability) and writes first impressions before it reads the hand-off. It runs the critique on ChatGPT `gpt-6.2-astra` through `codex exec` on the owner's ChatGPT plan and checks each `K<N>` finding against its screenshot; without that route it runs the method on Claude and names the fallback on its report's Model line. The method is OS Flow's own, which now has its one home here.
+- New eval `design-critique-planted`: three design problems its own hand-off asks for (three doors to one action, a page that copies another, an empty page). On 2026-11-21 (Claude Code 2.1.330, judge sonnet) it passed 3 of 3: every run reported all three with severity, wrote first impressions first, named its Claude fallback (no Codex in the sandbox) and changed no file.
+
 ## 0.3.0 (2026-10-31)
 
 - Works with dev-team 0.10.0. The designer, the design-auditor, the `design-handoff` skill and `README.md` read the app's `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet), the file apps are moving their rules to (owner's decision, 2026-10-31). Both roles' never-edit lists protect `AGENTS.md` (or `CLAUDE.md`). No other change. Eval seeds still write a `CLAUDE.md`, so they exercise the fallback.

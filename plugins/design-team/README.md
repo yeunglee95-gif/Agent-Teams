@@ -1,12 +1,13 @@
 # Design team
 
-Two roles that design an app's screens and check what was built against them, for any app, reading the app's own `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) and design system for its specifics. The app's design system (for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) always wins over any skill's taste.
+Three roles that design an app's screens, check what was built against them and judge the design itself, for any app, reading the app's own `AGENTS.md` (or `CLAUDE.md` where the app has not switched yet) and design system for its specifics. The app's design system (for OS Flow, Capsule in `docs/design/CAPSULE-DESIGN.md`) always wins over any skill's taste.
 
 ## The roles
 
 | Role | Does | Never |
 |---|---|---|
 | `designer` | Extends the app's design system (tokens in three layers, day and night), designs screens and writes the design hand-off the dev team builds from; sets visual direction for marketing pieces (landing pages, email templates, ads) when asked. | Writes app code; replaces the design system (a change to it is a proposal for the owner); writes outside the hand-off folder its brief names; sends or publishes anything. |
+| `design-critic` | Judges the design itself from the milestone's screenshots, before reading the hand-off: each page's main job, layout, competing controls, consistency and usability. Runs the critique on ChatGPT `gpt-6.2-astra` through `codex exec` on the owner's ChatGPT plan and checks each finding against its screenshot, or runs it on Claude and says so. Method: the `design-critique` skill. | Edits or fixes anything; reads the hand-off before its first impressions are written; falls back to Claude without naming it on the report. |
 | `design-auditor` | Checks the built screens against the hand-off and the design system: craft, accessibility (WCAG 2.2 AA) and motion, one report with severity, evidence and the rule each finding breaks. | Edits or fixes anything (findings go to the dev team's fixer); raises a skill's taste as a finding where the design system says otherwise (it notes the conflict instead). |
 
 One skill of the team's own, `design-handoff`, says what a hand-off holds; both roles preload it.
@@ -33,16 +34,16 @@ Skills read and not taken are in `skills/REJECTED.md`.
 
 ## Load the plugin
 
-- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install design-team@agent-teams`. The roles are then `design-team:designer` and `design-team:design-auditor`.
-- **Or copy it.** Where plugins do not install from a repo's settings (cloud sessions), copy `agents/*.md` into the app's `.claude/agents/` and `skills/design-handoff/` into the app's `.claude/skills/`, from one pinned commit of this repo, recorded in the app's `routine/TEAM-VERSION.md`, as for the dev team. The four account skills still come from the account.
+- **Install it.** In the app's Claude Code session: `/plugin marketplace add yeunglee95-gif/Agent-Teams`, then `/plugin install design-team@agent-teams`. The roles are then `design-team:designer`, `design-team:design-auditor` and `design-team:design-critic`.
+- **Or copy it.** Where plugins do not install from a repo's settings (cloud sessions), copy `agents/*.md` into the app's `.claude/agents/` and `skills/design-handoff/` and `skills/design-critique/` into the app's `.claude/skills/`, from one pinned commit of this repo, recorded in the app's `routine/TEAM-VERSION.md`, as for the dev team. The four account skills still come from the account.
 - To try it from a checkout of this repo: `claude --plugin-dir plugins/design-team`.
 
 ## Evals
 
-Behavior evals for the design-auditor are in `evals/<case>/` (`case.yaml`, `prompt.md`, `seed.sh`, `graders/`), in the dev team's format. Each seeds a tiny static app with a `DESIGN.md` and a hand-off, plants defects, and grades the report and that no seeded file changed. Run them from the repo root:
+Behavior evals for the design-auditor and the design-critic are in `evals/<case>/` (`case.yaml`, `prompt.md`, `seed.sh`, `graders/`), in the dev team's format. Each seeds a tiny static app with a `DESIGN.md` and a hand-off, plants defects, and grades the report and that no seeded file changed. Run them from the repo root:
 
 ```
 claude plugin eval plugins/design-team -j 3 --scaffold --allow-tools Bash Write Edit --ablation none --judge-model sonnet --no-publish --trust-plugin
 ```
 
-The cases do not rely on the account skills, since the eval sandbox may not have them; they pass from the role's own text. Results land in `evals/results/`, which is not committed.
+`design-critique-planted` plants three design problems its own hand-off asks for, and checks that the design-critic reports them anyway, writes first impressions first, and names its Claude fallback, because the sandbox has no Codex. The cases do not rely on the account skills, since the eval sandbox may not have them; they pass from the role's own text. Results land in `evals/results/`, which is not committed.

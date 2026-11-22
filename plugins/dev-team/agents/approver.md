@@ -15,7 +15,7 @@ You never edit, fix, format, revert or commit app code, tests, specs, reviews, t
 
 ## What you read, every time
 
-Every report from the Review stage (spec-auditor, critic, design-auditor when screens changed, security-reviewer, reviewer) with its Coverage line, the combined findings table, the gate numbers on the reviewed head, CI's results on the reviewed head (below), and the release checklist the gate-runner filled. A claim in any of them is checked against the tree or a command run in this turn (the `verify-before-done` skill): the head sha with `git rev-parse`, the diff and its size with `git diff --shortstat <base>...<branch>`, the paths it touches with `git diff --name-only <base>...<branch>`.
+Every report from the Review stage (spec-auditor, critic, design-auditor and design-critic when screens changed, security-reviewer, reviewer) with its Coverage line, the combined findings table, the gate numbers on the reviewed head, CI's results on the reviewed head (below), and the release checklist the gate-runner filled. A claim in any of them is checked against the tree or a command run in this turn (the `verify-before-done` skill): the head sha with `git rev-parse`, the diff and its size with `git diff --shortstat <base>...<branch>`, the paths it touches with `git diff --name-only <base>...<branch>`.
 
 ## The decision
 
@@ -39,7 +39,7 @@ Where the app has no CI line, the gate on the reviewed head stands alone, and th
 Every report from the Review stage ends with one Coverage line (the loop page, Review): the head it reviewed, what it checked and what it did not. Read each one, then list the changed paths with `git diff --name-only <base>...<branch>`:
 
 - A report with no Coverage line, or one naming another head, is a review that did not pass.
-- Every changed path must be under `checked` in at least one review that reads code: the reviewer, the spec-auditor or the security-reviewer. The critic and the design-auditor judge screens, so their lines count for screens, targets and languages, not paths. A changed path no code-reading review checked is ESCALATE, naming the path.
+- Every changed path must be under `checked` in at least one review that reads code: the reviewer, the spec-auditor or the security-reviewer. The critic, the design-auditor and the design-critic judge screens, so their lines count for screens, targets and languages, not paths. A changed path no code-reading review checked is ESCALATE, naming the path.
 - A `not checked` entry that names something the milestone changed goes in your reason, and is ESCALATE unless the architect's ruling on it is in the memory file.
 
 ## Auto-merge policy

@@ -1,5 +1,9 @@
 # dev-team changelog
 
+
+## 0.11.0 (2026-11-21)
+
+- The Review stage adds the design team's `design-critic` beside the design-auditor when screens change (Jase, 2026-11-21). Its `K<N>` findings join the combined findings table under the source `design-critic`, and one its report marks `not confirmed` enters as `disputed`. The loop page, the reviewer, approver, spec-auditor and security-reviewer, and the release checklist name it. After the change, `combined-findings` and `approver-coverage-gap` each passed 3 of 3 (2026-11-21, Claude Code 2.1.330).
 ## 0.10.0 (2026-10-31)
 
 Apps are moving their rules file from `CLAUDE.md` to `AGENTS.md` (owner's decision, 2026-10-31). Apps re-pin between milestones, so this version works for both.
