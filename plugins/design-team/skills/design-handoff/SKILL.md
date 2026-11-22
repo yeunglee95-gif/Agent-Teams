@@ -21,7 +21,7 @@ The app's design system (the file its `AGENTS.md` (or `CLAUDE.md` where the app 
 
 ## Each screen file
 
-1. **Purpose.** One or two sentences: who uses this screen, for what.
+1. **Purpose and main action.** One or two sentences: who uses this screen, for what. Then, for the screen and each key state, its one main element and one main action, and how every other action is demoted (a quieter style, a menu, another screen). Two controls that do the same thing on one screen are named here with the reason, or one goes. The design-auditor checks the build against this line, and the design-critic judges the screen without it.
 2. **Layout.** Regions in reading order, with the spacing and type tokens each uses.
 3. **States.** Every state the screen can be in, each named: default, loading, empty, error, disabled, and, for each control, hover, pressed and focus. Day and night where the app has both. A state the screen cannot reach says so ("no empty state: the list always has the seeded row").
 4. **Tokens used.** Semantic token names only (`--color-text-muted`, not a hex). A value the design system does not have is not invented here: it goes to `proposals.md`.
@@ -43,3 +43,5 @@ A hand-off extends the design system; it never replaces it. A new token, a chang
 ## Source
 
 Written by this team, from OS Flow's spec/09 (Design Hand-off and Folder Mapping, repo yeunglee95-gif/os-flow) and the owner's design-team scope of 2026-10-10. No outside text was copied.
+
+The main-action line in Purpose is an idea from `references/light-path.md` in oil-oil/oil-ui at `eebeee4` (MIT, Copyright (c) 2026 oil-oil), rewritten; no text copied (Jase, 2026-11-22).
