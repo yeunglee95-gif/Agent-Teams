@@ -1,7 +1,7 @@
 {
   "name": "toolkit",
-  "version": "0.3.0",
-  "description": "General-purpose skills any team or app can use: watch a video in detail (frames plus transcript), find and install skills from the open skills ecosystem, caveman voice for terse replies, and browser automation via agent-browser. Third-party skills are kept unmodified apart from a Source section.",
+  "version": "0.4.0",
+  "description": "General-purpose skills any team or app can use: watch a video in detail (frames plus transcript), find and install skills from the open skills ecosystem, caveman voice for terse replies, browser automation via agent-browser (Chrome-based), and headless browser automation via obscura (no Chrome needed). Third-party skills are kept unmodified apart from a Source section.",
   "author": {
     "name": "Jase"
   },
@@ -13,6 +13,8 @@
     "skills",
     "caveman",
     "agent-browser",
-    "browser"
+    "browser",
+    "obscura",
+    "headless"
   ]
 }

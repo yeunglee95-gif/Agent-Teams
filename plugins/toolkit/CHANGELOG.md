@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2026-11-22)
+
+- Added `obscura` skill: headless browser for AI agents and web scraping via the Obscura CLI. Written by this team.
+
 ## 0.3.0 (2026-11-20)
 
 - Added `agent-browser` skill: browser automation for AI agents via the agent-browser CLI. Written by this team.
