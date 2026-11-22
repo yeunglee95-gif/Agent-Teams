@@ -36,6 +36,7 @@
           "properties": { "what": { "type": "string" }, "what_zh": { "type": "string" }, "on": { "type": "string", "format": "date" } }
         },
         "stamps": { "type": "array", "items": { "type": "object", "required": ["label", "value"], "properties": { "label": { "type": "string" }, "value": { "type": "string" } } }, "description": "Small mono facts beside the timestamp, e.g. Branch, Rulings." },
+        "store": { "type": "string", "enum": ["embed", "db"], "description": "1.5: where the board keeps its records. embed (the default) inlines forge.json into board.html; db keeps them in the published page's own database, written with forge.mjs sync, so a change needs no republish (build spec 5.3c)." },
         "links": {
           "type": "object", "additionalProperties": { "type": "string", "format": "uri" },
           "description": "artifact (the published page), chat (the build chat where Jase answers asks; the board shows it as Answer in), live (the deployed app), repo, and any other named link."

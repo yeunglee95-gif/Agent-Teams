@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.5.2 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.6.0 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -529,10 +529,44 @@
   function el(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content; }
   function norm(s) { return String(s == null ? '' : s).trim().toLowerCase(); }
 
+  // Contract 1.5: a board whose project.store is "db" embeds only a shell and reads its records from the page's own
+  // database, collection "board": one "meta" document and the big lists in chunks "<section>-<n>". forge.mjs
+  // (boardDocs, assembleBoard) writes and joins them the same way; keep the two in step. It draws again on each change.
+  var CHUNKED = ['asks', 'decisions', 'work'];
+  function assembleBoard(docs) {
+    var meta = docs.filter(function (x) { return x.id === 'meta'; })[0];
+    var d = {}; var m = (meta && meta.body && meta.body.data) || {};
+    Object.keys(m).forEach(function (k) { d[k] = m[k]; });
+    CHUNKED.forEach(function (section) {
+      var parts = docs.filter(function (x) { return x.body && x.body.kind === 'chunk' && x.body.section === section; }).sort(function (a, b) { return a.body.n - b.body.n; });
+      d[section] = [].concat.apply([], parts.map(function (x) { return x.body.items || []; }));
+    });
+    return d;
+  }
+  function loadFromDb(shell, cb) {
+    var api = window.claude && typeof window.claude.use === 'function' ? window.claude : null;
+    if (!api) return cb(new Error('This board keeps its data in its page database. Open it on claude.ai, signed in, to read it.'));
+    var got = false;
+    var timer = setTimeout(function () { if (!got) cb(new Error('The board\'s data could not be reached yet. Check the connection, then reload.')); }, 10000);
+    api.use('db').then(function (db) {
+      if (!db) { clearTimeout(timer); return cb(new Error('This view cannot read the board\'s data. Open it on claude.ai, signed in.')); }
+      db.collection('board').onSnapshot(function (snap) {
+        var docs = snap.docs.filter(function (x) { return x.exists; }).map(function (x) { return { id: x.id, body: x.data() }; });
+        if (!docs.length) { if (!snap.metadata.fromCache) { got = true; clearTimeout(timer); cb(new Error('No data has been synced to this board yet. Run node forge/forge.mjs sync and apply its batch.')); } return; }
+        got = true; clearTimeout(timer);
+        cb(null, assembleBoard(docs));
+      }, function (e) { clearTimeout(timer); cb(new Error('The board\'s data stopped loading (' + (e && e.code) + '). Reload the page.')); });
+    }, function () { clearTimeout(timer); cb(new Error('This view cannot read the board\'s data.')); });
+  }
+
   function load(cb) {
     var inlineData = document.getElementById('forge-data');
     var text = inlineData && inlineData.textContent.trim();
-    if (text) { try { return cb(null, JSON.parse(text)); } catch (e) { return cb(e); } }
+    if (text) {
+      var parsed; try { parsed = JSON.parse(text); } catch (e) { return cb(e); }
+      if (parsed && parsed.project && parsed.project.store === 'db') return loadFromDb(parsed, cb);
+      return cb(null, parsed);
+    }
     if (location.protocol === 'file:') return cb(new Error('Open forge/board.html (the built page), or serve this folder. A file:// page cannot read forge.json next to it.'));
     fetch('./forge.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('forge.json: HTTP ' + r.status); return r.json(); }).then(function (d) { cb(null, d); }).catch(cb);
   }
