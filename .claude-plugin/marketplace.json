@@ -18,7 +18,7 @@
     {
       "name": "toolkit",
       "source": "./plugins/toolkit",
-      "description": "General-purpose skills for any team or app: watch a video in detail, and find and install skills from the open skills ecosystem."
+      "description": "General-purpose skills for any team or app: watch a video in detail, find and install skills, browser automation, and decide, which weighs a choice the way the project's owner does."
     },
     {
       "name": "forge",

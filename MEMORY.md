@@ -4,11 +4,12 @@ _The memory home for this repo. OS Flow reads it as Agent-Teams' memory (it is l
 
 ## Current State
 
-- **Versions:** dev-team 0.11.0, design-team 0.4.1, toolkit 0.4.0, forge 0.4.0, crew-progress 0.2.1, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
+- **Versions:** dev-team 0.11.0, design-team 0.4.1, toolkit 0.5.0, forge 0.4.0, crew-progress 0.2.1, auto-handoff 0.8.6-fork.5, cache-tax 2.4.1 and filetree 0.8.3; dev-team evals recorded 2026-11-01 (PR #18: 61 of 66). Details are in each team's `CHANGELOG.md`.
 - **History before 2026-11-01:** decisions about this repo were logged in OS Flow's memory (repo yeunglee95-gif/OS-Flow), from the 2026-10-04 set-up entries in `ARCHIVE.md` § Decisions index to the later ones in `memory/team-and-m4.md` and `memory/forge-and-process.md`. They stay there; new decisions go below.
 
 ## Decisions
 
+- **2026-11-23 (Jase, from OS Flow a-271 a): a `decide` skill in the toolkit (0.5.0) weighs every choice put to the owner the way they do, and a replay runner scores it against their real picks; the principles, overrides and cases stay in each project's `context/decide/`.** This repo is public and the record quotes his private reasons, so only the method, formats and runner live here; plain markdown so Codex and other models use it.
 - **2026-11-22 (Jase): `shelf/` keeps skills for a future need without loading them: brand-identity (OS Flow business users' own brands), dimensional-drawing (Geniotek product spec sheets) and Memento's skill-evolution engine (Floki improving skills from a user's workflow, with the user's approval in place of its auto-deploy).** Rejected adding them as skills now, since an unused skill still costs tokens; Awwwards-mcp and oil-ui as a whole skill are rejected (design-team `skills/REJECTED.md`).
 - **2026-11-22 (Jase): two oil-ui ideas join the design team, rewritten: the design-critic's blind walk of the running app, and one main action per screen in the hand-off (design-team 0.4.1).** Screenshots alone missed competing controls and hidden panels; rejected the whole skill (paid upsell, phones home, its own visual direction).
 - **2026-11-22 (Jase, from OS Flow a-237 "b" on 2026-11-20): the Forge keeps its records in the published page's own database and a move writes only the changed chunks; sessions walk live rows with `rows` and edit by id, never rewriting or re-reading the whole board (forge 0.4.0, contract 1.5, renderer 1.6.0).** A republish read the whole 750 KB page first, about 440k tokens per move on OS Flow; rejected a directory of small pages (a-237 "a").
