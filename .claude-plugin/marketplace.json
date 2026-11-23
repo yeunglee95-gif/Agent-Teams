@@ -18,7 +18,7 @@
     {
       "name": "toolkit",
       "source": "./plugins/toolkit",
-      "description": "General-purpose skills for any team or app: watch a video in detail, find and install skills, browser automation, and decide, which weighs a choice the way Jase does."
+      "description": "General-purpose skills for any team or app: watch a video in detail, find and install skills, browser automation, and decide, which weighs a choice the way the project's owner does."
     },
     {
       "name": "forge",

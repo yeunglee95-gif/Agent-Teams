@@ -1,9 +1,24 @@
 #!/usr/bin/env python3
 """Replay test for the decide skill.
 
-Each case in cases.jsonl is a past ask with Jase's pick and reason hidden. The
-runner asks a model to choose twice, once with the skill and once without, and
-scores agreement with his real pick.
+Each case is a past ask with the owner's pick and reason hidden. The runner
+asks a model to choose twice, once with the skill (SKILL.md plus the project's
+principles.md and overrides.md) and once without, and scores agreement with
+the real pick. Cases, principles, overrides and results all stay in the
+project, never in Agent-Teams.
+
+Inputs (from the project, for example context/decide/):
+  principles.md   ranked principles (format: skills/decide/templates/principles.md)
+  overrides.md    override log (format: skills/decide/templates/overrides.md)
+  cases.jsonl     one JSON object per line:
+    id           string, unique, used in file names
+    date         YYYY-MM-DD
+    context      what was going on, as the owner saw it
+    question     the ask
+    options      list of {"key": "a", "text": "..."}
+    recommended  key of the option recommended to the owner, or null
+    pick         key the owner picked (hidden from the model)
+    reason       the owner's words (hidden from the model; kept for review)
 
 Backends:
   --backend cmd --cmd "codex exec -"   pipe each prompt to a command, read stdout
@@ -15,8 +30,9 @@ Backends:
                                        run `score --out <dir>`
 
 Usage:
-  python3 run.py run --backend cmd --cmd "codex exec -" --label codex
-  python3 run.py score --out answers/ --label claude
+  python3 run.py run --context ctx/ --out res/ --backend cmd --cmd "codex exec -" --label codex
+  python3 run.py run --context ctx/ --out res/                # write prompt files
+  python3 run.py score --context ctx/ --out res/ --label claude
 """
 import argparse, json, os, pathlib, re, subprocess, sys, urllib.request
 
@@ -33,19 +49,26 @@ def load_cases(path):
     return cases
 
 
-def skill_text():
-    return "\n\n".join((SKILL / f).read_text() for f in ("SKILL.md", "principles.md", "calibration.md"))
+def skill_text(ctx):
+    parts = [(SKILL / "SKILL.md").read_text()]
+    for f in ("principles.md", "overrides.md"):
+        path = ctx / f
+        if path.exists():
+            parts.append(f"<{f}>\n" + path.read_text() + f"\n</{f}>")
+        else:
+            print(f"warning: no {path}", file=sys.stderr)
+    return "\n\n".join(parts)
 
 
-def prompt(case, arm):
+def prompt(case, arm, ctx, owner):
     opts = "\n".join(f"- {o['key']}: {o['text']}" for o in case["options"])
     rec = f"\nThe assistant recommended: {case['recommended']}\n" if case.get("recommended") else ""
     head = ""
     if arm == "with":
-        head = "Use this skill to decide as Jase would.\n\n<skill>\n" + skill_text() + "\n</skill>\n\n"
+        head = f"Use this skill to decide as {owner} would.\n\n<skill>\n" + skill_text(ctx) + "\n</skill>\n\n"
     return (
         head
-        + "You are choosing on behalf of Jase, a founder, the option he picked.\n\n"
+        + f"Predict the option {owner} picked.\n\n"
         + f"Context: {case['context']}\n\nQuestion: {case['question']}\n\nOptions:\n{opts}\n{rec}\n"
         + "Answer with one line, exactly `PICK: <key>`, then at most two lines of reasoning."
     )
@@ -101,15 +124,18 @@ def score(cases, answers, label):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=("run", "score"))
-    ap.add_argument("--cases", default=str(HERE / "cases.jsonl"))
+    ap.add_argument("--context", required=True, help="the project's decide folder")
+    ap.add_argument("--cases", help="default: <context>/cases.jsonl")
+    ap.add_argument("--owner", default="the project's owner")
     ap.add_argument("--backend", choices=("cmd", "openai", "files"), default="files")
     ap.add_argument("--cmd")
     ap.add_argument("--model")
-    ap.add_argument("--out", default=str(HERE / "results"))
+    ap.add_argument("--out", required=True, help="results folder, kept in the project")
     ap.add_argument("--label", default="model")
     args = ap.parse_args()
 
-    cases = load_cases(pathlib.Path(args.cases))
+    ctx = pathlib.Path(args.context)
+    cases = load_cases(pathlib.Path(args.cases) if args.cases else ctx / "cases.jsonl")
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     answers = {}
@@ -117,7 +143,7 @@ def main():
     if args.mode == "run":
         for c in cases:
             for a in ARMS:
-                p = prompt(c, a)
+                p = prompt(c, a, ctx, args.owner)
                 if args.backend == "files":
                     (out / f"{c['id']}.{a}.prompt").write_text(p)
                     continue

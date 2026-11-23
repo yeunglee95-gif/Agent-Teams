@@ -2,7 +2,7 @@
 
 ## 0.5.0 (2026-11-23)
 
-- Added `decide`: weigh a choice the way Jase does (aspects, pros and cons, one recommendation) and present it the way he reads it, with his ranked principles, an override log, and a replay test in `evals/decide/`. Written by this team, from a-271 (a). Draft: principles come from this repo's memory only until the OS Flow decision log is read.
+- Added `decide`: weigh a choice the way the project's owner does (aspects, pros and cons, one recommendation) and present it the way they read it. The owner's principles, overrides and replay cases stay in each project's `context/decide/`, with formats in `skills/decide/templates/`; `evals/decide/run.py` scores a model with and without the skill. Written by this team, from a-271 (a).
 
 ## 0.4.0 (2026-11-22)
 
