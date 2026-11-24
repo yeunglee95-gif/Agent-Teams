@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0 (2026-11-24)
+
+- Added `orchestrator`: the main chat keeps Jase, the decisions, the Forge and the merge, and every task runs as its own worker (a cloud session, a local background agent or a Codex lane) that reports back until done, then is merged and closed. Written by Jase.
+
 ## 0.5.0 (2026-11-23)
 
 - Added `decide`: weigh a choice the way the project's owner does (aspects, pros and cons, one recommendation) and present it the way they read it. The owner's principles, overrides and replay cases stay in each project's `context/decide/`, with formats in `skills/decide/templates/`; `evals/decide/run.py` scores a model with and without the skill. Written by this team, from a-271 (a).
