@@ -27,7 +27,7 @@ plugins/
     evals/                         behavior evals for the design-auditor
     THIRD_PARTY.md                 the account skills it references, not copies
     README.md, CHANGELOG.md
-  toolkit/                         general skills (watch, caveman, find-skills)
+  toolkit/                         general skills (watch, caveman, find-skills, decide, orchestrator)
   forge/
     skills/forge/                  the /forge skill
     master/                        the Forge's master renderer, contract, tool and build spec
