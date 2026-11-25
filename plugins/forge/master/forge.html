@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- forge renderer 1.6.0 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
+<!-- forge renderer 1.6.1 · master: Agent-Teams plugins/forge/master/forge.html · do not edit a copy; refresh it with `node forge/forge.mjs update` -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -530,15 +530,20 @@
   function norm(s) { return String(s == null ? '' : s).trim().toLowerCase(); }
 
   // Contract 1.5: a board whose project.store is "db" embeds only a shell and reads its records from the page's own
-  // database, collection "board": one "meta" document and the big lists in chunks "<section>-<n>". forge.mjs
+  // database, collection "board": one "meta" document and the big lists in chunks listed in meta.order. forge.mjs
   // (boardDocs, assembleBoard) writes and joins them the same way; keep the two in step. It draws again on each change.
   var CHUNKED = ['asks', 'decisions', 'work'];
   function assembleBoard(docs) {
     var meta = docs.filter(function (x) { return x.id === 'meta'; })[0];
     var d = {}; var m = (meta && meta.body && meta.body.data) || {};
     Object.keys(m).forEach(function (k) { d[k] = m[k]; });
+    var order = meta && meta.body && meta.body.order;
+    var byId = {}; docs.forEach(function (x) { byId[x.id] = x; });
     CHUNKED.forEach(function (section) {
-      var parts = docs.filter(function (x) { return x.body && x.body.kind === 'chunk' && x.body.section === section; }).sort(function (a, b) { return a.body.n - b.body.n; });
+      // forge 0.4.1 lists the chunks in meta.order; a board written by 1.6.0 has numbered chunks instead.
+      var parts = order && order[section]
+        ? order[section].map(function (id) { return byId[id]; }).filter(Boolean)
+        : docs.filter(function (x) { return x.body && x.body.kind === 'chunk' && x.body.section === section; }).sort(function (a, b) { return a.body.n - b.body.n; });
       d[section] = [].concat.apply([], parts.map(function (x) { return x.body.items || []; }));
     });
     return d;

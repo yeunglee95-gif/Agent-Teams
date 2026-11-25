@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 (2026-11-25)
+
+- Renderer 1.6.1: database chunks are cut where the records say, not by position (Jase, 2026-11-25). A chunk ends after a record whose key hashes to 0 mod 25 (60 records at most), and `meta.order` keeps chunk order, so a record added at the top, the bottom or the middle rewrites only its own chunk. On OS Flow's board a new decision rewrote all 21 decision chunks; now it rewrites 1. Boards written by 1.6.0 still read back in order.
+- Moving to it: `update`, `build`, republish the shell, then `sync`. The first sync replaces every chunk once.
+- Tests: 11 pass, including the page's assembly matching the tool's on the same data.
+
 ## 0.4.0 (2026-11-22)
 
 - Contract 1.5 and renderer 1.6.0: a board can keep its records in the published page's own database (`project.store: "db"`, build spec 5.3c; Jase, 2026-11-20, OS Flow a-237 "b"). `sync` writes only the changed chunks as `ArtifactData` batches and `sync --record` saves their versions, so a moved ask costs a data write instead of a republish (about 440k tokens on OS Flow). `build` makes a database board's page a shell; boards without `store` embed as before.

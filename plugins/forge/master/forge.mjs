@@ -16,7 +16,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 
-const RENDERER_VERSION = '1.6.0';
+const RENDERER_VERSION = '1.6.1';
 const MASTER_FILES = ['forge.html', 'forge.schema.json', 'forge.mjs'];
 const PLACEHOLDER = '<script type="application/json" id="forge-data"></script>';
 const MARK_START = '<!-- GENERATED:forge from forge/forge.json by forge/forge.mjs. Do not edit by hand. -->';
@@ -29,37 +29,67 @@ const HOUR = 3600000;
 // A board whose project.store is "db" keeps its records in the published page's own database, so a change is a
 // small data write instead of a republish (one republish read the whole 750 KB page, about 440k tokens). forge.json
 // stays the source under git. The page's collection "board" holds one "meta" document (everything but the big
-// lists) and the lists in fixed chunks of CHUNK records, "<section>-<n>": editing one ask rewrites one chunk.
+// lists) and the lists in chunks of about CHUNK records: editing one ask rewrites one chunk.
 export const STORE_COLLECTION = 'board';
-export const CHUNK = 25;
+// Chunks are cut where the records themselves say, not by position (forge 0.4.1, Jase 2026-11-25): a chunk ends after
+// a record whose key hashes to 0 mod CHUNK, so adding a record at the top, the bottom or the middle rewrites only the
+// chunk it lands in. OS Flow adds decisions at the top, so position cuts rewrote all 21 decision chunks per decision.
+// A chunk's id comes from its first record's key; meta.order keeps the chunks in board order.
+export const CHUNK = 25; // records per chunk, on average
+export const CHUNK_MAX = 60; // a chunk never holds more
 export const CHUNKED = ['asks', 'decisions', 'work'];
 const DOC_MAX = 240 * 1024; // the store's limit is 256 KiB a document
 const BATCH_MAX_WRITES = 50, BATCH_MAX_BYTES = 900 * 1024; // ArtifactData batch: 50 writes, 1 MiB body
+
+const keyOf = (x) => (x && (x.id != null ? String(x.id) : x.code != null ? String(x.code) : x.date != null || x.title != null ? `${x.date}|${x.title}` : JSON.stringify(x)));
+const h32 = (t) => crypto.createHash('sha256').update(t).digest().readUInt32BE(0);
 
 export function boardDocs(d) {
   const docs = new Map();
   const meta = {};
   for (const [k, v] of Object.entries(d)) if (!CHUNKED.includes(k)) meta[k] = v;
-  docs.set('meta', { kind: 'meta', data: meta });
+  const order = {};
+  const chunks = [];
   for (const section of CHUNKED) {
     const list = Array.isArray(d[section]) ? d[section] : [];
-    for (let n = 0; n * CHUNK < list.length; n++) docs.set(`${section}-${n}`, { kind: 'chunk', section, n, items: list.slice(n * CHUNK, (n + 1) * CHUNK) });
+    order[section] = [];
+    let cur = [];
+    const close = () => {
+      if (!cur.length) return;
+      let id = `${section}-${h32(keyOf(cur[0])).toString(36)}`;
+      while (order[section].includes(id)) id += 'x'; // two chunks starting with the same key
+      order[section].push(id);
+      chunks.push([id, { kind: 'chunk', section, items: cur }]);
+      cur = [];
+    };
+    for (const item of list) {
+      cur.push(item);
+      if (h32(keyOf(item)) % CHUNK === 0 || cur.length >= CHUNK_MAX) close();
+    }
+    close();
   }
+  docs.set('meta', { kind: 'meta', data: meta, order });
+  for (const [id, body] of chunks) docs.set(id, body);
   return docs;
 }
 
-// The renderer carries the same assembly (forge.html, assembleBoard); keep the two in step.
+// The renderer carries the same assembly (forge.html, assembleBoard); keep the two in step. A board written by the
+// 1.6.0 layout has numbered chunks and no meta.order, and still reads back in order.
 export function assembleBoard(docs) {
   const meta = docs.find((x) => x.id === 'meta');
   const d = { ...((meta && meta.body.data) || {}) };
+  const order = meta && meta.body.order;
+  const byId = new Map(docs.map((x) => [x.id, x]));
   for (const section of CHUNKED) {
-    const parts = docs.filter((x) => x.body && x.body.kind === 'chunk' && x.body.section === section).sort((a, b) => a.body.n - b.body.n);
+    const parts = order && order[section]
+      ? order[section].map((id) => byId.get(id)).filter(Boolean)
+      : docs.filter((x) => x.body && x.body.kind === 'chunk' && x.body.section === section).sort((a, b) => a.body.n - b.body.n);
     d[section] = parts.flatMap((x) => x.body.items || []);
   }
   // Key order as forge.json writes it, so a round trip compares equal.
-  const order = ['forge', 'project', 'updated', 'updated_by', 'headline', 'asks', 'milestones', 'work', 'team', 'goal', 'progress', 'decisions', 'glossary', 'usage', 'usage_note', 'extensions'];
+  const keys = ['forge', 'project', 'updated', 'updated_by', 'headline', 'asks', 'milestones', 'work', 'team', 'goal', 'progress', 'decisions', 'glossary', 'usage', 'usage_note', 'extensions'];
   const out = {};
-  for (const k of order) if (k in d) out[k] = d[k];
+  for (const k of keys) if (k in d) out[k] = d[k];
   for (const k of Object.keys(d)) if (!(k in out)) out[k] = d[k];
   return out;
 }
