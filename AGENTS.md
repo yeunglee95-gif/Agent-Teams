@@ -14,7 +14,21 @@ This repo is a Claude Code plugin marketplace; what it holds and how apps use it
 - **Codex and any other non-Claude agent read this same file (Jase, 2026-11-01).** Follow every rule here. Skip only the steps that name a Claude-only tool (skills, the Agent tool, model aliases such as `fable` or `opus`), and do the step's intent with your own tools.
 - **Decisions (Jase, 2026-11-01).** Log every decision in `MEMORY.md` § Decisions the turn it is made: date, who, what was chosen, what was rejected, why, in two sentences at most.
 - **Team input.** Never delete or overwrite a teammate's content without Jase's instruction; version on top instead, keeping the original labelled as the prior version.
-- **Action tiers.** Green: read, diagnose, draft, write or change roles and skills, run evals, commit and push a working branch. Red, which waits for Jase's explicit "proceed" each time and never batches: merge or push to `main` (apps copy pinned commits of it, so a merge releases a team version), tags, anything that spends money, shares a URL or reaches the team.
+- **Action tiers.** Green: read, diagnose, draft, write or change roles and skills, run evals, commit and push a working branch. Red, which waits for Jase's explicit "proceed" each time and never batches: merge or push to `main` (apps copy pinned commits of it, so a merge releases a team version), except a merge Review by risk allows; tags; anything that spends money, shares a URL or reaches the team.
+
+- **Review by risk (Jase, 2026-11-25).** Every change merges through a pull request, and its tier decides who says yes. Name the tier in the pull request and in the reply that reports it.
+  - **Agent only: merge once its checks pass, then report the pull request link in that turn's reply.** Every changed file is one of these, and the change is under 400 changed lines, not counting tests and eval cases:
+    - Text that records what was already decided: `MEMORY.md`, a `CHANGELOG.md`, a README or a doc.
+    - A role or skill edit whose eval cases all pass in the same change: its own cases and those of every role that loads it, with the results in its `CHANGELOG.md`.
+    - A Forge tool or renderer fix whose tests all pass and which keeps the contract version and every rule Jase set.
+  - **Jase:** everything else, and always:
+    - A change to the action tiers, the standing rules or this list.
+    - A change to what any role may do about merging, sending, spending, publishing or live data.
+    - A new plugin, role or third-party code (its licence).
+    - Removing a skill, role or plugin, or a model routing change.
+    - A new Forge contract version, or a change to what the board shows Jase.
+  - **Two people:** nothing in this repo has money or legal effect beyond licences, which Jase reviews.
+  - **The first time an agent-only merge breaks something** in an app, that kind of change moves to Jase, logged in `MEMORY.md`.
 
 ## Editorial rules
 
