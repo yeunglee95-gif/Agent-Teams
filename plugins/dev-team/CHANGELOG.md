@@ -4,7 +4,7 @@
 
 ## 0.12.0 (2026-11-26)
 
-- The loop page gains Model routing (Jase, 2026-11-26): one table for every project of which work goes to which Claude role, which to ChatGPT through Codex (bounded lanes with named tests, mechanical fixes, docs, a second-model review, the design critique) and which stays with Claude (decisions, architecture, approval). The Fable advisor appears only as a trial. A project's `AGENTS.md` states `Codex: available (ChatGPT plan)` or `Codex: none`. Role models are unchanged and stay in `evals/ROUTING.md`.
+- The loop page gains Model routing (Jase, 2026-11-26): one table for every project of which work goes to which Claude role, which to ChatGPT through Codex (bounded lanes with named tests, mechanical fixes, docs, a second-model review, the design critique) and which stays with Claude (decisions, architecture, approval). The Fable advisor appears only as a trial. A project's `AGENTS.md` states `Codex: available (ChatGPT plan)` or `Codex: none`. Role models are unchanged and stay in `evals/ROUTING.md`. After the change, `retro-cost-view` and `combined-findings` each passed 3 of 3 (2026-11-26, one run at a time).
 ## 0.11.0 (2026-11-21)
 
 - The Review stage adds the design team's `design-critic` beside the design-auditor when screens change (Jase, 2026-11-21). Its `K<N>` findings join the combined findings table under the source `design-critic`, and one its report marks `not confirmed` enters as `disputed`. The loop page, the reviewer, approver, spec-auditor and security-reviewer, and the release checklist name it. After the change, `combined-findings` and `approver-coverage-gap` each passed 3 of 3 (2026-11-21, Claude Code 2.1.330).
