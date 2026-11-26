@@ -70,6 +70,24 @@ Where the app's `AGENTS.md` names CI (`CI: <the required checks>` and how to rea
 
 Off unless the app's `AGENTS.md` turns it on, per project. It needs two lines there: `Auto-merge: safe changes` (or `Auto-merge: off`) and a line saying whether merging to main deploys (`Merging to main deploys: no`, or `yes`). If either line is missing, auto-merge is off. Optional lines: `Auto-merge size limit: <N> changed lines` (default 400), `Auto-merge may deploy: yes`, and an always-ask list. Only the approver merges under it, and only inside the limits written in its role (`agents/approver.md`, Auto-merge policy). Sending, spending, publishing and touching live data stay the owner's whatever the setting. With auto-merge off, an APPROVE goes to the owner for the go at stage 12.
 
+## Model routing
+
+Which model does which job, for every project on this loop (Jase, 2026-11-26). A role's own model is its role file's `model:` line, and the evidence for it is `evals/ROUTING.md`; this section adds the models outside the roles. A project's `AGENTS.md` states only `Codex: available (ChatGPT plan)` or `Codex: none` and, during a trial, `Advisor: <model>`.
+
+| Work | Done by | Advisor | Second look |
+|---|---|---|---|
+| Orchestrating, plans, rulings | the main session (Claude Opus) | Fable, on trial only | the owner, on Red actions |
+| Architecture, hard bugs | architect; the fixer's `opus` step-up | Fable, on trial only | reviewer |
+| Bounded lanes with named tests, mechanical fixes, docs | ChatGPT through Codex where available, else the owner role or the fixer on their own models | none | the Claude reviewer before it merges |
+| Routine and surface fixes | fixer on `sonnet` | none | its reviewer re-checks |
+| Reviews | the Review stage roles; where Codex is available, one Codex review may join as a second model | none | the combined findings table |
+| Design critique | ChatGPT `gpt-6.2-astra` (the design team's design-critic) | none | the Claude reader in that role |
+| Approval | approver | none | the owner, or the app's auto-merge setting |
+
+- **ChatGPT work** runs through `codex exec` on the owner's ChatGPT plan, never an API key, started only by the main session from a brief with named tests, on its own `codex/<topic>` branch. Its diff merges into the working branch only after the Claude reviewer (and the security-reviewer on a security surface) has read it. Codex makes no decision and writes no memory entry, Forge row or merge.
+- **An advisor** is a stronger Claude model the doing model consults at decision points (Claude Code's `/advisor`). Only Claude rows can have one, and it must rank at or above the doing model. It is off by default and turned on for a project only as a trial whose tokens and rework are compared with the previous milestone, like any routing change.
+- A route changes only with evidence: a cheaper or different setup is proposed with its eval or trial result, and one that failed is logged in `evals/routing-log.md`.
+
 ## Sessions
 
 How Claude Code sessions map to milestones, so parallel work does not collide and the prompt cache is not thrown away. A model switch mid-session drops the cache (`/model`, a plan-mode model toggle, a skill whose frontmatter names another model); an effort change on the 5.5 models keeps it. Each subagent has its own cache and its first request is uncached.

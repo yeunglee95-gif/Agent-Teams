@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "General-purpose skills any team or app can use: watch a video in detail (frames plus transcript), find and install skills from the open skills ecosystem, caveman voice for terse replies, browser automation via agent-browser (Chrome-based), headless browser automation via obscura (no Chrome needed) decide, which weighs a choice the way the project's owner does, from principles and overrides the project keeps, and orchestrator, which makes a project's main chat start, answer, merge and close a worker per task. Third-party skills are kept unmodified apart from a Source section.",
   "author": {
     "name": "Jase"

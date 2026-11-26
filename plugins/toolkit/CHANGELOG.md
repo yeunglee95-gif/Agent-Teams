@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1 (2026-11-26)
+
+- `orchestrator` picks each worker's model from the dev team's loop page, Model routing, instead of leaving each project to route on its own (Jase, 2026-11-26).
+
 ## 0.6.0 (2026-11-24)
 
 - Added `orchestrator`: the main chat keeps Jase, the decisions, the Forge and the merge, and every task runs as its own worker (a cloud session, a local background agent or a Codex lane) that reports back until done, then is merged and closed. Written by Jase.
