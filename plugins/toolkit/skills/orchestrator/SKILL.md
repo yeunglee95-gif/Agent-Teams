@@ -19,7 +19,7 @@ The steps below say what to do. "How each harness does it" at the end maps them 
 
 1. **Your address.** Find how a worker reaches the main chat (its session id, or a report path if the harness has no messaging). Every brief carries it.
 2. **Start it** from the working branch, on its own branch `task/<task-slug>`. A worker never pushes the working branch or `main`, and two workers never share a branch.
-3. **Pick its model and effort** as the project's AGENTS.md routes them. Never start a worker in a mode that waits for a person to approve a plan: nobody is watching it.
+3. **Pick its model and effort** as the dev team's loop page routes them (`workflows/milestone-loop.md`, Model routing) and the project's AGENTS.md says what it has (Codex, an advisor trial). Never start a worker in a mode that waits for a person to approve a plan: nobody is watching it.
 4. **Name it** `<Project>: <task>` and tag it with the project and the main chat's id, so Jase can find it.
 5. **Record it** on the Forge the same turn: the work row gets `who: {model, role}` and the worker's link or id in `ref`.
 
